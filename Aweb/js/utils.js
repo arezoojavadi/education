@@ -2,8 +2,8 @@
 // اتصال Supabase (مشترک بین همه صفحات)
 // ============================================
 // ⚠️ این مقادیر رو از فاز ۱ کپی کن
-const SUPABASE_URL = 'https://xxxxx.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOi...';
+const SUPABASE_URL = 'https://cfkwvzbqgapguuaqibmq.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_Qf3R9hPgjApwe2c-qQMoJA_jitobazq';
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ============================================
