@@ -1,28 +1,20 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#6C5CE7">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="آزمون">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/components.css">
-<link rel="stylesheet" href="css/animations.css">
-<link rel="stylesheet" href="css/skeletons.css">
-<link rel="stylesheet" href="css/print.css" media="print">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#6C5CE7">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="آزمون">
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>ورود | سامانه آزمون</title>
+  
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#6C5CE7">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="آزمون">
+  
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
 </head>
 <body class="auth-page">
 
@@ -30,7 +22,7 @@
     <div class="auth-header">
       <div class="logo">📝</div>
       <h1>سامانه آزمون</h1>
-      <p class="subtitle">کد ۴ رقمی خود را وارد کنید</p>
+      <p class="subtitle">کد ۶ رقمی خود را وارد کنید</p>
     </div>
 
     <div class="code-input-wrap">
@@ -38,10 +30,10 @@
         type="text" 
         id="codeInput" 
         class="code-input"
-        maxlength="4" 
+        maxlength="6" 
         inputmode="numeric" 
-        pattern="\d{4}" 
-        placeholder="----" 
+        pattern="\d{6}" 
+        placeholder="------" 
         autocomplete="off"
         autofocus
       >
@@ -60,22 +52,25 @@
     </div>
   </div>
 
-  <script src="js/errors.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // ⚠️ مقادیر رو جایگزین کن
-    const SUPABASE_URL = 'https://xxxxx.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOi...';
+    // ============================================
+    // اتصال به Supabase
+    // ============================================
+    const SUPABASE_URL = 'https://cfkwvzbqgapguuaqibmq.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_Qf3R9hPgjApwe2c-qQMoJA_jitobazq';
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const msg = document.getElementById('msg');
     const btn = document.getElementById('loginBtn');
     const input = document.getElementById('codeInput');
 
+    // فقط اعداد، حداکثر ۶ رقم
     input.addEventListener('input', e => {
-      e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4);
+      e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
     });
 
+    // Enter برای ورود
     input.addEventListener('keypress', e => {
       if (e.key === 'Enter') login();
     });
@@ -83,8 +78,8 @@
     async function login() {
       const code = input.value.trim();
 
-      if (!/^\d{4}$/.test(code)) {
-        showMsg('کد باید ۴ رقم باشه', 'error');
+      if (!/^\d{6}$/.test(code)) {
+        showMsg('کد باید ۶ رقم باشه', 'error');
         return;
       }
 
@@ -107,17 +102,27 @@
         return;
       }
 
-      const { data: profile } = await supabase
+      // گرفتن پروفایل
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('role, full_name, name_confirmed')
         .eq('id', data.user.id)
         .single();
 
+      if (profileError || !profile) {
+        showMsg('❌ خطا در بارگذاری اطلاعات', 'error');
+        btn.disabled = false;
+        btn.textContent = 'ورود به سامانه';
+        return;
+      }
+
+      // اگه اسم تأیید نشده → برو صفحه انتخاب نام
       if (!profile.name_confirmed) {
         window.location.href = 'choose-name.html';
         return;
       }
 
+      // تأیید شده → برو پنل
       window.location.href = profile.role === 'teacher' 
         ? 'teacher.html' 
         : 'student.html';
@@ -135,21 +140,11 @@
       localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
     }
 
+    // بازیابی تم
     if (localStorage.getItem('theme') === 'dark') {
       document.body.classList.add('dark');
       document.getElementById('themeIcon').textContent = '☀️';
     }
   </script>
 </body>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/utils.js"></script>
-<script src="js/errors.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/a11y.js"></script>
-<!-- اسکریپت مخصوص صفحه -->
 </html>
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<script src="js/a11y.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', initAccessibility);
-</script>
