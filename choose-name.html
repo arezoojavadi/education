@@ -220,7 +220,7 @@ html.dark .icon-sun  { opacity: 0; transform: rotate(90deg) scale(0.5); }
 html.dark .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
 
 /* ============================================================
-   APP LAYOUT
+   APP
 ============================================================ */
 .app {
   min-height: 100vh;
@@ -684,6 +684,60 @@ html.dark .suggestion:hover {
 }
 
 /* ============================================================
+   OVERLAY (Loading during save)
+============================================================ */
+.saving-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: rgba(15, 12, 36, 0.5);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  animation: overlayIn 0.2s var(--ease);
+}
+
+.saving-overlay.show { display: flex; }
+
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.saving-box {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: 32px 40px;
+  text-align: center;
+  box-shadow: var(--shadow-md);
+  animation: savingBoxIn 0.4s var(--bounce);
+}
+
+@keyframes savingBoxIn {
+  0% { opacity: 0; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.saving-spinner {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 16px;
+  border: 4px solid var(--input-border);
+  border-top-color: var(--brand-1);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.saving-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-1);
+}
+
+/* ============================================================
    RESPONSIVE
 ============================================================ */
 @media (max-width: 520px) {
@@ -808,6 +862,14 @@ html.dark .suggestion:hover {
   </div>
 </main>
 
+<!-- Saving Overlay -->
+<div class="saving-overlay" id="savingOverlay">
+  <div class="saving-box">
+    <div class="saving-spinner"></div>
+    <div class="saving-text" id="savingText">در حال ذخیره نام...</div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function () {
@@ -830,21 +892,24 @@ html.dark .suggestion:hover {
   /* ============================================================
      DOM
   ============================================================ */
-  var nameInput = document.getElementById('nameInput');
-  var saveBtn = document.getElementById('saveBtn');
-  var message = document.getElementById('message');
-  var counter = document.getElementById('counter');
-  var avatar = document.getElementById('avatar');
-  var codeText = document.getElementById('codeText');
-  var themeBtn = document.getElementById('themeBtn');
-  var suggestionsEl = document.getElementById('suggestions');
+  var nameInput       = document.getElementById('nameInput');
+  var saveBtn         = document.getElementById('saveBtn');
+  var message         = document.getElementById('message');
+  var counter         = document.getElementById('counter');
+  var avatar          = document.getElementById('avatar');
+  var codeText        = document.getElementById('codeText');
+  var themeBtn        = document.getElementById('themeBtn');
+  var suggestionsEl   = document.getElementById('suggestions');
+  var savingOverlay   = document.getElementById('savingOverlay');
+  var savingText      = document.getElementById('savingText');
 
   /* ============================================================
      STATE
   ============================================================ */
   var currentUser = null;
   var currentRole = 'student';
-  var isSaving = false;
+  var isSaving    = false;
+  var isRedirecting = false;
 
   /* ============================================================
      THEME
@@ -869,6 +934,19 @@ html.dark .suggestion:hover {
   });
 
   /* ============================================================
+     HELPERS
+  ============================================================ */
+  var FA_DIGITS = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+
+  function toFa(n) {
+    return String(n).replace(/\d/g, function (d) { return FA_DIGITS[+d]; });
+  }
+
+  function sleep(ms) {
+    return new Promise(function (r) { setTimeout(r, ms); });
+  }
+
+  /* ============================================================
      MESSAGE
   ============================================================ */
   var msgTimer = null;
@@ -890,12 +968,15 @@ html.dark .suggestion:hover {
   }
 
   /* ============================================================
-     PERSIAN NUMBERS
+     OVERLAY
   ============================================================ */
-  var FA_DIGITS = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+  function showOverlay(text) {
+    savingText.textContent = text || 'در حال ذخیره نام...';
+    savingOverlay.classList.add('show');
+  }
 
-  function toFa(n) {
-    return String(n).replace(/\d/g, function (d) { return FA_DIGITS[+d]; });
+  function hideOverlay() {
+    savingOverlay.classList.remove('show');
   }
 
   /* ============================================================
@@ -929,10 +1010,10 @@ html.dark .suggestion:hover {
       return;
     }
 
-    var initials = parts[0][0];
-    if (parts.length > 1) initials += parts[parts.length - 1][0];
+    var initials = parts[0][0] || '';
+    if (parts.length > 1) initials += parts[parts.length - 1][0] || '';
 
-    avatar.textContent = initials;
+    avatar.textContent = initials || '؟';
     avatar.classList.add('has-name');
   }
 
@@ -992,6 +1073,7 @@ html.dark .suggestion:hover {
   }
 
   function setBtnSuccess() {
+    saveBtn.disabled = true;
     saveBtn.innerHTML =
       '<span class="label">' +
         '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
@@ -1034,15 +1116,22 @@ html.dark .suggestion:hover {
   }
 
   /* ============================================================
-     GO TO PANEL — بدون تأخیر
+     GO TO PANEL — بدون تأخیر، بدون باگ
   ============================================================ */
   function goToPanel(role) {
+    if (isRedirecting) return;
+    isRedirecting = true;
+
     var dest = role === 'teacher' ? 'teacher.html' : 'student.html';
+
+    /* پاک کردن کش پروفایل تا صفحه‌ی بعدی دوباره بخونه */
+    try { localStorage.removeItem('auth_profile_cache'); } catch (e) {}
+
     window.location.replace(dest);
   }
 
   /* ============================================================
-     SAVE NAME
+     SAVE NAME — نسخه‌ی قطعی و مقاوم
   ============================================================ */
   async function saveName() {
     if (isSaving) return;
@@ -1065,101 +1154,100 @@ html.dark .suggestion:hover {
     setBtnLoading();
     hideMessage();
     nameInput.disabled = true;
+    showOverlay('در حال ذخیره نام...');
 
     try {
       /* ─── ۱) چک کن شاید قبلاً ذخیره شده ─── */
-      var check = await supabase
-        .from('profiles')
-        .select('name_confirmed, role')
-        .eq('id', currentUser.id)
-        .maybeSingle();
-
-      /* اگه الان true بود → بی‌صدا برو پنل */
-      if (check.data && check.data.name_confirmed === true) {
-        setBtnSuccess();
-        showMessage('✅ قبلاً ثبت شده!', 'success');
-        setTimeout(function () {
-          goToPanel(check.data.role);
-        }, 250);
-        return;
-      }
-
-      /* ─── ۲) ذخیره‌ی اصلی ─── */
-      var result = await supabase
-        .from('profiles')
-        .update({
-          full_name: v.value,
-          name_confirmed: true
-        })
-        .eq('id', currentUser.id)
-        .select('name_confirmed, role')
-        .maybeSingle();
-
-      /* ─── ۳) اگه خطا داد یا data نبود، دوباره چک کن ─── */
-      var saved = false;
-      var finalRole = currentRole;
-
-      if (result.data && result.data.name_confirmed === true) {
-        saved = true;
-        finalRole = result.data.role || currentRole;
-      } else {
-        /* دوباره چک کن شاید ذخیره شده ولی response نگرفتیم */
-        var finalCheck = await supabase
+      try {
+        var check = await supabase
           .from('profiles')
           .select('name_confirmed, role')
           .eq('id', currentUser.id)
           .maybeSingle();
 
-        if (finalCheck.data && finalCheck.data.name_confirmed === true) {
-          saved = true;
-          finalRole = finalCheck.data.role || currentRole;
+        if (check.data && check.data.name_confirmed === true) {
+          setBtnSuccess();
+          showMessage('✅ قبلاً ثبت شده!', 'success');
+          await sleep(300);
+          goToPanel(check.data.role);
+          return;
         }
+      } catch (e) {
+        console.warn('[check] failed:', e);
       }
 
-      /* ─── ۴) موفقیت ─── */
+      /* ─── ۲) ذخیره‌ی اصلی ─── */
+      var updateResult = await supabase
+        .from('profiles')
+        .update({
+          full_name: v.value,
+          name_confirmed: true
+        })
+        .eq('id', currentUser.id);
+
+      if (updateResult.error) {
+        console.warn('[update] error:', updateResult.error);
+      }
+
+      /* ─── ۳) صبر کوتاه تا DB commit کامل بشه ─── */
+      await sleep(500);
+
+      /* ─── ۴) تأیید قطعی با SELECT جدید ─── */
+      var verify = null;
+      try {
+        verify = await supabase
+          .from('profiles')
+          .select('name_confirmed, role, full_name')
+          .eq('id', currentUser.id)
+          .maybeSingle();
+      } catch (e) {
+        console.warn('[verify] failed:', e);
+      }
+
+      var saved = !!(verify && verify.data && verify.data.name_confirmed === true);
+      var finalRole = (verify && verify.data && verify.data.role) || currentRole;
+
+      /* ─── ۵) موفقیت ─── */
       if (saved) {
         setBtnSuccess();
-        showMessage('✅ نام ثبت شد!', 'success');
+        showMessage('✅ نام ثبت شد! در حال انتقال...', 'success');
 
         if (navigator.vibrate) {
           try { navigator.vibrate([60, 40, 60]); } catch (e) {}
         }
 
-        /* 🔥 بدون تأخیر */
-        setTimeout(function () {
-          goToPanel(finalRole);
-        }, 250);
+        await sleep(400);
+        goToPanel(finalRole);
         return;
       }
 
-      /* ─── ۵) خطای واقعی ─── */
-      console.error('[save] error:', result.error);
+      /* ─── ۶) خطا ─── */
+      console.error('[save] failed - updateResult:', updateResult.error, 'verify:', verify);
+      hideOverlay();
       isSaving = false;
       setBtnDefault();
       nameInput.disabled = false;
       nameInput.focus();
       shakeInput();
 
-      var errMsg = 'خطا در ذخیره. دوباره تلاش کن';
-      if (result.error && result.error.message) {
-        if (result.error.message.indexOf('policy') !== -1) {
-          /* احتمالاً قبلاً ذخیره شده — بازم برو پنل */
-          var roleCheck = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', currentUser.id)
-            .maybeSingle();
-          goToPanel(roleCheck.data ? roleCheck.data.role : currentRole);
-          return;
-        }
-        if (result.error.message.indexOf('Failed to fetch') !== -1) {
-          errMsg = 'اتصال به سرور برقرار نشد';
-        }
+      var errMsg = 'خطا در ذخیره نام. دوباره تلاش کن';
+      var rawMsg = (updateResult.error && updateResult.error.message) || '';
+
+      if (rawMsg.indexOf('policy') !== -1 || rawMsg.indexOf('row-level') !== -1) {
+        errMsg = 'دسترسی شما برای این عملیات مجاز نیست';
+      } else if (rawMsg.indexOf('Failed to fetch') !== -1 || rawMsg.indexOf('network') !== -1) {
+        errMsg = 'اتصال به سرور برقرار نشد';
+      } else if (rawMsg.indexOf('prevent_name_change') !== -1) {
+        /* نام قبلاً قفل شده — برو پنل */
+        goToPanel(currentRole);
+        return;
       }
+
       showMessage('❌ ' + errMsg, 'error');
 
     } catch (err) {
       console.error('[fatal]', err);
+      hideOverlay();
       isSaving = false;
       setBtnDefault();
       nameInput.disabled = false;
@@ -1179,7 +1267,7 @@ html.dark .suggestion:hover {
   });
 
   nameInput.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !isSaving) {
       e.preventDefault();
       saveName();
     }
@@ -1196,8 +1284,15 @@ html.dark .suggestion:hover {
     updateCounter();
 
     /* چک لاگین */
-    var userResult = await supabase.auth.getUser();
-    var user = userResult.data.user;
+    var userResult;
+    try {
+      userResult = await supabase.auth.getUser();
+    } catch (e) {
+      window.location.replace('index.html');
+      return;
+    }
+
+    var user = userResult && userResult.data && userResult.data.user;
 
     if (!user) {
       window.location.replace('index.html');
@@ -1206,13 +1301,18 @@ html.dark .suggestion:hover {
     currentUser = user;
 
     /* چک پروفایل */
-    var profileResult = await supabase
-      .from('profiles')
-      .select('code, name_confirmed, role')
-      .eq('id', user.id)
-      .maybeSingle();
+    var profile = null;
+    try {
+      var profileResult = await supabase
+        .from('profiles')
+        .select('code, name_confirmed, role')
+        .eq('id', user.id)
+        .maybeSingle();
 
-    var profile = profileResult.data;
+      profile = profileResult.data;
+    } catch (e) {
+      console.warn('[init] profile fetch failed:', e);
+    }
 
     /* اگه قبلاً تأیید کرده → بی‌صدا برو پنل */
     if (profile && profile.name_confirmed === true) {
@@ -1228,9 +1328,11 @@ html.dark .suggestion:hover {
 
     /* فوکوس روی input */
     setTimeout(function () {
-      nameInput.focus();
-      try { nameInput.select(); } catch (e) {}
-    }, 350);
+      try {
+        nameInput.focus();
+        nameInput.select();
+      } catch (e) {}
+    }, 400);
   }
 
   init();
