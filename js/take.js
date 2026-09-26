@@ -1,22 +1,13 @@
 /* ============================================================
  * js/take.js
  * ------------------------------------------------------------
- * منطق انجام آزمون توسط دانش‌آموز
+ * منطق انجام آزمون توسط دانش‌آموز — بدون تایمر
  * طراحی: فاطمه جوادی
  *
- * قابلیت‌ها:
- *   • چک لاگین + نقش دانش‌آموز
- *   • لود فایل HTML آزمون از Storage در iframe
- *   • تایمر معکوس بر اساس مدت آزمون
- *   • هشدار در یک دقیقه‌ی آخر
- *   • ذخیره‌ی خودکار پاسخ‌ها در localStorage
- *   • capture پاسخ‌های input / textarea / select / radio / checkbox
- *   • جلوگیری از ثبت دوباره
- *   • تأیید قبل از ارسال
- *   • هشدار قبل از بستن صفحه
- *   • ریسپانسیو + Toast + Theme
- *
- * وابستگی: @supabase/supabase-js از CDN
+ * 🆕 تغییرات این نسخه:
+ *   • حذف کامل تایمر
+ *   • بدون وابستگی به duration_minutes
+ *   • استفاده از SELECT * (مقاوم در برابر تغییرات دیتابیس)
  * ============================================================ */
 
 (function () {
@@ -32,8 +23,7 @@
 
   var BUCKET = 'exam-files';
   var DRAFT_PREFIX = 'exam_draft_';
-  var AUTOSAVE_INTERVAL = 5000;    // هر ۵ ثانیه
-  var WARNING_THRESHOLD = 60;      // هشدار در ثانیه‌ی آخر
+  var AUTOSAVE_INTERVAL = 5000;
 
   /* ============================================================
    * SUPABASE
@@ -60,15 +50,9 @@
     examId: null,
     fileHtml: null,
     startedAt: null,
-    durationSeconds: 0,
-    endTime: null,
-    remaining: 0,
-    timerInterval: null,
     autosaveInterval: null,
     isSubmitting: false,
     isSubmitted: false,
-    isRedirecting: false,
-    hasUnsavedChanges: false,
     draftRestored: false
   };
 
@@ -81,9 +65,6 @@
     el = {
       themeBtn:      document.getElementById('themeBtn'),
       examTitle:     document.getElementById('examTitle'),
-      timerWrap:     document.getElementById('timerWrap'),
-      timerText:     document.getElementById('timerText'),
-      timerProgress: document.getElementById('timerProgress'),
 
       loading:       document.getElementById('loadingState'),
       errorState:    document.getElementById('errorState'),
@@ -91,12 +72,12 @@
       examContent:   document.getElementById('examContent'),
       iframe:        document.getElementById('examFrame'),
       iframeWrap:    document.getElementById('iframeWrap'),
+      takeFooter:    document.getElementById('takeFooter'),
 
       submitBtn:     document.getElementById('submitBtn'),
       submitOverlay: document.getElementById('submitOverlay'),
       submitText:    document.getElementById('submitText'),
 
-      warningBanner: document.getElementById('warningBanner'),
       draftBanner:   document.getElementById('draftBanner'),
       draftRestore:  document.getElementById('draftRestore'),
       draftDiscard:  document.getElementById('draftDiscard'),
@@ -108,48 +89,6 @@
   /* ============================================================
    * HELPERS
    * ============================================================ */
-  var FA = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
-
-  function toFa(n) {
-    return String(n === null || n === undefined ? 0 : n)
-      .replace(/\d/g, function (d) { return FA[+d]; });
-  }
-
-  function escapeHtml(text) {
-    if (text === null || text === undefined) return '';
-    var div = document.createElement('div');
-    div.textContent = String(text);
-    return div.innerHTML;
-  }
-
-  function formatTimer(totalSeconds) {
-    var s = Math.max(0, Math.floor(totalSeconds));
-    var h = Math.floor(s / 3600);
-    var m = Math.floor((s % 3600) / 60);
-    var sec = s % 60;
-
-    if (h > 0) {
-      return pad(h) + ':' + pad(m) + ':' + pad(sec);
-    }
-    return pad(m) + ':' + pad(sec);
-  }
-
-  function pad(n) {
-    return n < 10 ? '0' + n : String(n);
-  }
-
-  function formatTimerFa(totalSeconds) {
-    var s = Math.max(0, Math.floor(totalSeconds));
-    var h = Math.floor(s / 3600);
-    var m = Math.floor((s % 3600) / 60);
-    var sec = s % 60;
-
-    if (h > 0) {
-      return toFa(h) + ':' + pad(m) + ':' + pad(sec);
-    }
-    return toFa(m) + ':' + pad(sec);
-  }
-
   function sleep(ms) {
     return new Promise(function (r) { setTimeout(r, ms); });
   }
@@ -210,14 +149,18 @@
   }
 
   /* ============================================================
-   * AUTH GUARD — فقط دانش‌آموز
+   * AUTH GUARD
    * ============================================================ */
   async function requireStudent() {
     var sb = state.supabase;
 
     var sessionResult;
     try { sessionResult = await sb.auth.getSession(); }
-    catch (e) { window.location.replace('index.html'); return null; }
+    catch (e) {
+      console.error('[take] session:', e);
+      window.location.replace('index.html');
+      return null;
+    }
 
     if (!sessionResult || !sessionResult.data || !sessionResult.data.session) {
       window.location.replace('index.html');
@@ -226,14 +169,17 @@
 
     var userResult;
     try { userResult = await sb.auth.getUser(); }
-    catch (e) { window.location.replace('index.html'); return null; }
+    catch (e) {
+      console.error('[take] user:', e);
+      window.location.replace('index.html');
+      return null;
+    }
 
     var user = userResult && userResult.data && userResult.data.user;
     if (!user) { window.location.replace('index.html'); return null; }
 
     var profile = null;
 
-    /* RPC */
     try {
       var rpc = await sb.rpc('get_my_profile');
       if (!rpc.error && rpc.data) profile = rpc.data;
@@ -269,7 +215,6 @@
       }
     }
 
-    /* معلم → پنل معلم */
     if (profile.role === 'teacher') {
       window.location.replace('teacher.html');
       return null;
@@ -285,33 +230,40 @@
     try {
       var r = await state.supabase
         .from('exams')
-        .select('id, title, description, file_path, duration_minutes, is_active, created_at')
+        .select('*')
         .eq('id', state.examId)
         .maybeSingle();
 
-      if (r.error || !r.data) {
+      if (r.error) {
+        console.error('[take] loadExam error:', r.error);
+        showError('خطا در بارگذاری آزمون: ' + (r.error.message || 'نامشخص'));
+        return null;
+      }
+
+      if (!r.data) {
         showError('آزمون پیدا نشد یا حذف شده است');
         return null;
       }
 
       state.exam = r.data;
 
-      /* چک فعال بودن */
-      if (state.exam.is_active !== true) {
+      if (typeof state.exam.is_active !== 'undefined' && state.exam.is_active !== true) {
         showError('این آزمون غیرفعال شده است');
         return null;
       }
 
+      console.log('[take] exam loaded:', state.exam.id, state.exam.title);
       return state.exam;
+
     } catch (e) {
-      console.warn('[take] loadExam failed:', e);
+      console.error('[take] loadExam fatal:', e);
       showError('خطا در بارگذاری آزمون');
       return null;
     }
   }
 
   /* ============================================================
-   * CHECK NOT SUBMITTED BEFORE
+   * CHECK NOT SUBMITTED
    * ============================================================ */
   async function checkNotSubmitted() {
     try {
@@ -326,7 +278,7 @@
         showError('شما قبلاً در این آزمون شرکت کرده‌اید');
         setTimeout(function () {
           window.location.replace('student.html');
-        }, 2000);
+        }, 2200);
         return false;
       }
 
@@ -347,22 +299,36 @@
     }
 
     try {
+      console.log('[take] downloading:', state.exam.file_path);
+
       var r = await state.supabase.storage
         .from(BUCKET)
         .download(state.exam.file_path);
 
-      if (r.error || !r.data) {
-        console.warn('[take] download failed:', r.error);
-        showError('خطا در بارگذاری فایل آزمون');
+      if (r.error) {
+        console.error('[take] download error:', r.error);
+        showError('خطا در دانلود فایل آزمون: ' + (r.error.message || 'دسترسی مجاز نیست'));
+        return false;
+      }
+
+      if (!r.data) {
+        showError('فایل آزمون خالی است');
         return false;
       }
 
       var text = await r.data.text();
+
+      if (!text || text.trim().length === 0) {
+        showError('فایل آزمون خالی است');
+        return false;
+      }
+
       state.fileHtml = text;
+      console.log('[take] file loaded, size:', text.length);
       return true;
 
     } catch (e) {
-      console.warn('[take] loadFile:', e);
+      console.error('[take] loadFile fatal:', e);
       showError('خطا در بارگذاری فایل');
       return false;
     }
@@ -374,71 +340,26 @@
   function renderIframe() {
     if (!el.iframe || !state.fileHtml) return;
 
-    /* لود از srcdoc */
     el.iframe.srcdoc = state.fileHtml;
 
     el.iframe.addEventListener('load', function onLoad() {
       el.iframe.removeEventListener('load', onLoad);
 
-      /* مخفی کردن loading، نمایش محتوا */
       if (el.loading) el.loading.style.display = 'none';
       if (el.examContent) el.examContent.style.display = 'block';
+      if (el.takeFooter) el.takeFooter.style.display = 'block';
 
-      /* بازیابی پیش‌نویس اگه هست */
       restoreDraft();
     });
-  }
 
-  /* ============================================================
-   * TIMER
-   * ============================================================ */
-  function startTimer() {
-    var duration = state.exam.duration_minutes || 15;
-
-    state.startedAt = Date.now();
-    state.durationSeconds = duration * 60;
-    state.endTime = state.startedAt + state.durationSeconds * 1000;
-    state.remaining = state.durationSeconds;
-
-    updateTimerDisplay();
-
-    state.timerInterval = setInterval(function () {
-      var remaining = Math.max(0, Math.floor((state.endTime - Date.now()) / 1000));
-      state.remaining = remaining;
-      updateTimerDisplay();
-
-      /* هشدار در یک دقیقه آخر */
-      if (remaining <= WARNING_THRESHOLD && remaining > 0) {
-        if (el.timerWrap && !el.timerWrap.classList.contains('warning')) {
-          el.timerWrap.classList.add('warning');
-          toast('⏰ یک دقیقه مونده!', 'error', 3000);
-        }
+    /* Timeout */
+    setTimeout(function () {
+      if (el.loading && el.loading.style.display !== 'none') {
+        if (el.examContent) el.examContent.style.display = 'block';
+        if (el.takeFooter) el.takeFooter.style.display = 'block';
+        if (el.loading) el.loading.style.display = 'none';
       }
-
-      /* تمام شدن زمان → ثبت خودکار */
-      if (remaining <= 0) {
-        clearInterval(state.timerInterval);
-        state.timerInterval = null;
-        toast('⏱ زمان تمام شد! در حال ثبت خودکار...', 'error', 4000);
-        doSubmit(true);
-      }
-    }, 1000);
-  }
-
-  function updateTimerDisplay() {
-    if (!el.timerText) return;
-
-    el.timerText.textContent = formatTimerFa(state.remaining);
-
-    if (el.timerProgress && state.durationSeconds > 0) {
-      var pct = (state.remaining / state.durationSeconds) * 100;
-      el.timerProgress.style.width = pct + '%';
-
-      /* رنگ بندی */
-      el.timerProgress.classList.remove('mid', 'low');
-      if (pct <= 15) el.timerProgress.classList.add('low');
-      else if (pct <= 40) el.timerProgress.classList.add('mid');
-    }
+    }, 10000);
   }
 
   /* ============================================================
@@ -460,11 +381,9 @@
     var inputs = [];
     var idx = 0;
 
-    /* ─── پیدا کردن label مرتبط ─── */
     function findLabel(node) {
       if (!node) return null;
 
-      /* label with for */
       if (node.id) {
         try {
           var lbl = doc.querySelector('label[for="' + node.id.replace(/"/g, '\\"') + '"]');
@@ -474,24 +393,21 @@
         } catch (e) {}
       }
 
-      /* label والد */
       var parent = node.closest && node.closest('label');
       if (parent && parent.textContent.trim()) {
         return parent.textContent.trim().slice(0, 200);
       }
 
-      /* aria-label */
       var aria = node.getAttribute && node.getAttribute('aria-label');
       if (aria && aria.trim()) return aria.trim().slice(0, 200);
 
-      /* placeholder */
       var ph = node.getAttribute && node.getAttribute('placeholder');
       if (ph && ph.trim()) return ph.trim().slice(0, 200);
 
       return null;
     }
 
-    /* ─── RADIO ─── */
+    /* RADIO */
     try {
       var radioNames = {};
       doc.querySelectorAll('input[type=radio]').forEach(function (r) {
@@ -520,11 +436,9 @@
           label: label
         });
       });
-    } catch (e) {
-      console.warn('[take] radio:', e);
-    }
+    } catch (e) {}
 
-    /* ─── CHECKBOX ─── */
+    /* CHECKBOX */
     try {
       var checkboxGroups = {};
       doc.querySelectorAll('input[type=checkbox]').forEach(function (cb) {
@@ -551,11 +465,9 @@
           label: label
         });
       });
-    } catch (e) {
-      console.warn('[take] checkbox:', e);
-    }
+    } catch (e) {}
 
-    /* ─── TEXT / NUMBER / EMAIL / TEL / URL ─── */
+    /* TEXT */
     try {
       doc.querySelectorAll(
         'input[type=text], input[type=number], input[type=email], input[type=tel], input[type=url], input[type=search]'
@@ -571,11 +483,9 @@
           label: findLabel(inp)
         });
       });
-    } catch (e) {
-      console.warn('[take] text:', e);
-    }
+    } catch (e) {}
 
-    /* ─── TEXTAREA ─── */
+    /* TEXTAREA */
     try {
       doc.querySelectorAll('textarea').forEach(function (ta) {
         var val = (ta.value || '').trim();
@@ -589,11 +499,9 @@
           label: findLabel(ta)
         });
       });
-    } catch (e) {
-      console.warn('[take] textarea:', e);
-    }
+    } catch (e) {}
 
-    /* ─── SELECT ─── */
+    /* SELECT */
     try {
       doc.querySelectorAll('select').forEach(function (sel) {
         if (!sel.value) return;
@@ -608,12 +516,9 @@
           label: findLabel(sel)
         });
       });
-    } catch (e) {
-      console.warn('[take] select:', e);
-    }
+    } catch (e) {}
 
-    /* ─── metadata ─── */
-    var duration = Math.floor((Date.now() - state.startedAt) / 1000);
+    var duration = state.startedAt ? Math.floor((Date.now() - state.startedAt) / 1000) : 0;
 
     return {
       inputs: inputs,
@@ -627,34 +532,16 @@
   }
 
   /* ============================================================
-   * DRAFT (localStorage)
+   * DRAFT
    * ============================================================ */
   function saveDraft() {
     if (state.isSubmitted || !state.examId) return;
 
     try {
       var data = captureAnswers();
-      var payload = {
-        answers: data,
-        savedAt: Date.now()
-      };
+      var payload = { answers: data, savedAt: Date.now() };
       localStorage.setItem(draftKey(state.examId), JSON.stringify(payload));
-      state.hasUnsavedChanges = true;
-    } catch (e) {
-      console.warn('[take] saveDraft:', e);
-    }
-  }
-
-  function hasDraft() {
-    if (!state.examId) return false;
-    try {
-      var raw = localStorage.getItem(draftKey(state.examId));
-      if (!raw) return false;
-      var parsed = JSON.parse(raw);
-      return !!(parsed && parsed.answers && parsed.answers.inputs && parsed.answers.inputs.length);
-    } catch (e) {
-      return false;
-    }
+    } catch (e) {}
   }
 
   function clearDraft() {
@@ -672,13 +559,10 @@
     var parsed = null;
     try { parsed = JSON.parse(raw); } catch (e) { return; }
     if (!parsed || !parsed.answers || !parsed.answers.inputs) return;
+    if (!parsed.answers.inputs.length) return;
 
-    /* نمایش بنر بازیابی */
-    if (el.draftBanner) {
-      el.draftBanner.style.display = 'flex';
-    }
+    if (el.draftBanner) el.draftBanner.style.display = 'flex';
 
-    /* دکمه‌ی بازیابی */
     if (el.draftRestore) {
       el.draftRestore.addEventListener('click', function () {
         applyDraft(parsed.answers.inputs);
@@ -688,7 +572,6 @@
       });
     }
 
-    /* دکمه‌ی حذف */
     if (el.draftDiscard) {
       el.draftDiscard.addEventListener('click', function () {
         clearDraft();
@@ -730,7 +613,6 @@
           var sel = doc.querySelector('select[name="' + item.name.replace(/"/g, '\\"') + '"]') ||
                     (item.name ? doc.getElementById(item.name) : null);
           if (sel) {
-            /* تلاش برای پیدا کردن option */
             for (var i = 0; i < sel.options.length; i++) {
               if ((sel.options[i].textContent || '').trim() === item.value) {
                 sel.selectedIndex = i;
@@ -739,23 +621,20 @@
             }
           }
 
-        } else if (item.type === 'text' || item.type === 'number' || item.type === 'email' || item.type === 'tel' || item.type === 'url' || item.type === 'search') {
+        } else if (['text','number','email','tel','url','search'].indexOf(item.type) !== -1) {
           var inp = doc.querySelector('input[name="' + item.name.replace(/"/g, '\\"') + '"]') ||
                     (item.name ? doc.getElementById(item.name) : null);
           if (inp) inp.value = item.value;
         }
-      } catch (e) {
-        console.warn('[take] applyDraft item:', e);
-      }
+      } catch (e) {}
     });
   }
 
   /* ============================================================
-   * AUTO-SAVE
+   * AUTOSAVE
    * ============================================================ */
   function startAutosave() {
     if (state.autosaveInterval) clearInterval(state.autosaveInterval);
-
     state.autosaveInterval = setInterval(function () {
       if (state.isSubmitted) return;
       try { saveDraft(); } catch (e) {}
@@ -772,49 +651,32 @@
   /* ============================================================
    * SUBMIT
    * ============================================================ */
-  async function doSubmit(auto) {
+  async function doSubmit() {
     if (state.isSubmitting || state.isSubmitted) return;
 
-    /* تأیید دستی */
-    if (!auto) {
-      var data = captureAnswers();
-      var total = data.inputs.length;
+    var data = captureAnswers();
+    var total = data.inputs.length;
 
-      var msg = 'مطمئنی که می‌خوای آزمون رو ثبت کنی؟\n';
-      if (total === 0) {
-        msg += '\n⚠️ هیچ پاسخی وارد نکردی!';
-      } else {
-        msg += '\nتعداد پاسخ‌های ثبت‌شده: ' + total;
-      }
+    var msg = 'مطمئنی که می‌خوای آزمون رو ثبت کنی؟\n';
+    if (total === 0) msg += '\n⚠️ هیچ پاسخی وارد نکردی!';
+    else msg += '\nتعداد پاسخ‌های ثبت‌شده: ' + total;
 
-      if (!confirm(msg)) return;
-    }
+    if (!confirm(msg)) return;
 
     state.isSubmitting = true;
 
-    /* UI */
     if (el.submitBtn) el.submitBtn.disabled = true;
     if (el.submitOverlay) el.submitOverlay.style.display = 'flex';
-    if (el.submitText) el.submitText.textContent = auto ? 'زمان تمام شد — در حال ثبت...' : 'در حال ثبت...';
+    if (el.submitText) el.submitText.textContent = 'در حال ثبت...';
 
-    /* توقف تایمر و autosave */
-    if (state.timerInterval) {
-      clearInterval(state.timerInterval);
-      state.timerInterval = null;
-    }
     stopAutosave();
 
     try {
       var answers = captureAnswers();
+      var duration = state.startedAt ? Math.floor((Date.now() - state.startedAt) / 1000) : 0;
 
-      /* اگر خودکار و بدون پاسخ، حداقل یه placeholder بذار */
-      if (auto && answers.inputs.length === 0) {
-        answers.inputs = [];
-      }
+      console.log('[take] submitting...', { exam_id: state.examId, duration: duration });
 
-      var duration = Math.floor((Date.now() - state.startedAt) / 1000);
-
-      /* درج در دیتابیس */
       var insertResult = await state.supabase
         .from('submissions')
         .insert({
@@ -827,13 +689,12 @@
         .maybeSingle();
 
       if (insertResult.error) {
-        console.warn('[take] submit error:', insertResult.error);
+        console.error('[take] submit error:', insertResult.error);
 
         var errMsg = 'خطا در ثبت آزمون';
 
         if ((insertResult.error.message || '').indexOf('قبلاً') !== -1 ||
             (insertResult.error.message || '').indexOf('duplicate') !== -1) {
-          errMsg = 'شما قبلاً این آزمون رو ثبت کرده‌اید';
           state.isSubmitted = true;
           toast('این آزمون قبلاً ثبت شده', 'info', 3000);
           await sleep(1500);
@@ -841,54 +702,52 @@
           return;
         } else if ((insertResult.error.message || '').indexOf('Failed to fetch') !== -1) {
           errMsg = 'اتصال به اینترنت برقرار نشد';
+        } else if (insertResult.error.message) {
+          errMsg += ': ' + insertResult.error.message;
         }
 
-        /* خطا → بازگشت به آزمون */
         state.isSubmitting = false;
         if (el.submitBtn) el.submitBtn.disabled = false;
         if (el.submitOverlay) el.submitOverlay.style.display = 'none';
         toast('❌ ' + errMsg, 'error', 5000);
 
-        /* تایمر رو دوباره شروع کن */
-        if (state.remaining > 0) startTimer();
         startAutosave();
         return;
       }
 
-      /* موفق */
       state.isSubmitted = true;
       clearDraft();
 
       if (el.submitText) el.submitText.textContent = '✅ ثبت شد! در حال انتقال...';
-
       toast('✅ آزمون با موفقیت ثبت شد', 'success', 2500);
 
       await sleep(1500);
-
       window.location.replace('student.html');
 
     } catch (e) {
-      console.warn('[take] submit fatal:', e);
+      console.error('[take] submit fatal:', e);
       state.isSubmitting = false;
       if (el.submitBtn) el.submitBtn.disabled = false;
       if (el.submitOverlay) el.submitOverlay.style.display = 'none';
       toast('❌ خطای غیرمنتظره، دوباره تلاش کن', 'error', 5000);
-
-      if (state.remaining > 0) startTimer();
       startAutosave();
     }
   }
 
   /* ============================================================
-   * ERROR
+   * SHOW ERROR
    * ============================================================ */
   function showError(message) {
     if (el.loading) el.loading.style.display = 'none';
     if (el.examContent) el.examContent.style.display = 'none';
+    if (el.takeFooter) el.takeFooter.style.display = 'none';
+
     if (el.errorState) {
       el.errorState.style.display = 'flex';
       if (el.errorText) el.errorText.textContent = message;
     }
+
+    console.error('[take] error:', message);
   }
 
   /* ============================================================
@@ -896,39 +755,30 @@
    * ============================================================ */
   function bindEvents() {
     if (el.submitBtn) {
-      el.submitBtn.addEventListener('click', function () { doSubmit(false); });
+      el.submitBtn.addEventListener('click', function () { doSubmit(); });
     }
 
-    /* ذخیره قبل از خروج */
     window.addEventListener('beforeunload', function (e) {
       if (state.isSubmitted) return;
       if (!state.startedAt) return;
-
-      /* تلاش برای ذخیره */
       try { saveDraft(); } catch (err) {}
-
       e.preventDefault();
       e.returnValue = '';
       return '';
     });
 
-    /* کیبورد shortcut */
     document.addEventListener('keydown', function (e) {
-      /* Ctrl + S → ذخیره */
       if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
         e.preventDefault();
         saveDraft();
         toast('💾 پیش‌نویس ذخیره شد', 'success', 1500);
       }
-
-      /* Ctrl + Enter → ثبت */
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         e.preventDefault();
-        doSubmit(false);
+        doSubmit();
       }
     });
 
-    /* ذخیره هنگام مخفی شدن tab */
     document.addEventListener('visibilitychange', function () {
       if (document.hidden && state.startedAt && !state.isSubmitted) {
         try { saveDraft(); } catch (e) {}
@@ -947,7 +797,6 @@
     initTheme();
     bindTheme();
 
-    /* examId از URL */
     var params = getQuery();
     state.examId = params.get('id');
 
@@ -956,38 +805,27 @@
       return;
     }
 
-    /* Auth */
     var auth = await requireStudent();
     if (!auth) return;
 
     state.user = auth.user;
     state.profile = auth.profile;
 
-    /* چک قبلاً شرکت کرده */
     var notSubmitted = await checkNotSubmitted();
     if (!notSubmitted) return;
 
-    /* لود آزمون */
     var exam = await loadExam();
     if (!exam) return;
 
-    /* عنوان */
     if (el.examTitle) el.examTitle.textContent = exam.title || 'آزمون';
 
-    /* لود فایل */
     var fileOk = await loadFile();
     if (!fileOk) return;
 
-    /* رندر iframe */
+    state.startedAt = Date.now();
+
     renderIframe();
-
-    /* تایمر */
-    startTimer();
-
-    /* autosave */
     startAutosave();
-
-    /* رویدادها */
     bindEvents();
 
     try {
@@ -1006,7 +844,7 @@
     __loaded: true,
     init: init,
     state: state,
-    submit: function () { doSubmit(false); },
+    submit: doSubmit,
     saveDraft: saveDraft,
     captureAnswers: captureAnswers,
     toast: toast
