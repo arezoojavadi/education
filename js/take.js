@@ -1,18 +1,12 @@
 /* ============================================================
  * js/take.js
  * ------------------------------------------------------------
- * منطق انجام آزمون توسط دانش‌آموز — بدون تایمر
+ * منطق انجام آزمون — بدون تایمر
  * طراحی: فاطمه جوادی
  *
- * قابلیت‌ها:
- *   • حذف کامل تایمر (دانش‌آموز هر چقدر بخواد وقت داره)
- *   • capture کامل — همه‌ی inputها حتی خالی‌ها ذخیره می‌شن
- *   • بدون وابستگی به duration_minutes
- *   • استفاده از SELECT * (مقاوم در برابر تغییرات دیتابیس)
- *   • ذخیره‌ی خودکار پیش‌نویس
- *   • بازیابی پیش‌نویس
- *   • هشدار قبل از خروج
- *   • حالت شب/روز + Toast
+ * 🆕 تغییر این نسخه:
+ *   • فیلتر inputهای اضافی (مخفی، غیرقابل‌مشاهده، نوار جستجو)
+ *   • فقط inputهای واقعی سؤال capture می‌شن
  * ============================================================ */
 
 (function () {
@@ -20,9 +14,6 @@
 
   if (window.TakePanel && window.TakePanel.__loaded) return;
 
-  /* ============================================================
-   * CONFIG
-   * ============================================================ */
   var SUPABASE_URL = 'https://cfkwvzbqgapguuaqibmq.supabase.co';
   var SUPABASE_KEY = 'sb_publishable_Qf3R9hPgjApwe2c-qQMoJA_jitobazq';
 
@@ -32,9 +23,6 @@
 
   var DEBUG = true;
 
-  /* ============================================================
-   * LOGGER
-   * ============================================================ */
   function log() {
     if (!DEBUG) return;
     var a = Array.prototype.slice.call(arguments);
@@ -378,7 +366,6 @@
       restoreDraft();
     });
 
-    /* Timeout امن */
     setTimeout(function () {
       if (el.loading && el.loading.style.display !== 'none') {
         if (el.examContent) el.examContent.style.display = 'block';
@@ -389,14 +376,17 @@
   }
 
   /* ============================================================
-   * 🆕 CAPTURE ANSWERS — همه‌ی inputها حتی خالی‌ها
+   * 🆕 CAPTURE ANSWERS — با فیلتر هوشمند
    * ============================================================ */
   function captureAnswers() {
     if (!el.iframe) return { inputs: [] };
 
+    var iframeWin = null;
     var doc = null;
+
     try {
-      doc = el.iframe.contentDocument || el.iframe.contentWindow.document;
+      iframeWin = el.iframe.contentWindow;
+      doc = el.iframe.contentDocument || (iframeWin && iframeWin.document);
     } catch (e) {
       logWarn('⚠️ [capture] iframe access failed:', e);
       return { inputs: [] };
@@ -404,10 +394,90 @@
 
     if (!doc) return { inputs: [] };
 
+    /* ─── ابزار: بررسی قابل‌مشاهده بودن ─── */
+    function isVisible(node) {
+      if (!node) return false;
+
+      /* نوع hidden */
+      if (node.type === 'hidden') return false;
+
+      /* غیرفعال */
+      if (node.disabled) return false;
+
+      /* استایل */
+      var style = null;
+      try {
+        style = iframeWin ? iframeWin.getComputedStyle(node) : null;
+      } catch (e) {}
+
+      if (style) {
+        if (style.display === 'none') return false;
+        if (style.visibility === 'hidden') return false;
+        if (style.visibility === 'collapse') return false;
+        if (parseFloat(style.opacity) === 0) return false;
+      }
+
+      /* offsetParent (برای مخفی‌ها null می‌شه) */
+      if (node.offsetParent === null) {
+        /* استثنا: position: fixed */
+        if (style && style.position === 'fixed') return true;
+        return false;
+      }
+
+      /* ابعاد */
+      var rect = null;
+      try { rect = node.getBoundingClientRect(); } catch (e) {}
+      if (rect && rect.width === 0 && rect.height === 0) return false;
+
+      return true;
+    }
+
+    /* ─── ابزار: بررسی داخل نوار جستجو / منو ─── */
+    function isInSearchOrNav(node) {
+      var p = node.parentElement;
+      var depth = 0;
+
+      while (p && depth < 6) {
+        var tag = (p.tagName || '').toLowerCase();
+        var role = (p.getAttribute && p.getAttribute('role')) || '';
+        var cls = (p.className && String(p.className)) || '';
+        var pid = p.id || '';
+
+        if (tag === 'nav' || tag === 'header' || tag === 'footer') return true;
+        if (role === 'search' || role === 'navigation' || role === 'banner' || role === 'toolbar') return true;
+
+        var combined = (cls + ' ' + pid).toLowerCase();
+        if (combined.indexOf('search') !== -1) return true;
+        if (combined.indexOf('navbar') !== -1) return true;
+        if (combined.indexOf('toolbar') !== -1) return true;
+        if (combined.indexOf('sidebar') !== -1) return true;
+        if (combined.indexOf('filter') !== -1 && tag !== 'form') return true;
+
+        p = p.parentElement;
+        depth++;
+      }
+      return false;
+    }
+
+    /* ─── ابزار: بررسی نوع search ─── */
+    function isSearchInput(node) {
+      return node.type === 'search';
+    }
+
+    /* ─── ابزار: فیلتر اصلی ─── */
+    function shouldCapture(node) {
+      if (!node) return false;
+      if (!isVisible(node)) return false;
+      if (isInSearchOrNav(node)) return false;
+      if (isSearchInput(node)) return false;
+      return true;
+    }
+
     var inputs = [];
     var idx = 0;
+    var skipped = { hidden: 0, invisible: 0, searchNav: 0, searchType: 0 };
 
-    /* ─── پیدا کردن label مرتبط ─── */
+    /* ─── پیدا کردن label ─── */
     function findLabel(node) {
       if (!node) return null;
 
@@ -434,11 +504,13 @@
       return null;
     }
 
-    /* ─── RADIO — همه‌ی گروه‌ها (حتی اگه هیچی انتخاب نشده) ─── */
+    /* ─── RADIO ─── */
     try {
       var radioNames = [];
       doc.querySelectorAll('input[type=radio]').forEach(function (r) {
-        if (r.name && radioNames.indexOf(r.name) === -1) {
+        if (!r.name) return;
+        if (!shouldCapture(r)) { skipped.invisible++; return; }
+        if (radioNames.indexOf(r.name) === -1) {
           radioNames.push(r.name);
         }
       });
@@ -469,12 +541,14 @@
       logWarn('⚠️ [capture] radio:', e);
     }
 
-    /* ─── CHECKBOX — همه‌ی گروه‌ها ─── */
+    /* ─── CHECKBOX ─── */
     try {
       var checkboxGroups = {};
       doc.querySelectorAll('input[type=checkbox]').forEach(function (cb) {
         var key = cb.name || cb.id;
         if (!key) return;
+        if (!shouldCapture(cb)) { skipped.invisible++; return; }
+
         if (!checkboxGroups[key]) checkboxGroups[key] = { values: [], first: cb };
         if (cb.checked) checkboxGroups[key].values.push(String(cb.value || 'true'));
       });
@@ -496,11 +570,17 @@
       logWarn('⚠️ [capture] checkbox:', e);
     }
 
-    /* ─── TEXT / NUMBER / EMAIL / TEL / URL — 🆕 همه حتی خالی ─── */
+    /* ─── TEXT / NUMBER / EMAIL / TEL / URL — با فیلتر ─── */
     try {
       doc.querySelectorAll(
-        'input[type=text], input[type=number], input[type=email], input[type=tel], input[type=url], input[type=search]'
+        'input[type=text], input[type=number], input[type=email], input[type=tel], input[type=url]'
       ).forEach(function (inp) {
+        if (!shouldCapture(inp)) {
+          if (inp.type === 'hidden') skipped.hidden++;
+          else skipped.invisible++;
+          return;
+        }
+
         var val = (inp.value || '').trim();
         idx++;
         inputs.push({
@@ -515,9 +595,11 @@
       logWarn('⚠️ [capture] text:', e);
     }
 
-    /* ─── TEXTAREA — 🆕 همه حتی خالی ─── */
+    /* ─── TEXTAREA — با فیلتر ─── */
     try {
       doc.querySelectorAll('textarea').forEach(function (ta) {
+        if (!shouldCapture(ta)) { skipped.invisible++; return; }
+
         var val = (ta.value || '').trim();
         idx++;
         inputs.push({
@@ -532,9 +614,11 @@
       logWarn('⚠️ [capture] textarea:', e);
     }
 
-    /* ─── SELECT — همه ─── */
+    /* ─── SELECT — با فیلتر ─── */
     try {
       doc.querySelectorAll('select').forEach(function (sel) {
+        if (!shouldCapture(sel)) { skipped.invisible++; return; }
+
         var opt = sel.options[sel.selectedIndex];
         var text = opt ? (opt.textContent || '').trim() : (sel.value || '');
 
@@ -556,7 +640,8 @@
       return i.value !== null && i.value !== undefined && String(i.value).trim() !== '';
     }).length;
 
-    log('📋 [capture] ' + inputs.length + ' سؤال، ' + answered + ' پاسخ');
+    log('📋 [capture] ' + inputs.length + ' سؤال معتبر، ' + answered + ' پاسخ');
+    log('🚫 [capture] رد شده:', skipped);
 
     return {
       inputs: inputs,
@@ -600,7 +685,6 @@
     if (!parsed || !parsed.answers || !parsed.answers.inputs) return;
     if (!parsed.answers.inputs.length) return;
 
-    /* چک کن حداقل یه پاسخ پر شده باشه */
     var hasAnyValue = parsed.answers.inputs.some(function (i) {
       return i.value !== null && i.value !== undefined && String(i.value).trim() !== '';
     });
@@ -666,7 +750,7 @@
             }
           }
 
-        } else if (['text','number','email','tel','url','search'].indexOf(item.type) !== -1) {
+        } else if (['text','number','email','tel','url'].indexOf(item.type) !== -1) {
           var inp = doc.querySelector('input[name="' + item.name.replace(/"/g, '\\"') + '"]') ||
                     (item.name ? doc.getElementById(item.name) : null);
           if (inp && item.value) inp.value = item.value;
