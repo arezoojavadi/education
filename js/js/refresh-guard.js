@@ -4,96 +4,182 @@
  * تشخیص رفرش صفحه و بازگشت به پنل مناسب
  * طراحی: فاطمه جوادی
  *
- * چطور کار می‌کنه:
- *   • اگه کاربر صفحه رو F5 یا Ctrl+R کنه → می‌ره پنل
- *   • اگه از یه لینک باز کنه → عادی کار می‌کنه
- *   • اگه از یه دکمه → عادی کار می‌کنه
+ * ⚠️ فقط به این صفحات اضافه شود:
+ *   • take.html  →  student.html
+ *   • view.html  →  teacher.html
  *
- * صفحه‌های پشتیبانی‌شده:
- *   • take.html → student.html
- *   • view.html → teacher.html
- *   • student.html → student.html (نمونه)
- *   • teacher.html → teacher.html (نمونه)
+ * ⛔ هرگز به این صفحات اضافه نشود:
+ *   • index.html
+ *   • choose-name.html
+ *   • student.html
+ *   • teacher.html
+ *   • 404.html
+ *
+ * چطور کار می‌کنه:
+ *   • اگه کاربر F5 یا Ctrl+R بزنه → می‌ره پنل مربوطه
+ *   • اگه از لینک باز کنه → عادی کار می‌کنه
+ *   • اگه از History برگرده → عادی کار می‌کنه
  * ============================================================ */
 
 (function () {
   'use strict';
 
-  /* جلوگیری از اجرای دوباره */
-  if (window.__RefreshGuard__) return;
-  window.__RefreshGuard__ = true;
+  /* ────────────────────────────────────────────────────────────
+   * ۰) جلوگیری از اجرای دوباره
+   * ──────────────────────────────────────────────────────────── */
+  if (window.__RefreshGuardLoaded) return;
+  window.__RefreshGuardLoaded = true;
 
-  /* ============================================================
-   * تشخیص رفرش
-   * ============================================================ */
-  var isReload = false;
+  /* ────────────────────────────────────────────────────────────
+   * ۱) حالت دیباگ
+   * برای دیدن پیام‌ها در Console، true بذار
+   * ──────────────────────────────────────────────────────────── */
+  var DEBUG = true;
 
-  try {
+  function log() {
+    if (!DEBUG) return;
+    var args = Array.prototype.slice.call(arguments);
+    try {
+      console.log.apply(console, ['%c[RefreshGuard]', 'color: #6C5CE7; font-weight: bold;'].concat(args));
+    } catch (e) {}
+  }
+
+  /* ────────────────────────────────────────────────────────────
+   * ۲) نام دقیق فایل جاری
+   * ──────────────────────────────────────────────────────────── */
+  function getCurrentFile() {
+    try {
+      var path = String(window.location.pathname || '');
+
+      /* حذف query string و hash */
+      path = path.split('?')[0].split('#')[0];
+
+      /* آخرین بخش مسیر (نام فایل) */
+      var parts = path.split('/');
+      var file = parts[parts.length - 1] || '';
+
+      /* اگه فایل خالی بود (ریشه) → index.html */
+      if (!file) file = 'index.html';
+
+      return file.toLowerCase();
+    } catch (e) {
+      return '';
+    }
+  }
+
+  /* ────────────────────────────────────────────────────────────
+   * ۳) تشخیص رفرش
+   * ──────────────────────────────────────────────────────────── */
+  function isPageReload() {
     /* روش مدرن: PerformanceNavigationTiming */
-    if (window.performance && typeof performance.getEntriesByType === 'function') {
-      var entries = performance.getEntriesByType('navigation');
-      if (entries && entries.length && entries[0] && entries[0].type) {
-        isReload = (entries[0].type === 'reload');
+    try {
+      if (window.performance && typeof performance.getEntriesByType === 'function') {
+        var entries = performance.getEntriesByType('navigation');
+        if (entries && entries.length) {
+          var type = entries[0] && entries[0].type;
+          log('Navigation type:', type);
+          if (type === 'reload') return true;
+          if (type === 'navigate' || type === 'back_forward') return false;
+        }
       }
+    } catch (e) {
+      log('getEntriesByType failed:', e);
     }
 
     /* Fallback: performance.navigation (مرورگرهای قدیمی) */
-    if (!isReload && window.performance && performance.navigation) {
-      isReload = (performance.navigation.type === 1);
+    try {
+      if (window.performance && performance.navigation) {
+        var navType = performance.navigation.type;
+        log('Legacy navigation type:', navType);
+        if (navType === 1) return true;       /* TYPE_RELOAD */
+        if (navType === 0) return false;      /* TYPE_NAVIGATE */
+        if (navType === 2) return false;      /* TYPE_BACK_FORWARD */
+      }
+    } catch (e) {
+      log('performance.navigation failed:', e);
     }
+
+    /* اگه هیچی تشخیص نشد → فرض کن رفرش نیست */
+    return false;
+  }
+
+  /* ────────────────────────────────────────────────────────────
+   * ۴) نقشه‌ی مقصد — فقط برای این دو فایل
+   * ──────────────────────────────────────────────────────────── */
+  var PAGE_DESTINATIONS = {
+    'take.html': 'student.html',
+    'view.html': 'teacher.html'
+  };
+
+  /* ────────────────────────────────────────────────────────────
+   * ۵) جلوگیری از حلقه‌ی بی‌نهایت
+   * ──────────────────────────────────────────────────────────── */
+  function hasRecentlyRedirected() {
+    try {
+      var last = sessionStorage.getItem('_refresh_guard_ts');
+      if (!last) return false;
+
+      var ts = parseInt(last, 10);
+      if (isNaN(ts)) return false;
+
+      /* اگه کمتر از ۳ ثانیه پیش بوده → حلقه */
+      return (Date.now() - ts) < 3000;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function markRedirect() {
+    try {
+      sessionStorage.setItem('_refresh_guard_ts', String(Date.now()));
+    } catch (e) {}
+  }
+
+  /* ────────────────────────────────────────────────────────────
+   * ۶) اصلی
+   * ──────────────────────────────────────────────────────────── */
+  var currentFile = getCurrentFile();
+  log('فایل جاری:', currentFile);
+
+  /* چک کن این فایل توی نقشه هست یا نه */
+  var destination = PAGE_DESTINATIONS[currentFile];
+
+  if (!destination) {
+    /* این صفحه نباید ریدایرکت کنه → عادی کار کن */
+    log('این صفحه توی نقشه نیست → عادی کار می‌کنه');
+    return;
+  }
+
+  log('این صفحه در نقشه هست → مقصد:', destination);
+
+  /* چک رفرش */
+  var reloaded = isPageReload();
+
+  if (!reloaded) {
+    log('رفرش نبود → عادی کار می‌کنه');
+    return;
+  }
+
+  log('🚨 رفرش تشخیص داده شد!');
+
+  /* چک حلقه */
+  if (hasRecentlyRedirected()) {
+    log('⚠️ ریدایرکت اخیر بوده → جلوگیری از حلقه');
+    return;
+  }
+
+  /* ریدایرکت */
+  markRedirect();
+  log('➡️ ریدایرکت به:', destination);
+
+  try {
+    window.location.replace(destination);
   } catch (e) {
-    /* خطای دسترسی → رفرش نیست */
-    isReload = false;
+    try {
+      window.location.href = destination;
+    } catch (e2) {
+      log('❌ ریدایرکت شکست خورد:', e2);
+    }
   }
-
-  /* اگه رفرش نبود → کاری نکن */
-  if (!isReload) return;
-
-  /* ============================================================
-   * تعیین صفحه‌ی مقصد
-   * ============================================================ */
-  var path = '';
-
-  try {
-    path = String(window.location.pathname || '').toLowerCase();
-  } catch (e) {}
-
-  var dest = 'index.html';
-
-  /* ترتیب مهمه — take قبل از student چک بشه */
-  if (path.indexOf('take') !== -1) {
-    dest = 'student.html';
-  } else if (path.indexOf('view') !== -1) {
-    dest = 'teacher.html';
-  } else if (path.indexOf('choose-name') !== -1) {
-    dest = 'index.html';
-  } else if (path.indexOf('student') !== -1) {
-    dest = 'student.html';
-  } else if (path.indexOf('teacher') !== -1) {
-    dest = 'teacher.html';
-  } else {
-    dest = 'index.html';
-  }
-
-  /* ============================================================
-   * علامت‌گذاری قبل از ریدایرکت (برای جلوگیری از حلقه)
-   * ============================================================ */
-  try {
-    sessionStorage.setItem('_refresh_redirected', '1');
-  } catch (e) {}
-
-  /* ============================================================
-   * ریدایرکت — با replace تا دکمه‌ی Back گیر نکنه
-   * ============================================================ */
-  try {
-    window.location.replace(dest);
-  } catch (e) {
-    window.location.href = dest;
-  }
-
-  /* توقف ادامه‌ی اجرای اسکریپت‌ها */
-  try {
-    document.documentElement.style.opacity = '0';
-  } catch (e) {}
 
 })();
