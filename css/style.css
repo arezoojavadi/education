@@ -1625,3 +1625,149 @@ html.reduced-motion *::after {
 /* ============================================================
  * 26) END — سامانه آزمون فاطمه جوادی
  * ============================================================ */
+/* ============================================================
+   🆕 DATE & TIME DISPLAY
+============================================================ */
+
+/* بلوک زمان در کارت لیست */
+.submission-time {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+.submission-time svg {
+  width: 13px;
+  height: 13px;
+  stroke: var(--brand-1);
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+html.dark .submission-time svg { stroke: var(--brand-2); }
+
+.time-date {
+  font-family: 'Vazirmatn', monospace;
+  letter-spacing: 0.5px;
+  color: var(--text-1);
+  font-weight: 800;
+}
+
+.time-clock {
+  font-family: 'Vazirmatn', monospace;
+  letter-spacing: 1px;
+  color: var(--brand-1);
+  font-weight: 900;
+  background: rgba(108, 92, 231, 0.08);
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(108, 92, 231, 0.15);
+}
+
+html.dark .time-clock {
+  color: var(--brand-2);
+  background: rgba(162, 155, 254, 0.12);
+  border-color: rgba(162, 155, 254, 0.2);
+}
+
+.time-sep {
+  color: var(--text-3);
+  font-weight: 900;
+}
+
+.time-relative {
+  font-size: 10.5px;
+  color: var(--text-3);
+  font-weight: 600;
+  font-style: italic;
+}
+
+/* بلوک زمان در جزئیات */
+.detail-time {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg,
+    rgba(108, 92, 231, 0.06),
+    rgba(0, 206, 201, 0.06));
+  border: 1px solid rgba(108, 92, 231, 0.15);
+  border-right: 4px solid var(--brand-1);
+  border-radius: var(--radius-md);
+  margin-top: 12px;
+}
+
+html.dark .detail-time {
+  background: linear-gradient(135deg,
+    rgba(162, 155, 254, 0.1),
+    rgba(0, 206, 201, 0.08));
+  border-color: rgba(162, 155, 254, 0.2);
+  border-right-color: var(--brand-2);
+}
+
+.detail-time > svg {
+  width: 24px;
+  height: 24px;
+  stroke: var(--brand-1);
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+html.dark .detail-time > svg { stroke: var(--brand-2); }
+
+.detail-time-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.detail-time-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-2);
+  margin-bottom: 4px;
+  letter-spacing: 0.3px;
+}
+
+.detail-time-value {
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--text-1);
+  font-family: 'Vazirmatn', monospace;
+  letter-spacing: 0.5px;
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+.detail-time-relative {
+  font-size: 11.5px;
+  color: var(--brand-1);
+  font-weight: 700;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+html.dark .detail-time-relative { color: var(--brand-2); }
+
+/* ریسپانسیو */
+@media (max-width: 600px) {
+  .submission-time { font-size: 11px; gap: 4px; }
+  .submission-time svg { width: 12px; height: 12px; }
+  .time-clock { padding: 2px 6px; font-size: 11px; }
+
+  .detail-time { padding: 14px 16px; gap: 10px; }
+  .detail-time > svg { width: 20px; height: 20px; }
+  .detail-time-value { font-size: 13px; }
+}
