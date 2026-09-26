@@ -7,10 +7,6 @@
   <meta name="author" content="فاطمه جوادی">
   <meta name="theme-color" content="#6C5CE7" id="themeMeta">
   <meta name="color-scheme" content="light dark">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="سامانه آزمون">
-  <meta name="format-detection" content="telephone=no">
 
   <title>ورود | سامانه آزمون فاطمه جوادی</title>
 
@@ -18,11 +14,11 @@
   <link rel="manifest" href="manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
     /* ============================================
-       RESET & BASE
+       RESET
        ============================================ */
     *, *::before, *::after {
       box-sizing: border-box;
@@ -32,261 +28,125 @@
     }
 
     /* ============================================
-       DESIGN TOKENS — LIGHT
+       DESIGN TOKENS — LIGHT (سریع و بدون blur)
        ============================================ */
     :root {
-      /* Brand */
       --brand-1: #6C5CE7;
-      --brand-2: #A29BFE;
+      --brand-2: #8E7CFF;
       --brand-3: #00CEC9;
-      --brand-4: #55EFC4;
-      --brand-5: #FD79A8;
-      --brand-6: #FDCB6E;
+      --brand-4: #FD79A8;
+      --brand-5: #FDCB6E;
 
-      /* Semantic */
       --success: #00B894;
       --danger: #FF6B6B;
-      --warning: #FDCB6E;
 
-      /* Surfaces */
-      --bg-base: #F5F3FF;
-      --bg-grad-1: #EDE9FE;
-      --bg-grad-2: #DBEAFE;
-      --bg-grad-3: #FCE7F3;
+      /* پس‌زمینه — گرادیانت static */
+      --bg: linear-gradient(135deg, #EEF0FF 0%, #F5F0FF 50%, #FFF0F8 100%);
 
-      /* Aurora colors */
-      --aurora-1: rgba(108, 92, 231, 0.55);
-      --aurora-2: rgba(0, 206, 201, 0.45);
-      --aurora-3: rgba(253, 121, 168, 0.4);
-      --aurora-4: rgba(85, 239, 196, 0.35);
+      /* کارت */
+      --card-bg: #FFFFFF;
+      --card-border: rgba(108, 92, 231, 0.08);
 
-      /* Card */
-      --card-bg: rgba(255, 255, 255, 0.72);
-      --card-border: rgba(255, 255, 255, 0.9);
-      --card-shadow: 0 20px 60px rgba(108, 92, 231, 0.18);
-      --card-shadow-hover: 0 32px 80px rgba(108, 92, 231, 0.28);
-
-      /* Text */
-      --text-1: #1F1B3A;
+      /* متن */
+      --text-1: #1E1B3A;
       --text-2: #6B6789;
-      --text-3: #A8A3C7;
+      --text-3: #A5A0C0;
 
-      /* Inputs */
-      --input-bg: rgba(255, 255, 255, 0.65);
-      --input-border: rgba(108, 92, 231, 0.15);
-      --input-border-focus: #6C5CE7;
-      --input-glow: rgba(108, 92, 231, 0.35);
+      /* ورودی */
+      --input-bg: #F8F7FF;
+      --input-border: #E5E0FF;
+      --input-focus: #6C5CE7;
+      --input-glow: rgba(108, 92, 231, 0.18);
 
-      /* Effects */
-      --glow-1: rgba(108, 92, 231, 0.4);
-      --glow-2: rgba(0, 206, 201, 0.35);
-      --grid-color: rgba(108, 92, 231, 0.05);
+      --shadow: 0 4px 20px rgba(108, 92, 231, 0.08), 0 1px 3px rgba(0,0,0,0.03);
+      --shadow-hover: 0 8px 32px rgba(108, 92, 231, 0.15);
 
-      /* Motion */
-      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-
-      /* Radius */
-      --r-sm: 12px;
-      --r-md: 16px;
-      --r-lg: 24px;
-      --r-xl: 32px;
+      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+      --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    /* ============================================
-       DESIGN TOKENS — DARK
-       ============================================ */
+    /* DARK */
     html.dark {
-      --brand-1: #A29BFE;
-      --brand-2: #6C5CE7;
-      --brand-3: #00CEC9;
+      --bg: linear-gradient(135deg, #0F0C24 0%, #14102E 50%, #1A1030 100%);
+      --card-bg: #1A1638;
+      --card-border: rgba(162, 155, 254, 0.12);
 
-      --bg-base: #07061A;
-      --bg-grad-1: #0A0820;
-      --bg-grad-2: #140B2E;
-      --bg-grad-3: #1A0F35;
+      --text-1: #F2F0FF;
+      --text-2: #A5A0C0;
+      --text-3: #6B6789;
 
-      --aurora-1: rgba(162, 155, 254, 0.5);
-      --aurora-2: rgba(0, 206, 201, 0.4);
-      --aurora-3: rgba(253, 121, 168, 0.35);
-      --aurora-4: rgba(85, 239, 196, 0.3);
+      --input-bg: #14102E;
+      --input-border: #2A2456;
+      --input-focus: #A29BFE;
+      --input-glow: rgba(162, 155, 254, 0.25);
 
-      --card-bg: rgba(26, 22, 56, 0.65);
-      --card-border: rgba(162, 155, 254, 0.25);
-      --card-shadow: 0 20px 60px rgba(0, 0, 0, 0.65);
-      --card-shadow-hover: 0 32px 80px rgba(0, 0, 0, 0.85);
-
-      --text-1: #F5F3FF;
-      --text-2: #B8B3D4;
-      --text-3: #7A7599;
-
-      --input-bg: rgba(15, 12, 35, 0.7);
-      --input-border: rgba(162, 155, 254, 0.25);
-      --input-border-focus: #A29BFE;
-      --input-glow: rgba(162, 155, 254, 0.5);
-
-      --glow-1: rgba(162, 155, 254, 0.5);
-      --glow-2: rgba(0, 206, 201, 0.45);
-      --grid-color: rgba(162, 155, 254, 0.07);
+      --shadow: 0 4px 20px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.3);
+      --shadow-hover: 0 8px 32px rgba(0,0,0,0.5);
     }
 
     /* ============================================
        BASE
        ============================================ */
     html, body {
-      min-height: 100%;
       height: 100%;
+      min-height: 100%;
     }
 
     body {
       font-family: 'Vazirmatn', system-ui, -apple-system, sans-serif;
-      background: var(--bg-base);
+      background: var(--bg);
+      background-attachment: fixed;
       color: var(--text-1);
-      overflow-x: hidden;
       line-height: 1.6;
+      overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      transition: background 0.6s var(--ease-out), color 0.4s var(--ease-out);
+      transition: background 0.4s var(--ease), color 0.4s var(--ease);
     }
 
     button { font-family: inherit; cursor: pointer; }
     input { font-family: inherit; }
 
     /* ============================================
-       BACKGROUND LAYERS
+       BACKGROUND PATTERN — SVG سبک (بدون blur)
        ============================================ */
-    .bg-base {
-      position: fixed;
-      inset: 0;
-      background: linear-gradient(135deg, var(--bg-grad-1) 0%, var(--bg-grad-2) 50%, var(--bg-grad-3) 100%);
-      z-index: -5;
-      transition: background 0.8s var(--ease-out);
-    }
-
-    .bg-aurora {
-      position: fixed;
-      inset: -20%;
-      z-index: -4;
-      filter: blur(80px);
-      opacity: 0.85;
-      pointer-events: none;
-    }
-
-    .aurora {
-      position: absolute;
-      border-radius: 50%;
-      mix-blend-mode: screen;
-      animation: auroraFloat 24s ease-in-out infinite;
-      will-change: transform;
-    }
-
-    html.dark .aurora { mix-blend-mode: lighten; }
-
-    .aurora-1 {
-      width: 60vw; height: 60vw;
-      max-width: 800px; max-height: 800px;
-      background: radial-gradient(circle, var(--aurora-1) 0%, transparent 65%);
-      top: -10%; right: -10%;
-      animation-delay: 0s;
-    }
-
-    .aurora-2 {
-      width: 55vw; height: 55vw;
-      max-width: 750px; max-height: 750px;
-      background: radial-gradient(circle, var(--aurora-2) 0%, transparent 65%);
-      bottom: -15%; left: -10%;
-      animation-delay: -6s;
-    }
-
-    .aurora-3 {
-      width: 50vw; height: 50vw;
-      max-width: 700px; max-height: 700px;
-      background: radial-gradient(circle, var(--aurora-3) 0%, transparent 65%);
-      top: 30%; left: 20%;
-      animation-delay: -12s;
-    }
-
-    .aurora-4 {
-      width: 40vw; height: 40vw;
-      max-width: 600px; max-height: 600px;
-      background: radial-gradient(circle, var(--aurora-4) 0%, transparent 65%);
-      bottom: 10%; right: 25%;
-      animation-delay: -18s;
-    }
-
-    @keyframes auroraFloat {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      25% { transform: translate(6%, -8%) scale(1.1); }
-      50% { transform: translate(-5%, 6%) scale(0.95); }
-      75% { transform: translate(4%, 4%) scale(1.05); }
-    }
-
-    .bg-grid {
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(var(--grid-color) 1px, transparent 1px),
-        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-      background-size: 48px 48px;
-      z-index: -3;
-      animation: gridDrift 60s linear infinite;
-      mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
-      -webkit-mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
-    }
-
-    @keyframes gridDrift {
-      from { background-position: 0 0, 0 0; }
-      to { background-position: 48px 48px, 48px 48px; }
-    }
-
-    .bg-noise {
+    .bg-pattern {
       position: fixed;
       inset: 0;
       z-index: -2;
-      opacity: 0.035;
+      opacity: 0.4;
       pointer-events: none;
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+      background-image:
+        radial-gradient(circle at 20% 20%, rgba(108, 92, 231, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(0, 206, 201, 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(253, 121, 168, 0.05) 0%, transparent 50%);
+      transition: opacity 0.4s;
     }
 
-    html.dark .bg-noise { opacity: 0.06; }
+    html.dark .bg-pattern {
+      opacity: 0.7;
+      background-image:
+        radial-gradient(circle at 20% 20%, rgba(162, 155, 254, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(0, 206, 201, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(253, 121, 168, 0.08) 0%, transparent 50%);
+    }
 
-    /* ============================================
-       PARTICLES
-       ============================================ */
-    .particles {
+    /* الگوی نقطه‌ای — SVG inline (سریع) */
+    .bg-dots {
       position: fixed;
       inset: 0;
       z-index: -1;
-      pointer-events: none;
-      overflow: hidden;
-    }
-
-    .particle {
-      position: absolute;
-      border-radius: 50%;
-      background: var(--brand-1);
       opacity: 0.35;
-      animation: particleFloat linear infinite;
-      will-change: transform;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='2' cy='2' r='1' fill='%236C5CE7' opacity='0.35'/></svg>");
+      background-size: 32px 32px;
+      mask-image: radial-gradient(ellipse at center, black 10%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse at center, black 10%, transparent 70%);
     }
 
-    html.dark .particle {
-      background: var(--brand-2);
+    html.dark .bg-dots {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='2' cy='2' r='1' fill='%23A29BFE' opacity='0.5'/></svg>");
       opacity: 0.5;
-    }
-
-    @keyframes particleFloat {
-      0% {
-        transform: translate(0, 0);
-        opacity: 0;
-      }
-      10% { opacity: 0.4; }
-      90% { opacity: 0.4; }
-      100% {
-        transform: translate(var(--dx, 40px), var(--dy, -100vh));
-        opacity: 0;
-      }
     }
 
     /* ============================================
@@ -296,132 +156,58 @@
       position: fixed;
       top: 20px;
       left: 20px;
-      display: flex;
-      gap: 10px;
       z-index: 100;
     }
 
     .icon-btn {
-      width: 48px;
-      height: 48px;
-      border-radius: 16px;
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
       display: flex;
       align-items: center;
       justify-content: center;
       color: var(--text-1);
-      transition: all 0.35s var(--ease-spring);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      box-shadow: var(--shadow);
+      transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
     }
 
     .icon-btn:hover {
-      transform: translateY(-3px) scale(1.05);
-      box-shadow: 0 10px 28px var(--glow-1);
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: var(--shadow-hover);
     }
 
-    .icon-btn:active { transform: scale(0.92); }
+    .icon-btn:active {
+      transform: scale(0.94);
+    }
 
-    .icon-btn svg {
+    .icon-wrap {
+      position: relative;
       width: 22px;
       height: 22px;
+    }
+
+    .icon-wrap svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
       stroke: currentColor;
       fill: none;
       stroke-width: 2;
       stroke-linecap: round;
       stroke-linejoin: round;
-      transition: opacity 0.3s, transform 0.4s var(--ease-spring);
-    }
-
-    /* Theme icons */
-    .theme-icon-wrap {
-      position: relative;
-      width: 22px;
-      height: 22px;
-    }
-
-    .theme-icon-wrap svg {
-      position: absolute;
-      inset: 0;
-      transition: opacity 0.35s, transform 0.5s var(--ease-spring);
+      transition: opacity 0.25s, transform 0.3s var(--ease);
     }
 
     .icon-sun { opacity: 1; transform: rotate(0) scale(1); }
-    .icon-moon { opacity: 0; transform: rotate(-90deg) scale(0.4); }
-    html.dark .icon-sun { opacity: 0; transform: rotate(90deg) scale(0.4); }
+    .icon-moon { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+    html.dark .icon-sun { opacity: 0; transform: rotate(90deg) scale(0.5); }
     html.dark .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
 
-    /* Sound icon */
-    .sound-icon-wrap {
-      position: relative;
-      width: 22px;
-      height: 22px;
-    }
-
-    .sound-icon-wrap svg {
-      position: absolute;
-      inset: 0;
-    }
-
-    .icon-sound-on { opacity: 1; }
-    .icon-sound-off { opacity: 0; }
-    body.muted .icon-sound-on { opacity: 0; }
-    body.muted .icon-sound-off { opacity: 1; }
-
     /* ============================================
-       NETWORK INDICATOR
-       ============================================ */
-    .network-indicator {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 8px 14px 8px 10px;
-      border-radius: 14px;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-2);
-      z-index: 100;
-      opacity: 0;
-      transform: translateY(-8px);
-      transition: all 0.4s var(--ease-out);
-      pointer-events: none;
-    }
-
-    .network-indicator.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .net-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--success);
-      box-shadow: 0 0 0 3px rgba(0, 184, 148, 0.2);
-      animation: netPulse 2s ease-in-out infinite;
-    }
-
-    .net-dot.offline {
-      background: var(--danger);
-      box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
-    }
-
-    @keyframes netPulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.15); }
-    }
-
-    /* ============================================
-       MAIN LAYOUT
+       APP / CARD
        ============================================ */
     .app {
       position: relative;
@@ -431,181 +217,86 @@
       align-items: center;
       justify-content: center;
       padding: 80px 20px 40px;
-      z-index: 1;
     }
 
-    /* ============================================
-       CARD
-       ============================================ */
     .card {
       width: 100%;
-      max-width: 460px;
+      max-width: 440px;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: var(--r-xl);
-      padding: 44px 38px 32px;
-      backdrop-filter: blur(32px) saturate(180%);
-      -webkit-backdrop-filter: blur(32px) saturate(180%);
-      box-shadow: var(--card-shadow);
+      border-radius: 28px;
+      padding: 42px 36px 30px;
+      box-shadow: var(--shadow);
       position: relative;
       overflow: hidden;
-      animation: cardEnter 0.8s var(--ease-out) both;
-      transition: background 0.5s var(--ease-out), border 0.5s var(--ease-out), box-shadow 0.5s var(--ease-out);
+      transition: background 0.4s var(--ease), border 0.4s var(--ease), box-shadow 0.4s var(--ease);
     }
 
-    .card:hover {
-      box-shadow: var(--card-shadow-hover);
-    }
-
-    /* Shine line on top */
+    /* نوار رنگی بالای کارت */
     .card::before {
       content: '';
       position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      background: linear-gradient(90deg,
-        transparent,
-        var(--brand-1),
-        var(--brand-3),
-        var(--brand-5),
-        var(--brand-1),
-        transparent);
+      top: 0;
+      right: 0;
+      left: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #6C5CE7, #00CEC9, #FD79A8, #6C5CE7);
       background-size: 200% 100%;
-      animation: shineLine 4s linear infinite;
+      animation: shimmer 6s linear infinite;
     }
 
-    @keyframes shineLine {
-      from { background-position: 100% 0; }
-      to { background-position: -100% 0; }
-    }
-
-    /* Subtle inner glow */
-    .card::after {
-      content: '';
-      position: absolute;
-      top: -50%; left: -50%;
-      width: 200%; height: 200%;
-      background: radial-gradient(circle at 30% 20%, rgba(162,155,254,0.08) 0%, transparent 40%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    @keyframes cardEnter {
-      from {
-        opacity: 0;
-        transform: translateY(40px) scale(0.92);
-        filter: blur(8px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        filter: blur(0);
-      }
+    @keyframes shimmer {
+      to { background-position: 200% 0; }
     }
 
     /* ============================================
-       LOGO
+       LOGO — SVG سبک
        ============================================ */
     .logo-wrap {
       text-align: center;
-      margin-bottom: 26px;
-      position: relative;
-      z-index: 1;
+      margin-bottom: 24px;
     }
 
     .logo {
-      width: 88px;
-      height: 88px;
-      margin: 0 auto 22px;
-      border-radius: 26px;
-      background: linear-gradient(135deg, var(--brand-1) 0%, var(--brand-3) 100%);
+      width: 76px;
+      height: 76px;
+      margin: 0 auto 18px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #6C5CE7, #00CEC9);
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
-      box-shadow: 0 16px 40px var(--glow-1);
-      animation: logoEnter 1s var(--ease-spring) 0.15s both;
+      box-shadow: 0 10px 28px rgba(108, 92, 231, 0.3);
+      animation: logoPop 0.6s var(--ease-bounce) both;
     }
 
-    .logo::before {
-      content: '';
-      position: absolute;
-      inset: -8px;
-      border-radius: 34px;
-      background: linear-gradient(135deg, var(--brand-1), var(--brand-3), var(--brand-5));
-      opacity: 0.4;
-      filter: blur(20px);
-      z-index: -1;
-      animation: logoGlow 4s ease-in-out infinite;
-    }
-
-    .logo::after {
-      content: '';
-      position: absolute;
-      inset: -14px;
-      border-radius: 40px;
-      border: 1.5px dashed rgba(108, 92, 231, 0.3);
-      animation: logoRotate 25s linear infinite;
-    }
-
-    html.dark .logo::after {
-      border-color: rgba(162, 155, 254, 0.35);
-    }
-
-    @keyframes logoRotate {
-      to { transform: rotate(360deg); }
-    }
-
-    @keyframes logoGlow {
-      0%, 100% { opacity: 0.35; transform: scale(1); }
-      50% { opacity: 0.65; transform: scale(1.08); }
-    }
-
-    @keyframes logoEnter {
-      0% { opacity: 0; transform: scale(0.2) rotate(-45deg); }
-      65% { transform: scale(1.15) rotate(8deg); }
-      100% { opacity: 1; transform: scale(1) rotate(0); }
+    @keyframes logoPop {
+      0% { opacity: 0; transform: scale(0.4); }
+      100% { opacity: 1; transform: scale(1); }
     }
 
     .logo svg {
-      width: 46px;
-      height: 46px;
+      width: 40px;
+      height: 40px;
       color: #fff;
-      animation: logoIconBounce 3s var(--ease-in-out) infinite;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
-    @keyframes logoIconBounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-3px); }
-    }
-
-    /* ============================================
-       TITLE
-       ============================================ */
     .title {
-      font-size: clamp(22px, 5vw, 28px);
+      font-size: 26px;
       font-weight: 900;
-      letter-spacing: -0.5px;
-      background: linear-gradient(135deg, var(--brand-1) 0%, var(--brand-3) 50%, var(--brand-5) 100%);
-      background-size: 200% 200%;
+      letter-spacing: -0.3px;
+      background: linear-gradient(135deg, #6C5CE7, #00CEC9);
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-bottom: 8px;
-      animation: gradientFlow 6s ease infinite;
+      margin-bottom: 6px;
       line-height: 1.3;
-    }
-
-    @keyframes gradientFlow {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-    }
-
-    .greeting {
-      font-size: 14px;
-      color: var(--text-2);
-      font-weight: 500;
-      margin-bottom: 4px;
     }
 
     .subtitle {
@@ -615,53 +306,35 @@
       line-height: 1.7;
     }
 
-    /* ============================================
-       DESIGNER BADGE
-       ============================================ */
     .designer-badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      margin-top: 14px;
-      padding: 6px 14px;
-      background: linear-gradient(135deg, rgba(108,92,231,0.1), rgba(0,206,201,0.08));
-      border: 1px solid rgba(108,92,231,0.18);
-      border-radius: 20px;
-      font-size: 11.5px;
+      gap: 5px;
+      margin-top: 12px;
+      padding: 5px 13px;
+      background: linear-gradient(135deg, rgba(108, 92, 231, 0.08), rgba(0, 206, 201, 0.08));
+      border: 1px solid rgba(108, 92, 231, 0.15);
+      border-radius: 16px;
+      font-size: 11px;
       font-weight: 700;
       color: var(--brand-1);
       letter-spacing: 0.2px;
     }
 
     html.dark .designer-badge {
-      background: linear-gradient(135deg, rgba(162,155,254,0.15), rgba(0,206,201,0.12));
-      border-color: rgba(162,155,254,0.3);
-    }
-
-    .designer-badge .spark {
-      animation: sparkle 2.5s ease-in-out infinite;
-      display: inline-block;
-    }
-
-    @keyframes sparkle {
-      0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
-      50% { transform: scale(1.3) rotate(20deg); opacity: 0.75; }
+      background: linear-gradient(135deg, rgba(162, 155, 254, 0.12), rgba(0, 206, 201, 0.1));
+      border-color: rgba(162, 155, 254, 0.2);
     }
 
     /* ============================================
-       OTP SECTION
+       OTP
        ============================================ */
-    .otp-section {
-      position: relative;
-      z-index: 1;
-    }
-
     .otp-hint {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      margin: 26px 0 16px;
+      gap: 10px;
+      margin: 22px 0 14px;
       font-size: 12px;
       font-weight: 700;
       color: var(--text-2);
@@ -676,204 +349,117 @@
       background: linear-gradient(90deg, transparent, var(--input-border), transparent);
     }
 
-    .otp-hint .lock-icon {
-      display: inline-flex;
-      animation: lockPulse 3s ease-in-out infinite;
-    }
-
-    @keyframes lockPulse {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.1); opacity: 0.85; }
-    }
-
-    .otp-inputs {
+    .otp {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       justify-content: center;
       direction: ltr;
-      margin-bottom: 24px;
-      perspective: 800px;
+      margin-bottom: 20px;
     }
 
-    .otp-inputs input {
-      width: 54px;
-      height: 68px;
+    .otp input {
+      width: 50px;
+      height: 62px;
       text-align: center;
-      font-size: 30px;
+      font-size: 28px;
       font-weight: 800;
       font-family: 'Vazirmatn', monospace;
       background: var(--input-bg);
       border: 2px solid var(--input-border);
-      border-radius: var(--r-md);
+      border-radius: 14px;
       color: var(--text-1);
       outline: none;
-      transition:
-        border-color 0.25s var(--ease-out),
-        background 0.25s var(--ease-out),
-        transform 0.2s var(--ease-spring),
-        box-shadow 0.25s var(--ease-out);
+      transition: border-color 0.2s var(--ease), background 0.2s var(--ease), transform 0.15s var(--ease);
       caret-color: var(--brand-1);
       -webkit-user-select: none;
       user-select: none;
-      position: relative;
     }
 
-    .otp-inputs input:hover:not(:focus) {
-      border-color: var(--brand-2);
-    }
-
-    .otp-inputs input:focus {
-      border-color: var(--input-border-focus);
+    .otp input:focus {
+      border-color: var(--input-focus);
       background: var(--card-bg);
-      transform: translateY(-4px) scale(1.06);
-      box-shadow:
-        0 12px 28px var(--input-glow),
-        0 0 0 4px rgba(108, 92, 231, 0.1);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px var(--input-glow);
     }
 
-    html.dark .otp-inputs input:focus {
-      box-shadow:
-        0 12px 28px var(--input-glow),
-        0 0 0 4px rgba(162, 155, 254, 0.15);
-    }
-
-    .otp-inputs input.filled {
+    .otp input.filled {
       border-color: var(--brand-1);
-      background: linear-gradient(135deg,
-        rgba(108, 92, 231, 0.15),
-        rgba(0, 206, 201, 0.12));
-      animation: digitPop 0.3s var(--ease-spring);
+      background: linear-gradient(135deg, rgba(108, 92, 231, 0.08), rgba(0, 206, 201, 0.06));
     }
 
-    html.dark .otp-inputs input.filled {
-      background: linear-gradient(135deg,
-        rgba(162, 155, 254, 0.2),
-        rgba(0, 206, 201, 0.15));
+    html.dark .otp input.filled {
+      background: linear-gradient(135deg, rgba(162, 155, 254, 0.15), rgba(0, 206, 201, 0.1));
     }
 
-    @keyframes digitPop {
-      0% { transform: scale(1); }
-      45% { transform: scale(1.14); }
-      100% { transform: scale(1); }
-    }
-
-    .otp-inputs input.error {
+    .otp input.error {
       border-color: var(--danger);
-      background: rgba(255, 107, 107, 0.12);
-      animation: shakeX 0.45s var(--ease-out);
+      background: rgba(255, 107, 107, 0.08);
+      animation: shake 0.35s var(--ease);
     }
 
-    @keyframes shakeX {
+    @keyframes shake {
       0%, 100% { transform: translateX(0); }
-      15% { transform: translateX(-10px); }
-      30% { transform: translateX(9px); }
-      45% { transform: translateX(-6px); }
-      60% { transform: translateX(4px); }
-      75% { transform: translateX(-2px); }
+      25% { transform: translateX(-8px); }
+      75% { transform: translateX(8px); }
     }
 
-    .otp-inputs input.success {
+    .otp input.success {
       border-color: var(--success);
-      background: rgba(0, 184, 148, 0.12);
-      animation: successPulse 0.5s var(--ease-spring);
-    }
-
-    @keyframes successPulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.12); }
-      100% { transform: scale(1); }
+      background: rgba(0, 184, 148, 0.08);
     }
 
     /* ============================================
        BUTTON
        ============================================ */
-    .btn-primary {
+    .btn {
       width: 100%;
-      padding: 17px 24px;
-      font-size: 16px;
+      padding: 16px 22px;
+      font-size: 15.5px;
       font-weight: 800;
-      letter-spacing: 0.2px;
       color: #fff;
-      background: linear-gradient(135deg, var(--brand-1) 0%, var(--brand-2) 100%);
-      background-size: 200% 200%;
+      background: linear-gradient(135deg, #6C5CE7, #8E7CFF);
       border: none;
-      border-radius: var(--r-lg);
+      border-radius: 16px;
       cursor: pointer;
-      position: relative;
-      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      transition: all 0.4s var(--ease-out);
-      box-shadow:
-        0 10px 28px var(--glow-1),
-        inset 0 1px 0 rgba(255,255,255,0.3);
-      min-height: 58px;
+      min-height: 56px;
+      box-shadow: 0 6px 18px rgba(108, 92, 231, 0.28);
+      transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+      position: relative;
+      overflow: hidden;
     }
 
-    .btn-primary::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 60%;
-      height: 100%;
-      background: linear-gradient(90deg,
-        transparent,
-        rgba(255,255,255,0.5),
-        transparent);
-      transition: left 0.7s var(--ease-out);
+    .btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 26px rgba(108, 92, 231, 0.4);
     }
 
-    .btn-primary:hover:not(:disabled) {
-      transform: translateY(-3px);
-      box-shadow:
-        0 18px 42px var(--glow-1),
-        inset 0 1px 0 rgba(255,255,255,0.4);
-      background-position: 100% 50%;
+    .btn:active:not(:disabled) {
+      transform: translateY(0) scale(0.98);
     }
 
-    .btn-primary:hover:not(:disabled)::before {
-      left: 120%;
-    }
-
-    .btn-primary:active:not(:disabled) {
-      transform: translateY(-1px) scale(0.985);
-    }
-
-    .btn-primary:disabled {
-      opacity: 0.65;
+    .btn:disabled {
+      opacity: 0.7;
       cursor: not-allowed;
       transform: none;
     }
 
-    .btn-primary .label {
+    .btn .label {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      position: relative;
-      z-index: 1;
     }
 
-    .btn-primary .arrow {
-      display: inline-flex;
-      transition: transform 0.3s var(--ease-spring);
-    }
-
-    .btn-primary:hover:not(:disabled) .arrow {
-      transform: translateX(-4px);
-    }
-
-    /* Spinner */
     .spinner {
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       border: 2.5px solid rgba(255,255,255,0.3);
       border-top-color: #fff;
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      display: inline-block;
+      animation: spin 0.7s linear infinite;
     }
 
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -882,195 +468,114 @@
        MESSAGE
        ============================================ */
     .message {
-      margin-top: 18px;
-      padding: 0 18px;
+      margin-top: 14px;
+      padding: 0 16px;
       text-align: center;
-      font-size: 13.5px;
+      font-size: 13px;
       font-weight: 700;
-      line-height: 1.6;
-      border-radius: 14px;
+      border-radius: 12px;
       opacity: 0;
-      transform: translateY(-10px);
+      transform: translateY(-6px);
       max-height: 0;
       overflow: hidden;
-      transition: all 0.4s var(--ease-out);
+      transition: all 0.3s var(--ease);
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
     }
 
     .message.show {
       opacity: 1;
       transform: translateY(0);
-      max-height: 120px;
-      padding: 13px 18px;
+      max-height: 100px;
+      padding: 11px 16px;
     }
 
     .message.error {
-      background: rgba(255, 107, 107, 0.12);
+      background: rgba(255, 107, 107, 0.1);
       color: var(--danger);
-      border: 1px solid rgba(255, 107, 107, 0.25);
+      border: 1px solid rgba(255, 107, 107, 0.2);
     }
 
     .message.success {
-      background: rgba(0, 184, 148, 0.12);
+      background: rgba(0, 184, 148, 0.1);
       color: var(--success);
-      border: 1px solid rgba(0, 184, 148, 0.25);
-    }
-
-    .message.info {
-      background: rgba(0, 206, 201, 0.1);
-      color: var(--brand-3);
-      border: 1px solid rgba(0, 206, 201, 0.25);
+      border: 1px solid rgba(0, 184, 148, 0.2);
     }
 
     /* ============================================
        FOOTER
        ============================================ */
-    .card-footer {
+    .footer {
       text-align: center;
-      margin-top: 22px;
-      padding-top: 18px;
+      margin-top: 20px;
+      padding-top: 16px;
       border-top: 1px solid var(--input-border);
-      font-size: 11.5px;
+      font-size: 11px;
       color: var(--text-3);
       font-weight: 500;
-      position: relative;
-      z-index: 1;
     }
 
-    .card-footer .heart {
+    .footer .heart {
       display: inline-block;
-      color: var(--brand-5);
-      animation: heartbeat 1.6s var(--ease-in-out) infinite;
+      color: #FD79A8;
+      animation: heartbeat 1.8s ease-in-out infinite;
     }
 
     @keyframes heartbeat {
       0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.25); }
-    }
-
-    /* ============================================
-       DOTS LOADER (for loading state)
-       ============================================ */
-    .dots {
-      display: inline-flex;
-      gap: 4px;
-      align-items: center;
-    }
-
-    .dots span {
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: currentColor;
-      animation: dotPulse 1.4s ease-in-out infinite;
-    }
-
-    .dots span:nth-child(2) { animation-delay: 0.2s; }
-    .dots span:nth-child(3) { animation-delay: 0.4s; }
-
-    @keyframes dotPulse {
-      0%, 60%, 100% { transform: scale(0.6); opacity: 0.4; }
-      30% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); }
     }
 
     /* ============================================
        RESPONSIVE
        ============================================ */
     @media (max-width: 520px) {
-      .card {
-        padding: 36px 24px 26px;
-        border-radius: var(--r-lg);
+      .card { padding: 34px 22px 24px; border-radius: 24px; }
+      .logo { width: 66px; height: 66px; border-radius: 20px; }
+      .logo svg { width: 34px; height: 34px; }
+      .title { font-size: 22px; }
+      .otp { gap: 6px; }
+      .otp input {
+        width: 44px;
+        height: 56px;
+        font-size: 24px;
+        border-radius: 12px;
       }
-
-      .logo { width: 72px; height: 72px; border-radius: 22px; }
-      .logo svg { width: 38px; height: 38px; }
-
-      .otp-inputs { gap: 6px; }
-
-      .otp-inputs input {
-        width: 46px;
-        height: 58px;
-        font-size: 25px;
-        border-radius: 13px;
-      }
-
-      .btn-primary {
-        padding: 15px 20px;
-        font-size: 15px;
-        min-height: 54px;
-      }
-
-      .top-controls { top: 14px; left: 14px; gap: 8px; }
-      .icon-btn { width: 44px; height: 44px; border-radius: 14px; }
-      .icon-btn svg { width: 20px; height: 20px; }
-
-      .network-indicator { top: 14px; right: 14px; font-size: 11px; padding: 6px 12px 6px 8px; }
+      .btn { padding: 14px 20px; font-size: 14.5px; min-height: 52px; }
+      .top-controls { top: 14px; left: 14px; }
+      .icon-btn { width: 42px; height: 42px; }
     }
 
     @media (max-width: 380px) {
-      .card { padding: 30px 18px 22px; }
-      .otp-inputs { gap: 5px; }
-      .otp-inputs input {
-        width: 40px;
-        height: 52px;
-        font-size: 22px;
-        border-radius: 11px;
+      .card { padding: 28px 16px 20px; }
+      .otp { gap: 4px; }
+      .otp input {
+        width: 38px;
+        height: 48px;
+        font-size: 20px;
+        border-radius: 10px;
       }
-      .app { padding: 70px 14px 30px; }
+      .app { padding: 70px 12px 30px; }
     }
 
-    @media (max-height: 700px) {
-      .app { padding-top: 60px; padding-bottom: 20px; }
-      .logo { width: 68px; height: 68px; margin-bottom: 16px; }
-      .logo svg { width: 34px; height: 34px; }
-      .logo-wrap { margin-bottom: 18px; }
-    }
-
-    /* ============================================
-       REDUCED MOTION
-       ============================================ */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
       }
-      .bg-aurora, .particles { display: none; }
-    }
-
-    /* ============================================
-       PRINT
-       ============================================ */
-    @media print {
-      .top-controls, .network-indicator, .bg-aurora, .particles, .bg-noise {
-        display: none !important;
-      }
-      body { background: #fff !important; color: #000 !important; }
-      .card { box-shadow: none !important; border: 1px solid #ddd !important; }
     }
   </style>
 </head>
 <body>
 
-  <!-- ============ BACKGROUND ============ -->
-  <div class="bg-base"></div>
-  <div class="bg-aurora" aria-hidden="true">
-    <div class="aurora aurora-1"></div>
-    <div class="aurora aurora-2"></div>
-    <div class="aurora aurora-3"></div>
-    <div class="aurora aurora-4"></div>
-  </div>
-  <div class="bg-grid" aria-hidden="true"></div>
-  <div class="particles" id="particles" aria-hidden="true"></div>
-  <div class="bg-noise" aria-hidden="true"></div>
+  <div class="bg-pattern" aria-hidden="true"></div>
+  <div class="bg-dots" aria-hidden="true"></div>
 
-  <!-- ============ TOP CONTROLS ============ -->
   <div class="top-controls">
     <button class="icon-btn" id="themeBtn" type="button" title="تغییر حالت روز/شب" aria-label="تغییر تم">
-      <span class="theme-icon-wrap">
+      <span class="icon-wrap">
         <svg class="icon-sun" viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="4"/>
           <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
@@ -1080,197 +585,80 @@
         </svg>
       </span>
     </button>
-
-    <button class="icon-btn" id="soundBtn" type="button" title="صدای بازخورد" aria-label="صدای بازخورد">
-      <span class="sound-icon-wrap">
-        <svg class="icon-sound-on" viewBox="0 0 24 24">
-          <path d="M11 5L6 9H2v6h4l5 4z"/>
-          <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/>
-        </svg>
-        <svg class="icon-sound-off" viewBox="0 0 24 24">
-          <path d="M11 5L6 9H2v6h4l5 4z"/>
-          <line x1="23" y1="9" x2="17" y2="15"/>
-          <line x1="17" y1="9" x2="23" y2="15"/>
-        </svg>
-      </span>
-    </button>
   </div>
 
-  <!-- ============ NETWORK INDICATOR ============ -->
-  <div class="network-indicator" id="netIndicator">
-    <span class="net-dot" id="netDot"></span>
-    <span id="netText">آنلاین</span>
-  </div>
-
-  <!-- ============ MAIN ============ -->
   <main class="app">
     <div class="card">
 
       <div class="logo-wrap">
         <div class="logo">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg viewBox="0 0 24 24">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
             <path d="M14 2v6h6"/>
             <path d="M9 15l2 2 4-4"/>
           </svg>
         </div>
-
-        <p class="greeting" id="greeting">سلام 👋</p>
         <h1 class="title">سامانه آزمون</h1>
         <p class="subtitle">برای شروع، کد ورود ۶ رقمی خود را وارد کنید</p>
-
         <div class="designer-badge">
-          <span class="spark">✨</span>
-          <span>طراحی و توسعه: فاطمه جوادی</span>
+          <span>✨</span>
+          <span>طراحی: فاطمه جوادی</span>
         </div>
       </div>
 
-      <div class="otp-section">
-        <div class="otp-hint">
-          <span class="lock-icon">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="11" width="18" height="11" rx="2"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-            </svg>
-          </span>
-          <span>کد ۶ رقمی</span>
-        </div>
-
-        <div class="otp-inputs" id="otp" dir="ltr">
-          <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" data-i="0" aria-label="رقم ۱" spellcheck="false">
-          <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" data-i="1" aria-label="رقم ۲" spellcheck="false">
-          <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" data-i="2" aria-label="رقم ۳" spellcheck="false">
-          <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" data-i="3" aria-label="رقم ۴" spellcheck="false">
-          <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" data-i="4" aria-label="رقم ۵" spellcheck="false">
-          <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" data-i="5" aria-label="رقم ۶" spellcheck="false">
-        </div>
-
-        <button class="btn-primary" id="loginBtn" type="button">
-          <span class="label">
-            <span>ورود به سامانه</span>
-            <span class="arrow">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="19" y1="12" x2="5" y2="12"/>
-                <polyline points="12 19 5 12 12 5"/>
-              </svg>
-            </span>
-          </span>
-        </button>
-
-        <div class="message" id="message"></div>
+      <div class="otp-hint">
+        <span>کد ۶ رقمی</span>
       </div>
 
-      <div class="card-footer">
+      <div class="otp" id="otp" dir="ltr">
+        <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="رقم ۱" spellcheck="false">
+        <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="رقم ۲" spellcheck="false">
+        <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="رقم ۳" spellcheck="false">
+        <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="رقم ۴" spellcheck="false">
+        <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="رقم ۵" spellcheck="false">
+        <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="رقم ۶" spellcheck="false">
+      </div>
+
+      <button class="btn" id="loginBtn" type="button">
+        <span class="label">
+          <span>ورود به سامانه</span>
+        </span>
+      </button>
+
+      <div class="message" id="message"></div>
+
+      <div class="footer">
         ساخته شده با <span class="heart">♥</span> برای یادگیری بهتر
       </div>
 
     </div>
   </main>
 
-  <!-- ============ SUPABASE ============ -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <!-- ============ APP SCRIPT ============ -->
   <script>
   (function() {
     'use strict';
 
-    // ============================================
-    // CONFIG
-    // ============================================
     var SUPABASE_URL = 'https://cfkwvzbqgapguuaqibmq.supabase.co';
     var SUPABASE_KEY = 'sb_publishable_Qf3R9hPgjApwe2c-qQMoJA_jitobazq';
-
     var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // ============================================
-    // ELEMENTS
-    // ============================================
-    var otpInputs = Array.prototype.slice.call(document.querySelectorAll('#otp input'));
+    var inputs = Array.prototype.slice.call(document.querySelectorAll('#otp input'));
     var loginBtn = document.getElementById('loginBtn');
     var message = document.getElementById('message');
     var themeBtn = document.getElementById('themeBtn');
-    var soundBtn = document.getElementById('soundBtn');
-    var netIndicator = document.getElementById('netIndicator');
-    var netDot = document.getElementById('netDot');
-    var netText = document.getElementById('netText');
-    var particlesContainer = document.getElementById('particles');
-    var greetingEl = document.getElementById('greeting');
-
-    var isLoggingIn = false;
-    var soundEnabled = true;
-
-    // ============================================
-    // SOUND (Web Audio)
-    // ============================================
-    var audioCtx = null;
-
-    function ensureAudio() {
-      if (!audioCtx) {
-        try {
-          var Ctx = window.AudioContext || window.webkitAudioContext;
-          if (Ctx) audioCtx = new Ctx();
-        } catch(e) {}
-      }
-      if (audioCtx && audioCtx.state === 'suspended') {
-        audioCtx.resume().catch(function(){});
-      }
-    }
-
-    function playTone(freq, duration, volume, type) {
-      if (!soundEnabled) return;
-      ensureAudio();
-      if (!audioCtx) return;
-      try {
-        var osc = audioCtx.createOscillator();
-        var gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.type = type || 'sine';
-        osc.frequency.value = freq;
-        var now = audioCtx.currentTime;
-        gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(volume || 0.06, now + 0.01);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + (duration || 0.08));
-        osc.start(now);
-        osc.stop(now + (duration || 0.08) + 0.02);
-      } catch(e) {}
-    }
-
-    function soundType() { playTone(880, 0.05, 0.05); }
-    function soundDelete() { playTone(440, 0.05, 0.04); }
-    function soundError() {
-      playTone(220, 0.15, 0.08);
-      setTimeout(function() { playTone(180, 0.2, 0.08); }, 100);
-    }
-    function soundSuccess() {
-      playTone(660, 0.1, 0.07);
-      setTimeout(function() { playTone(880, 0.15, 0.07); }, 100);
-      setTimeout(function() { playTone(1320, 0.2, 0.06); }, 220);
-    }
-
-    // ============================================
-    // HAPTIC
-    // ============================================
-    function vibrate(ms) {
-      if (navigator.vibrate && window.matchMedia('(pointer: coarse)').matches) {
-        try { navigator.vibrate(ms || 8); } catch(e) {}
-      }
-    }
+    var isLogging = false;
 
     // ============================================
     // THEME
     // ============================================
     function setTheme(isDark) {
       var html = document.documentElement;
-      if (isDark) {
-        html.classList.add('dark');
-      } else {
-        html.classList.remove('dark');
-      }
+      if (isDark) html.classList.add('dark');
+      else html.classList.remove('dark');
       try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch(e) {}
       var meta = document.getElementById('themeMeta');
-      if (meta) meta.setAttribute('content', isDark ? '#0A0820' : '#6C5CE7');
+      if (meta) meta.setAttribute('content', isDark ? '#0F0C24' : '#6C5CE7');
     }
 
     function initTheme() {
@@ -1281,171 +669,60 @@
     }
 
     themeBtn.addEventListener('click', function() {
-      var isDark = !document.documentElement.classList.contains('dark');
-      setTheme(isDark);
-      playTone(isDark ? 400 : 700, 0.06, 0.04);
+      setTheme(!document.documentElement.classList.contains('dark'));
     });
 
     // ============================================
-    // SOUND TOGGLE
-    // ============================================
-    function initSound() {
-      var saved = null;
-      try { saved = localStorage.getItem('sound'); } catch(e) {}
-      soundEnabled = saved !== 'off';
-      document.body.classList.toggle('muted', !soundEnabled);
-    }
-
-    soundBtn.addEventListener('click', function() {
-      soundEnabled = !soundEnabled;
-      document.body.classList.toggle('muted', !soundEnabled);
-      try { localStorage.setItem('sound', soundEnabled ? 'on' : 'off'); } catch(e) {}
-      if (soundEnabled) soundType();
-    });
-
-    // ============================================
-    // NETWORK
-    // ============================================
-    function updateNetwork() {
-      var online = navigator.onLine;
-      netDot.classList.toggle('offline', !online);
-      netText.textContent = online ? 'آنلاین' : 'آفلاین';
-
-      if (!online) {
-        netIndicator.classList.add('show');
-      } else {
-        setTimeout(function() { netIndicator.classList.remove('show'); }, 2000);
-      }
-    }
-
-    window.addEventListener('online', function() {
-      updateNetwork();
-      showMessage('✅ اتصال اینترنت برقرار شد', 'success', 3000);
-    });
-
-    window.addEventListener('offline', function() {
-      updateNetwork();
-      showMessage('⚠️ اتصال اینترنت قطع شد', 'error', 5000);
-    });
-
-    // ============================================
-    // PARTICLES
-    // ============================================
-    function createParticles() {
-      var count = window.innerWidth < 640 ? 14 : 24;
-      var html = '';
-      for (var i = 0; i < count; i++) {
-        var size = 2 + Math.random() * 4;
-        var left = Math.random() * 100;
-        var top = 100 + Math.random() * 20;
-        var duration = 18 + Math.random() * 20;
-        var delay = -Math.random() * 30;
-        var dx = (Math.random() - 0.5) * 200;
-
-        html += '<div class="particle" style="' +
-          'width:' + size.toFixed(1) + 'px;' +
-          'height:' + size.toFixed(1) + 'px;' +
-          'left:' + left.toFixed(2) + '%;' +
-          'top:' + top.toFixed(2) + '%;' +
-          '--dx:' + dx.toFixed(0) + 'px;' +
-          'animation-duration:' + duration.toFixed(1) + 's;' +
-          'animation-delay:' + delay.toFixed(1) + 's;' +
-          '">' +
-        '</div>';
-      }
-      particlesContainer.innerHTML = html;
-    }
-
-    // ============================================
-    // GREETING
-    // ============================================
-    function updateGreeting() {
-      var h = new Date().getHours();
-      var text = 'سلام 👋';
-      if (h >= 5 && h < 11) text = 'صبح بخیر ☀️';
-      else if (h >= 11 && h < 15) text = 'ظهر بخیر 🌤️';
-      else if (h >= 15 && h < 19) text = 'عصر بخیر 🌇';
-      else if (h >= 19 && h < 23) text = 'شب بخیر 🌙';
-      else text = 'شب آرام ✨';
-      greetingEl.textContent = text;
-    }
-
-    // ============================================
-    // MESSAGE
-    // ============================================
-    var msgTimeout = null;
-    function showMessage(text, type, duration) {
-      clearTimeout(msgTimeout);
-      message.className = 'message ' + (type || 'info') + ' show';
-      message.innerHTML = '<span>' + text + '</span>';
-      if (duration) {
-        msgTimeout = setTimeout(function() {
-          message.classList.remove('show');
-        }, duration);
-      }
-    }
-
-    function hideMessage() {
-      clearTimeout(msgTimeout);
-      message.classList.remove('show');
-    }
-
-    // ============================================
-    // OTP LOGIC
+    // HELPERS
     // ============================================
     function getCode() {
       var s = '';
-      for (var i = 0; i < otpInputs.length; i++) s += otpInputs[i].value;
+      for (var i = 0; i < inputs.length; i++) s += inputs[i].value;
       return s;
     }
 
-    function clearAllErrors() {
-      otpInputs.forEach(function(inp) {
+    function hideMessage() {
+      message.classList.remove('show');
+    }
+
+    function showMessage(text, type) {
+      message.className = 'message ' + type + ' show';
+      message.textContent = text;
+    }
+
+    function focusIdx(i) {
+      if (i >= 0 && i < inputs.length) inputs[i].focus();
+    }
+
+    function clearErrors() {
+      inputs.forEach(function(inp) {
         inp.classList.remove('error');
         inp.classList.remove('success');
       });
-      hideMessage();
     }
 
-    function focusIndex(i) {
-      if (i >= 0 && i < otpInputs.length) {
-        otpInputs[i].focus();
-      }
-    }
-
-    function setDigit(idx, digit) {
-      var inp = otpInputs[idx];
-      inp.value = digit;
-      inp.classList.add('filled');
-      inp.classList.remove('error');
-      clearAllErrors();
-    }
-
-    function tryAutoSubmit() {
-      if (getCode().length === 6) {
-        setTimeout(function() { doLogin(); }, 260);
-      }
-    }
-
-    otpInputs.forEach(function(input, idx) {
-
-      // --- keydown ---
+    // ============================================
+    // OTP
+    // ============================================
+    inputs.forEach(function(input, idx) {
       input.addEventListener('keydown', function(e) {
-        // مدیفایرها
         if (e.ctrlKey || e.metaKey || e.altKey) return;
 
         // عدد
         if (e.key.length === 1 && e.key >= '0' && e.key <= '9') {
           e.preventDefault();
-          setDigit(idx, e.key);
-          soundType();
-          vibrate(8);
+          input.value = e.key;
+          input.classList.add('filled');
+          clearErrors();
+          hideMessage();
 
-          if (idx < otpInputs.length - 1) {
-            focusIndex(idx + 1);
+          if (idx < inputs.length - 1) {
+            focusIdx(idx + 1);
           } else {
             input.blur();
-            tryAutoSubmit();
+            if (getCode().length === 6) {
+              setTimeout(doLogin, 200);
+            }
           }
           return;
         }
@@ -1456,265 +733,189 @@
           if (input.value) {
             input.value = '';
             input.classList.remove('filled');
-            soundDelete();
-            vibrate(6);
+            hideMessage();
           } else if (idx > 0) {
-            otpInputs[idx - 1].value = '';
-            otpInputs[idx - 1].classList.remove('filled');
-            focusIndex(idx - 1);
-            soundDelete();
+            inputs[idx - 1].value = '';
+            inputs[idx - 1].classList.remove('filled');
+            focusIdx(idx - 1);
+            hideMessage();
           }
-          clearAllErrors();
           return;
         }
 
-        // Delete
         if (e.key === 'Delete') {
           e.preventDefault();
           input.value = '';
           input.classList.remove('filled');
-          clearAllErrors();
           return;
         }
 
-        // Arrows
-        if (e.key === 'ArrowLeft') { e.preventDefault(); focusIndex(idx - 1); return; }
-        if (e.key === 'ArrowRight') { e.preventDefault(); focusIndex(idx + 1); return; }
-
-        // Home / End
-        if (e.key === 'Home') { e.preventDefault(); focusIndex(0); return; }
-        if (e.key === 'End') { e.preventDefault(); focusIndex(otpInputs.length - 1); return; }
-
-        // Enter
+        if (e.key === 'ArrowLeft') { e.preventDefault(); focusIdx(idx - 1); return; }
+        if (e.key === 'ArrowRight') { e.preventDefault(); focusIdx(idx + 1); return; }
+        if (e.key === 'Home') { e.preventDefault(); focusIdx(0); return; }
+        if (e.key === 'End') { e.preventDefault(); focusIdx(inputs.length - 1); return; }
         if (e.key === 'Enter') { e.preventDefault(); doLogin(); return; }
-
-        // Tab — عادی
         if (e.key === 'Tab') return;
-
-        // هر چیز دیگه
         if (e.key.length === 1) e.preventDefault();
       });
 
-      // --- paste ---
       input.addEventListener('paste', function(e) {
         e.preventDefault();
         var text = '';
         try {
           text = (e.clipboardData || window.clipboardData).getData('text') || '';
         } catch(err) { return; }
-
         var digits = text.replace(/\D/g, '').slice(0, 6);
         if (!digits) return;
-
-        clearAllErrors();
-
-        for (var i = 0; i < otpInputs.length; i++) {
+        clearErrors();
+        hideMessage();
+        for (var i = 0; i < inputs.length; i++) {
           if (i < digits.length) {
-            otpInputs[i].value = digits[i];
-            otpInputs[i].classList.add('filled');
+            inputs[i].value = digits[i];
+            inputs[i].classList.add('filled');
           } else {
-            otpInputs[i].value = '';
-            otpInputs[i].classList.remove('filled');
+            inputs[i].value = '';
+            inputs[i].classList.remove('filled');
           }
         }
-
-        soundType();
-        vibrate(12);
-
         if (digits.length === 6) {
-          otpInputs[5].blur();
-          tryAutoSubmit();
+          inputs[5].blur();
+          setTimeout(doLogin, 200);
         } else {
-          focusIndex(Math.min(digits.length, 5));
+          focusIdx(Math.min(digits.length, 5));
         }
       });
 
-      // --- focus ---
       input.addEventListener('focus', function() {
         setTimeout(function() { input.select(); }, 0);
-      });
-
-      // --- blur : پاک کردن انتخاب ---
-      input.addEventListener('blur', function() {
-        setTimeout(function() { input.value = input.value.replace(/\D/g,'').slice(0,1); }, 0);
       });
     });
 
     // ============================================
     // LOGIN
     // ============================================
-    function setButtonState(state) {
-      if (state === 'loading') {
+    function setBtn(loading) {
+      if (loading) {
         loginBtn.disabled = true;
-        loginBtn.innerHTML =
-          '<span class="label">' +
-            '<span>در حال ورود</span>' +
-            '<span class="dots"><span></span><span></span><span></span></span>' +
-          '</span>';
-      } else if (state === 'success') {
-        loginBtn.innerHTML =
-          '<span class="label">' +
-            '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
-              '<polyline points="20 6 9 17 4 12"/>' +
-            '</svg>' +
-            '<span>موفق!</span>' +
-          '</span>';
+        loginBtn.innerHTML = '<span class="label"><span>در حال ورود</span><span class="spinner"></span></span>';
       } else {
         loginBtn.disabled = false;
-        loginBtn.innerHTML =
-          '<span class="label">' +
-            '<span>ورود به سامانه</span>' +
-            '<span class="arrow">' +
-              '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">' +
-                '<line x1="19" y1="12" x2="5" y2="12"/>' +
-                '<polyline points="12 19 5 12 12 5"/>' +
-              '</svg>' +
-            '</span>' +
-          '</span>';
+        loginBtn.innerHTML = '<span class="label"><span>ورود به سامانه</span></span>';
       }
     }
 
-    function shakeAll() {
-      otpInputs.forEach(function(inp) {
-        inp.classList.add('error');
-      });
-      vibrate([30, 40, 30]);
+    function shake() {
+      inputs.forEach(function(i) { i.classList.add('error'); });
+      if (navigator.vibrate && window.matchMedia('(pointer: coarse)').matches) {
+        try { navigator.vibrate([30, 40, 30]); } catch(e) {}
+      }
       setTimeout(function() {
-        otpInputs.forEach(function(inp) { inp.classList.remove('error'); });
-      }, 500);
+        inputs.forEach(function(i) { i.classList.remove('error'); });
+      }, 400);
     }
 
-    function clearInputsWithFocus() {
-      otpInputs.forEach(function(inp) {
-        inp.value = '';
-        inp.classList.remove('filled');
+    function clearInputs() {
+      inputs.forEach(function(i) {
+        i.value = '';
+        i.classList.remove('filled');
       });
-      focusIndex(0);
+      focusIdx(0);
     }
 
     async function doLogin() {
-      if (isLoggingIn) return;
+      if (isLogging) return;
 
       var code = getCode();
-
       if (code.length !== 6) {
-        shakeAll();
-        soundError();
-        showMessage('⚠️ کد باید ۶ رقم باشه', 'error');
+        shake();
+        showMessage('⚠️ کد باید ۶ رقم باشد', 'error');
         return;
       }
 
       if (!navigator.onLine) {
-        shakeAll();
-        soundError();
-        showMessage('⚠️ اینترنت قطع است. اتصال خود را بررسی کنید.', 'error', 5000);
+        shake();
+        showMessage('⚠️ اتصال اینترنت قطع است', 'error');
         return;
       }
 
-      isLoggingIn = true;
-      clearAllErrors();
-      setButtonState('loading');
-
-      var email = code + '@exam.local';
-      var password = code + code;
+      isLogging = true;
+      clearErrors();
+      hideMessage();
+      setBtn(true);
 
       try {
-        var result = await supabase.auth.signInWithPassword({ email: email, password: password });
+        var result = await supabase.auth.signInWithPassword({
+          email: code + '@exam.local',
+          password: code + code
+        });
 
         if (result.error) {
           console.error('[login]', result.error);
-          setButtonState('default');
-          isLoggingIn = false;
+          setBtn(false);
+          isLogging = false;
+          shake();
 
-          shakeAll();
-          soundError();
-
-          var errMsg = 'کد وارد شده معتبر نیست';
+          var msg = 'کد وارد شده معتبر نیست';
           if (result.error.message && result.error.message.indexOf('Failed to fetch') !== -1) {
-            errMsg = 'اتصال به سرور برقرار نشد';
+            msg = 'اتصال به سرور برقرار نشد';
           }
-          showMessage('❌ ' + errMsg, 'error', 4000);
+          showMessage('❌ ' + msg, 'error');
 
-          setTimeout(function() {
-            clearInputsWithFocus();
-          }, 550);
+          setTimeout(clearInputs, 500);
           return;
         }
 
-        // پروفایل
         var profileResult = await supabase
           .from('profiles')
-          .select('role, full_name, name_confirmed')
+          .select('role, name_confirmed')
           .eq('id', result.data.user.id)
           .single();
 
         if (profileResult.error || !profileResult.data) {
           console.error('[profile]', profileResult.error);
-          setButtonState('default');
-          isLoggingIn = false;
-          shakeAll();
-          soundError();
-          showMessage('❌ خطا در بارگذاری اطلاعات کاربر', 'error', 4000);
+          setBtn(false);
+          isLogging = false;
+          shake();
+          showMessage('❌ خطا در بارگذاری اطلاعات', 'error');
           return;
         }
 
         var profile = profileResult.data;
 
-        // موفقیت بصری
-        otpInputs.forEach(function(inp) { inp.classList.add('success'); });
-        setButtonState('success');
-        soundSuccess();
+        // موفقیت
+        inputs.forEach(function(i) { i.classList.add('success'); });
+        loginBtn.innerHTML = '<span class="label"><span>✅ موفق!</span></span>';
+        showMessage('✅ خوش آمدی!', 'success');
 
-        // مسیر
         var dest;
-        if (!profile.name_confirmed) {
-          dest = 'choose-name.html';
-        } else if (profile.role === 'teacher') {
-          dest = 'teacher.html';
-        } else {
-          dest = 'student.html';
-        }
-
-        showMessage('✅ خوش آمدی' + (profile.full_name ? '، ' + profile.full_name : '') + '!', 'success');
+        if (!profile.name_confirmed) dest = 'choose-name.html';
+        else if (profile.role === 'teacher') dest = 'teacher.html';
+        else dest = 'student.html';
 
         setTimeout(function() {
           window.location.href = dest;
-        }, 700);
+        }, 600);
 
       } catch (err) {
         console.error('[fatal]', err);
-        setButtonState('default');
-        isLoggingIn = false;
-        shakeAll();
-        soundError();
-        showMessage('❌ خطای غیرمنتظره، دوباره تلاش کنید', 'error', 4000);
+        setBtn(false);
+        isLogging = false;
+        shake();
+        showMessage('❌ خطای غیرمنتظره، دوباره تلاش کنید', 'error');
       }
     }
 
-    // ============================================
-    // BIND
-    // ============================================
     loginBtn.addEventListener('click', doLogin);
 
     // ============================================
-    // KEYBOARD SHORTCUTS (global)
+    // SHORTCUT: Ctrl+K
     // ============================================
     document.addEventListener('keydown', function(e) {
-      // Ctrl/Cmd + K → خالی کردن
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
-        clearInputsWithFocus();
-        clearAllErrors();
-        soundDelete();
-      }
-    });
-
-    // ============================================
-    // VISIBILITY (مقابله با تعلیق)
-    // ============================================
-    document.addEventListener('visibilitychange', function() {
-      if (!document.hidden) {
-        updateNetwork();
+        clearInputs();
+        clearErrors();
+        hideMessage();
       }
     });
 
@@ -1722,17 +923,8 @@
     // INIT
     // ============================================
     initTheme();
-    initSound();
-    createParticles();
-    updateGreeting();
-    updateNetwork();
+    setTimeout(function() { focusIdx(0); }, 300);
 
-    // فوکوس اولیه
-    setTimeout(function() {
-      focusIndex(0);
-    }, 400);
-
-    // تم سیستم
     if (window.matchMedia) {
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
         var saved = null;
