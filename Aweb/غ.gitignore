@@ -1,0 +1,8 @@
+node_modules/
+exam-scripts/
+.env
+*.env
+failed.json
+*-codes.txt
+.DS_Store
+Thumbs.db

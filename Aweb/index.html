@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#6C5CE7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="آزمون">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/animations.css">
+<link rel="stylesheet" href="css/skeletons.css">
+<link rel="stylesheet" href="css/print.css" media="print">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#6C5CE7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="آزمون">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ورود | سامانه آزمون</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth-page">
+
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="logo">📝</div>
+      <h1>سامانه آزمون</h1>
+      <p class="subtitle">کد ۴ رقمی خود را وارد کنید</p>
+    </div>
+
+    <div class="code-input-wrap">
+      <input 
+        type="text" 
+        id="codeInput" 
+        class="code-input"
+        maxlength="4" 
+        inputmode="numeric" 
+        pattern="\d{4}" 
+        placeholder="----" 
+        autocomplete="off"
+        autofocus
+      >
+    </div>
+
+    <button class="btn btn-primary btn-block" id="loginBtn" onclick="login()">
+      ورود به سامانه
+    </button>
+
+    <div class="auth-msg" id="msg"></div>
+
+    <div class="auth-footer">
+      <button class="theme-toggle" onclick="toggleTheme()" title="تغییر تم">
+        <span id="themeIcon">🌙</span>
+      </button>
+    </div>
+  </div>
+
+  <script src="js/errors.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // ⚠️ مقادیر رو جایگزین کن
+    const SUPABASE_URL = 'https://xxxxx.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOi...';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const msg = document.getElementById('msg');
+    const btn = document.getElementById('loginBtn');
+    const input = document.getElementById('codeInput');
+
+    input.addEventListener('input', e => {
+      e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4);
+    });
+
+    input.addEventListener('keypress', e => {
+      if (e.key === 'Enter') login();
+    });
+
+    async function login() {
+      const code = input.value.trim();
+
+      if (!/^\d{4}$/.test(code)) {
+        showMsg('کد باید ۴ رقم باشه', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'در حال ورود...';
+      msg.textContent = '';
+
+      const email = `${code}@exam.local`;
+      const password = `${code}${code}`;
+
+      const { data, error } = await supabase.auth.signInWithPassword({ 
+        email, password 
+      });
+
+      if (error) {
+        showMsg('❌ کد معتبر نیست', 'error');
+        btn.disabled = false;
+        btn.textContent = 'ورود به سامانه';
+        input.select();
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role, full_name, name_confirmed')
+        .eq('id', data.user.id)
+        .single();
+
+      if (!profile.name_confirmed) {
+        window.location.href = 'choose-name.html';
+        return;
+      }
+
+      window.location.href = profile.role === 'teacher' 
+        ? 'teacher.html' 
+        : 'student.html';
+    }
+
+    function showMsg(text, type = 'error') {
+      msg.textContent = text;
+      msg.className = 'auth-msg ' + type;
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+      const icon = document.getElementById('themeIcon');
+      icon.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+      localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    }
+
+    if (localStorage.getItem('theme') === 'dark') {
+      document.body.classList.add('dark');
+      document.getElementById('themeIcon').textContent = '☀️';
+    }
+  </script>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/utils.js"></script>
+<script src="js/errors.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/a11y.js"></script>
+<!-- اسکریپت مخصوص صفحه -->
+</html>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<script src="js/a11y.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', initAccessibility);
+</script>

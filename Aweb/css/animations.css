@@ -1,0 +1,198 @@
+/* ============================================
+   Micro-interactions
+============================================ */
+
+/* Fade-in با جهت */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes bounceIn {
+  0%   { opacity: 0; transform: scale(.9); }
+  50%  { opacity: 1; transform: scale(1.02); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* اعمال به کارت‌ها */
+.card { animation: slideUp .35s ease both; }
+.card:nth-child(1) { animation-delay: 0s; }
+.card:nth-child(2) { animation-delay: .06s; }
+.card:nth-child(3) { animation-delay: .12s; }
+.card:nth-child(4) { animation-delay: .18s; }
+.card:nth-child(5) { animation-delay: .24s; }
+.card:nth-child(6) { animation-delay: .30s; }
+
+/* Hover ملایم روی دکمه‌ها */
+.btn { position: relative; overflow: hidden; }
+
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255,255,255,.3), transparent 70%);
+  opacity: 0;
+  transition: opacity .3s;
+}
+
+.btn:hover::after { opacity: 1; }
+
+/* آیکون‌های header */
+.btn-icon {
+  transition: transform .2s, background .2s;
+}
+
+.btn-icon:hover {
+  transform: rotate(-8deg) scale(1.08);
+}
+
+/* کاربر آواتار */
+.user-avatar {
+  transition: transform .3s, box-shadow .3s;
+  box-shadow: 0 4px 12px rgba(108,92,231,.25);
+}
+
+.user-avatar:hover {
+  transform: scale(1.1) rotate(4deg);
+  box-shadow: 0 8px 24px rgba(108,92,231,.4);
+}
+
+/* بج‌ها */
+.badge {
+  transition: transform .2s;
+}
+
+.badge:hover { transform: scale(1.05); }
+
+/* ورودی‌ها */
+.form-input, .code-input, .text-input {
+  transition: border-color .2s, background .2s, transform .2s;
+}
+
+.form-input:focus, .code-input:focus, .text-input:focus {
+  transform: scale(1.01);
+}
+
+/* Card hover با سایه عمیق‌تر */
+.card-hover {
+  transition: transform .25s cubic-bezier(.4,0,.2,1), 
+              box-shadow .25s cubic-bezier(.4,0,.2,1);
+}
+
+/* جدول - row hover */
+.table tr {
+  transition: background .15s;
+}
+
+/* Toast ورود و خروج */
+@keyframes toastSlideIn {
+  from { opacity: 0; transform: translateX(-100%); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes toastSlideOut {
+  from { opacity: 1; transform: translateX(0); max-height: 200px; }
+  to   { opacity: 0; transform: translateX(-100%); max-height: 0; }
+}
+
+.toast { animation: toastSlideIn .4s cubic-bezier(.4,0,.2,1) both; }
+.toast.removing { animation: toastSlideOut .3s cubic-bezier(.4,0,.2,1) both; }
+
+/* Modal */
+@keyframes backdropIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal-overlay.show {
+  animation: backdropIn .2s ease;
+}
+
+.modal-overlay.show .modal {
+  animation: bounceIn .35s cubic-bezier(.4,0,.2,1);
+}
+
+/* Progress bar */
+.progress-fill {
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,.4),
+    transparent
+  );
+  animation: shimmer 1.6s linear infinite;
+}
+
+@keyframes shimmer {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
+
+/* Success checkmark */
+@keyframes checkPop {
+  0%   { transform: scale(0) rotate(-45deg); opacity: 0; }
+  50%  { transform: scale(1.2) rotate(0); opacity: 1; }
+  100% { transform: scale(1) rotate(0); }
+}
+
+.check-pop { animation: checkPop .4s cubic-bezier(.34,1.56,.64,1); }
+
+/* Timer pulse */
+@keyframes timerPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,107,107,.5); }
+  50%      { box-shadow: 0 0 0 8px rgba(255,107,107,0); }
+}
+
+.timer.warning {
+  animation: timerPulse 1.5s ease-in-out infinite;
+}
+
+/* درخشش روی آیکون اصلی */
+@keyframes glow {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(108,92,231,.3)); }
+  50%      { filter: drop-shadow(0 0 20px rgba(108,92,231,.6)); }
+}
+
+.logo { animation: wave 3s ease-in-out infinite, glow 2s ease-in-out infinite; }
+
+/* اسکرول‌بار ملایم */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 10px;
+  transition: background .2s;
+}
+
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+/* احترام به prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "سامانه آزمون",
+  "short_name": "آزمون",
+  "description": "سامانه آزمون آنلاین",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F8F9FE",
+  "theme_color": "#6C5CE7",
+  "orientation": "portrait-primary",
+  "lang": "fa",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#6C5CE7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="آزمون">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/animations.css">
+<link rel="stylesheet" href="css/skeletons.css">
+<link rel="stylesheet" href="css/print.css" media="print">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#6C5CE7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="آزمون">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مشاهده پاسخ‌ها</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+
+  <header class="app-header">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <a href="teacher.html" class="btn-icon" title="بازگشت">←</a>
+      <h2 id="pageTitle">مشاهده پاسخ‌ها</h2>
+    </div>
+    <div class="user-info">
+      <button class="btn-icon" onclick="toggleTheme()" title="تغییر تم">
+        <span id="themeIcon">🌙</span>
+      </button>
+      <button class="btn-icon" onclick="logout()" title="خروج">🚪</button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+      در حال بارگذاری...
+    </div>
+
+    <!-- لیست دانش‌آموزان -->
+    <div id="studentsList" style="display:none;">
+      <h3 class="section-title" id="examTitle">—</h3>
+      <input type="text" class="form-input" id="searchInput" 
+             placeholder="🔍 جستجوی نام دانش‌آموز..." 
+             style="margin-bottom:20px;">
+      <div id="submissionsList"></div>
+    </div>
+
+    <!-- پاسخ‌های یک دانش‌آموز -->
+    <div id="detailView" style="display:none;">
+      <div class="card" style="margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h3 id="studentName" style="margin-bottom:6px;">—</h3>
+            <div style="color:var(--text-muted); font-size:13px;" id="submitMeta">—</div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="backToList()">
+            ← بازگشت به لیست
+          </button>
+        </div>
+      </div>
+
+      <div id="answersContainer"></div>
+    </div>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/view.js"></script>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/utils.js"></script>
+<script src="js/errors.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/a11y.js"></script>
+<!-- اسکریپت مخصوص صفحه -->
+</html>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<button class="btn btn-secondary" onclick="exportAll()">
+  ⬇ خروجی CSV
+</button>
+<script src="js/a11y.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', initAccessibility);
+</script>
