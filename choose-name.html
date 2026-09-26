@@ -1,572 +1,843 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="description" content="انتخاب نام کاربری — سامانه آزمون فاطمه جوادی">
-  <meta name="author" content="فاطمه جوادی">
-  <meta name="theme-color" content="#6C5CE7" id="themeMeta">
-  <meta name="color-scheme" content="light dark">
-
-  <title>انتخاب نام | سامانه آزمون فاطمه جوادی</title>
-
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="manifest" href="manifest.json">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-
-  <style>
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    :root {
-      --brand-1: #6C5CE7;
-      --brand-2: #8E7CFF;
-      --brand-3: #00CEC9;
-      --brand-4: #FD79A8;
-      --brand-5: #FDCB6E;
-
-      --success: #00B894;
-      --danger: #FF6B6B;
-
-      --bg: linear-gradient(135deg, #EEF0FF 0%, #F5F0FF 50%, #FFF0F8 100%);
-      --card-bg: #FFFFFF;
-      --card-border: rgba(108, 92, 231, 0.08);
-
-      --text-1: #1E1B3A;
-      --text-2: #6B6789;
-      --text-3: #A5A0C0;
-
-      --input-bg: #F8F7FF;
-      --input-border: #E5E0FF;
-      --input-focus: #6C5CE7;
-      --input-glow: rgba(108, 92, 231, 0.18);
-
-      --shadow: 0 4px 20px rgba(108, 92, 231, 0.08), 0 1px 3px rgba(0,0,0,0.03);
-      --shadow-hover: 0 8px 32px rgba(108, 92, 231, 0.15);
-
-      --ease: cubic-bezier(0.4, 0, 0.2, 1);
-      --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    html.dark {
-      --bg: linear-gradient(135deg, #0F0C24 0%, #14102E 50%, #1A1030 100%);
-      --card-bg: #1A1638;
-      --card-border: rgba(162, 155, 254, 0.12);
-      --text-1: #F2F0FF;
-      --text-2: #A5A0C0;
-      --text-3: #6B6789;
-      --input-bg: #14102E;
-      --input-border: #2A2456;
-      --input-focus: #A29BFE;
-      --input-glow: rgba(162, 155, 254, 0.25);
-      --shadow: 0 4px 20px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.3);
-      --shadow-hover: 0 8px 32px rgba(0,0,0,0.5);
-    }
-
-    html, body { height: 100%; min-height: 100%; }
-
-    body {
-      font-family: 'Vazirmatn', system-ui, -apple-system, sans-serif;
-      background: var(--bg);
-      background-attachment: fixed;
-      color: var(--text-1);
-      line-height: 1.6;
-      overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      transition: background 0.4s var(--ease), color 0.4s var(--ease);
-    }
-
-    button { font-family: inherit; cursor: pointer; }
-    input { font-family: inherit; }
-
-    .bg-pattern {
-      position: fixed;
-      inset: 0;
-      z-index: -2;
-      opacity: 0.4;
-      pointer-events: none;
-      background-image:
-        radial-gradient(circle at 20% 20%, rgba(108, 92, 231, 0.08) 0%, transparent 40%),
-        radial-gradient(circle at 80% 80%, rgba(0, 206, 201, 0.06) 0%, transparent 40%),
-        radial-gradient(circle at 50% 50%, rgba(253, 121, 168, 0.05) 0%, transparent 50%);
-      transition: opacity 0.4s;
-    }
-
-    html.dark .bg-pattern {
-      opacity: 0.7;
-      background-image:
-        radial-gradient(circle at 20% 20%, rgba(162, 155, 254, 0.12) 0%, transparent 40%),
-        radial-gradient(circle at 80% 80%, rgba(0, 206, 201, 0.1) 0%, transparent 40%),
-        radial-gradient(circle at 50% 50%, rgba(253, 121, 168, 0.08) 0%, transparent 50%);
-    }
-
-    .bg-dots {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      opacity: 0.35;
-      pointer-events: none;
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='2' cy='2' r='1' fill='%236C5CE7' opacity='0.35'/></svg>");
-      background-size: 32px 32px;
-      mask-image: radial-gradient(ellipse at center, black 10%, transparent 70%);
-      -webkit-mask-image: radial-gradient(ellipse at center, black 10%, transparent 70%);
-    }
-
-    html.dark .bg-dots {
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='2' cy='2' r='1' fill='%23A29BFE' opacity='0.5'/></svg>");
-      opacity: 0.5;
-    }
-
-    .top-controls {
-      position: fixed; top: 20px; left: 20px; z-index: 100;
-    }
-
-    .icon-btn {
-      width: 46px; height: 46px;
-      border-radius: 14px;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      display: flex; align-items: center; justify-content: center;
-      color: var(--text-1);
-      box-shadow: var(--shadow);
-      transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
-    }
-
-    .icon-btn:hover { transform: translateY(-2px) scale(1.04); box-shadow: var(--shadow-hover); }
-    .icon-btn:active { transform: scale(0.94); }
-
-    .icon-wrap { position: relative; width: 22px; height: 22px; }
-    .icon-wrap svg {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%;
-      stroke: currentColor; fill: none;
-      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
-      transition: opacity 0.25s, transform 0.3s var(--ease);
-    }
-    .icon-sun { opacity: 1; transform: rotate(0) scale(1); }
-    .icon-moon { opacity: 0; transform: rotate(-90deg) scale(0.5); }
-    html.dark .icon-sun { opacity: 0; transform: rotate(90deg) scale(0.5); }
-    html.dark .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
-
-    .app {
-      position: relative;
-      min-height: 100vh;
-      min-height: 100dvh;
-      display: flex; align-items: center; justify-content: center;
-      padding: 80px 20px 40px;
-    }
-
-    .card {
-      width: 100%;
-      max-width: 480px;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 28px;
-      padding: 42px 36px 30px;
-      box-shadow: var(--shadow);
-      position: relative;
-      overflow: hidden;
-      transition: background 0.4s var(--ease), border 0.4s var(--ease), box-shadow 0.4s var(--ease);
-    }
-
-    .card::before {
-      content: '';
-      position: absolute;
-      top: 0; right: 0; left: 0;
-      height: 4px;
-      background: linear-gradient(90deg, #6C5CE7, #00CEC9, #FD79A8, #6C5CE7);
-      background-size: 200% 100%;
-      animation: shimmer 6s linear infinite;
-    }
-
-    @keyframes shimmer { to { background-position: 200% 0; } }
-
-    .avatar {
-      width: 76px; height: 76px;
-      margin: 0 auto 18px;
-      border-radius: 22px;
-      background: linear-gradient(135deg, #6C5CE7, #00CEC9);
-      display: flex; align-items: center; justify-content: center;
-      color: #fff;
-      font-size: 30px;
-      font-weight: 900;
-      letter-spacing: 1px;
-      box-shadow: 0 10px 28px rgba(108, 92, 231, 0.3);
-      animation: avatarPop 0.6s var(--ease-bounce) both;
-      transition: background 0.3s var(--ease);
-    }
-
-    .avatar.has-name {
-      background: linear-gradient(135deg, #00CEC9, #55EFC4);
-    }
-
-    @keyframes avatarPop {
-      0% { opacity: 0; transform: scale(0.4); }
-      100% { opacity: 1; transform: scale(1); }
-    }
-
-    .header { text-align: center; margin-bottom: 20px; }
-
-    .title {
-      font-size: 24px;
-      font-weight: 900;
-      letter-spacing: -0.3px;
-      background: linear-gradient(135deg, #6C5CE7, #00CEC9);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 8px;
-      line-height: 1.3;
-    }
-
-    .subtitle {
-      font-size: 12.5px;
-      color: var(--text-2);
-      font-weight: 500;
-      line-height: 1.75;
-      max-width: 320px;
-      margin: 0 auto;
-    }
-
-    .code-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 12px;
-      padding: 6px 14px;
-      background: linear-gradient(135deg, rgba(108, 92, 231, 0.08), rgba(0, 206, 201, 0.06));
-      border: 1px solid rgba(108, 92, 231, 0.15);
-      border-radius: 16px;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--brand-1);
-      letter-spacing: 2px;
-      font-family: 'Vazirmatn', monospace;
-    }
-
-    html.dark .code-badge {
-      background: linear-gradient(135deg, rgba(162, 155, 254, 0.12), rgba(0, 206, 201, 0.1));
-      border-color: rgba(162, 155, 254, 0.2);
-    }
-
-    .code-badge svg {
-      width: 13px; height: 13px;
-      stroke: currentColor; fill: none;
-      stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;
-    }
-
-    .warning {
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-      padding: 12px 16px;
-      background: rgba(253, 203, 110, 0.1);
-      border: 1px solid rgba(253, 203, 110, 0.3);
-      border-right: 3px solid var(--brand-5);
-      border-radius: 12px;
-      font-size: 12px;
-      line-height: 1.75;
-      color: #8B6914;
-      margin-bottom: 20px;
-    }
-
-    html.dark .warning {
-      color: var(--brand-5);
-      background: rgba(253, 203, 110, 0.08);
-    }
-
-    .warning svg {
-      width: 18px; height: 18px;
-      flex-shrink: 0;
-      margin-top: 2px;
-      stroke: currentColor; fill: none;
-      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
-    }
-
-    .label-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-
-    .label {
-      font-size: 12.5px;
-      font-weight: 700;
-      color: var(--text-2);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .label svg {
-      width: 14px; height: 14px;
-      stroke: currentColor; fill: none;
-      stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;
-    }
-
-    .counter {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--text-3);
-      font-variant-numeric: tabular-nums;
-      transition: color 0.3s;
-    }
-
-    .counter.warn { color: var(--brand-5); }
-    .counter.full { color: var(--danger); }
-
-    .name-input {
-      width: 100%;
-      padding: 15px 18px;
-      font-size: 16px;
-      font-weight: 600;
-      background: var(--input-bg);
-      border: 2px solid var(--input-border);
-      border-radius: 14px;
-      color: var(--text-1);
-      outline: none;
-      transition: border-color 0.2s var(--ease), background 0.2s var(--ease), transform 0.2s var(--ease);
-      text-align: center;
-    }
-
-    .name-input::placeholder {
-      color: var(--text-3);
-      font-weight: 500;
-    }
-
-    .name-input:focus {
-      border-color: var(--input-focus);
-      background: var(--card-bg);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px var(--input-glow);
-    }
-
-    .name-input.error {
-      border-color: var(--danger);
-      background: rgba(255, 107, 107, 0.06);
-      animation: shake 0.35s var(--ease);
-    }
-
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-8px); }
-      75% { transform: translateX(8px); }
-    }
-
-    .suggestions-label {
-      font-size: 11px;
-      color: var(--text-3);
-      margin-top: 14px;
-      margin-bottom: 8px;
-      font-weight: 600;
-    }
-
-    .suggestions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .suggestion {
-      padding: 6px 12px;
-      background: var(--input-bg);
-      border: 1px solid var(--input-border);
-      border-radius: 10px;
-      font-size: 11.5px;
-      font-weight: 600;
-      color: var(--text-2);
-      cursor: pointer;
-      transition: all 0.2s var(--ease);
-    }
-
-    .suggestion:hover {
-      border-color: var(--brand-1);
-      color: var(--brand-1);
-      transform: translateY(-1px);
-    }
-
-    .suggestion:active { transform: scale(0.96); }
-
-    .btn {
-      width: 100%;
-      padding: 16px 22px;
-      font-size: 15.5px;
-      font-weight: 800;
-      color: #fff;
-      background: linear-gradient(135deg, #6C5CE7, #8E7CFF);
-      border: none;
-      border-radius: 16px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      min-height: 56px;
-      box-shadow: 0 6px 18px rgba(108, 92, 231, 0.28);
-      transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
-      margin-top: 20px;
-    }
-
-    .btn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 26px rgba(108, 92, 231, 0.4);
-    }
-
-    .btn:active:not(:disabled) { transform: translateY(0) scale(0.98); }
-    .btn:disabled { opacity: 0.7; cursor: not-allowed; }
-
-    .btn .label {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .spinner {
-      width: 18px; height: 18px;
-      border: 2.5px solid rgba(255,255,255,0.3);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .message {
-      margin-top: 14px;
-      padding: 0 16px;
-      text-align: center;
-      font-size: 13px;
-      font-weight: 700;
-      border-radius: 12px;
-      opacity: 0;
-      transform: translateY(-6px);
-      max-height: 0;
-      overflow: hidden;
-      transition: all 0.3s var(--ease);
-    }
-
-    .message.show {
-      opacity: 1;
-      transform: translateY(0);
-      max-height: 100px;
-      padding: 11px 16px;
-    }
-
-    .message.error {
-      background: rgba(255, 107, 107, 0.1);
-      color: var(--danger);
-      border: 1px solid rgba(255, 107, 107, 0.2);
-    }
-
-    .message.success {
-      background: rgba(0, 184, 148, 0.1);
-      color: var(--success);
-      border: 1px solid rgba(0, 184, 148, 0.2);
-    }
-
-    .footer {
-      text-align: center;
-      margin-top: 20px;
-      padding-top: 16px;
-      border-top: 1px solid var(--input-border);
-      font-size: 11px;
-      color: var(--text-3);
-      font-weight: 500;
-    }
-
-    .footer .heart {
-      display: inline-block;
-      color: #FD79A8;
-      animation: heartbeat 1.8s ease-in-out infinite;
-    }
-
-    @keyframes heartbeat {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.2); }
-    }
-
-    @media (max-width: 520px) {
-      .card { padding: 34px 22px 24px; border-radius: 24px; }
-      .avatar { width: 66px; height: 66px; border-radius: 20px; font-size: 26px; }
-      .title { font-size: 21px; }
-      .name-input { padding: 13px 16px; font-size: 15px; }
-      .btn { padding: 14px 20px; font-size: 14.5px; min-height: 52px; }
-      .top-controls { top: 14px; left: 14px; }
-      .icon-btn { width: 42px; height: 42px; }
-    }
-
-    @media (max-width: 380px) {
-      .card { padding: 28px 16px 20px; }
-      .app { padding: 70px 12px 30px; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="انتخاب نام — سامانه آزمون فاطمه جوادی">
+<meta name="author" content="فاطمه جوادی">
+<meta name="theme-color" content="#6C5CE7" id="themeMeta">
+<meta name="color-scheme" content="light dark">
+
+<title>انتخاب نام | سامانه آزمون فاطمه جوادی</title>
+
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   RESET
+============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ============================================================
+   DESIGN TOKENS — LIGHT
+============================================================ */
+:root {
+  --brand-1: #6C5CE7;
+  --brand-2: #8E7CFF;
+  --brand-3: #00CEC9;
+  --brand-4: #FD79A8;
+  --brand-5: #FDCB6E;
+  --success: #00B894;
+  --danger:  #FF6B6B;
+  --warning: #FDCB6E;
+
+  --bg-1: #EEF0FF;
+  --bg-2: #F5F0FF;
+  --bg-3: #FFF0F8;
+
+  --card-bg: #FFFFFF;
+  --card-border: rgba(108, 92, 231, 0.08);
+
+  --text-1: #1E1B3A;
+  --text-2: #6B6789;
+  --text-3: #A5A0C0;
+
+  --input-bg: #F8F7FF;
+  --input-border: #E5E0FF;
+  --input-focus: #6C5CE7;
+  --input-glow: rgba(108, 92, 231, 0.18);
+
+  --shadow-sm: 0 2px 8px rgba(108, 92, 231, 0.06);
+  --shadow-md: 0 6px 24px rgba(108, 92, 231, 0.1);
+  --shadow-lg: 0 12px 40px rgba(108, 92, 231, 0.15);
+  --shadow-btn: 0 6px 18px rgba(108, 92, 231, 0.28);
+
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+}
+
+/* ============================================================
+   DESIGN TOKENS — DARK
+============================================================ */
+html.dark {
+  --bg-1: #0F0C24;
+  --bg-2: #14102E;
+  --bg-3: #1A1030;
+
+  --card-bg: #1A1638;
+  --card-border: rgba(162, 155, 254, 0.12);
+
+  --text-1: #F2F0FF;
+  --text-2: #A5A0C0;
+  --text-3: #6B6789;
+
+  --input-bg: #14102E;
+  --input-border: #2A2456;
+  --input-focus: #A29BFE;
+  --input-glow: rgba(162, 155, 254, 0.25);
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.5);
+  --shadow-btn: 0 6px 18px rgba(108, 92, 231, 0.4);
+}
+
+/* ============================================================
+   BASE
+============================================================ */
+html, body {
+  min-height: 100%;
+  height: 100%;
+}
+
+body {
+  font-family: 'Vazirmatn', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 50%, var(--bg-3) 100%);
+  background-attachment: fixed;
+  color: var(--text-1);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background 0.4s var(--ease), color 0.4s var(--ease);
+}
+
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+input, textarea { font-family: inherit; }
+
+/* ============================================================
+   BACKGROUND DECORATION
+============================================================ */
+.bg-decor {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bg-decor::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='2' cy='2' r='1' fill='%236C5CE7' opacity='0.35'/></svg>");
+  background-size: 32px 32px;
+  opacity: 0.35;
+  mask-image: radial-gradient(ellipse at center, #000 10%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 10%, transparent 70%);
+}
+
+html.dark .bg-decor::before {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='2' cy='2' r='1' fill='%23A29BFE' opacity='0.5'/></svg>");
+  opacity: 0.5;
+}
+
+.bg-decor::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(108, 92, 231, 0.12) 0%, transparent 35%),
+    radial-gradient(circle at 85% 85%, rgba(0, 206, 201, 0.1) 0%, transparent 35%),
+    radial-gradient(circle at 50% 50%, rgba(253, 121, 168, 0.06) 0%, transparent 45%);
+}
+
+html.dark .bg-decor::after {
+  background:
+    radial-gradient(circle at 15% 15%, rgba(162, 155, 254, 0.15) 0%, transparent 35%),
+    radial-gradient(circle at 85% 85%, rgba(0, 206, 201, 0.12) 0%, transparent 35%),
+    radial-gradient(circle at 50% 50%, rgba(253, 121, 168, 0.08) 0%, transparent 45%);
+}
+
+/* ============================================================
+   TOP BAR
+============================================================ */
+.top-bar {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.top-bar > * { pointer-events: auto; }
+
+.icon-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-md);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-1);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+
+.icon-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.icon-btn:active { transform: scale(0.94); }
+
+.icon-wrap {
+  position: relative;
+  width: 22px;
+  height: 22px;
+}
+
+.icon-wrap svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: opacity 0.25s, transform 0.35s var(--ease);
+}
+
+.icon-sun  { opacity: 1; transform: rotate(0) scale(1); }
+.icon-moon { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+
+html.dark .icon-sun  { opacity: 0; transform: rotate(90deg) scale(0.5); }
+html.dark .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
+
+.net-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-2);
+  box-shadow: var(--shadow-sm);
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+}
+
+.net-indicator.show { opacity: 1; transform: translateY(0); }
+
+.net-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 0 3px rgba(0, 184, 148, 0.18);
+  animation: netPulse 2s ease-in-out infinite;
+}
+
+.net-dot.offline {
+  background: var(--danger);
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.18);
+}
+
+@keyframes netPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+/* ============================================================
+   APP LAYOUT
+============================================================ */
+.app {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px 40px;
+}
+
+/* ============================================================
+   CARD
+============================================================ */
+.card {
+  width: 100%;
+  max-width: 480px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-xl);
+  padding: 42px 36px 30px;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+  transition: background 0.4s var(--ease), border 0.4s var(--ease), box-shadow 0.4s var(--ease);
+}
+
+.card-top-bar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #6C5CE7, #00CEC9, #FD79A8, #6C5CE7);
+  background-size: 200% 100%;
+  animation: shimmer 8s linear infinite;
+}
+
+@keyframes shimmer { to { background-position: 200% 0; } }
+
+/* ============================================================
+   AVATAR PREVIEW
+============================================================ */
+.avatar {
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 18px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #6C5CE7 0%, #00CEC9 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  box-shadow: 0 10px 28px rgba(108, 92, 231, 0.32);
+  animation: avatarPop 0.6s var(--bounce) both;
+  transition: background 0.4s var(--ease), transform 0.3s var(--bounce), box-shadow 0.3s var(--ease);
+  position: relative;
+  user-select: none;
+}
+
+.avatar::after {
+  content: '';
+  position: absolute;
+  inset: -10px;
+  border-radius: 30px;
+  border: 1.5px dashed rgba(108, 92, 231, 0.25);
+  animation: slowRotate 30s linear infinite;
+  pointer-events: none;
+}
+
+html.dark .avatar::after {
+  border-color: rgba(162, 155, 254, 0.3);
+}
+
+.avatar.has-name {
+  background: linear-gradient(135deg, #00CEC9 0%, #55EFC4 100%);
+  box-shadow: 0 10px 28px rgba(0, 206, 201, 0.35);
+  transform: scale(1.03);
+}
+
+.avatar.has-name::after {
+  border-color: rgba(0, 206, 201, 0.35);
+}
+
+@keyframes slowRotate { to { transform: rotate(360deg); } }
+
+@keyframes avatarPop {
+  0% { opacity: 0; transform: scale(0.4) rotate(-15deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+/* ============================================================
+   HEADER
+============================================================ */
+.header {
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+.title {
+  font-size: 25px;
+  font-weight: 900;
+  letter-spacing: -0.3px;
+  background: linear-gradient(135deg, #6C5CE7 0%, #00CEC9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+html.dark .title {
+  background: linear-gradient(135deg, #A29BFE 0%, #00CEC9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  font-size: 12.5px;
+  color: var(--text-2);
+  font-weight: 500;
+  line-height: 1.75;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.code-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  padding: 5px 13px;
+  background: linear-gradient(135deg, rgba(108, 92, 231, 0.08), rgba(0, 206, 201, 0.08));
+  border: 1px solid rgba(108, 92, 231, 0.15);
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--brand-1);
+  letter-spacing: 2.5px;
+  font-family: 'Vazirmatn', monospace;
+}
+
+html.dark .code-badge {
+  background: linear-gradient(135deg, rgba(162, 155, 254, 0.12), rgba(0, 206, 201, 0.1));
+  border-color: rgba(162, 155, 254, 0.2);
+  color: var(--brand-2);
+}
+
+.code-badge svg {
+  width: 13px;
+  height: 13px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  letter-spacing: normal;
+}
+
+/* ============================================================
+   WARNING BOX
+============================================================ */
+.warning {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 13px 16px;
+  background: linear-gradient(135deg, rgba(253, 203, 110, 0.12), rgba(255, 107, 107, 0.06));
+  border: 1px solid rgba(253, 203, 110, 0.32);
+  border-right: 3px solid var(--brand-5);
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  line-height: 1.75;
+  color: #8B6914;
+  margin-bottom: 22px;
+}
+
+html.dark .warning {
+  color: var(--brand-5);
+  background: linear-gradient(135deg, rgba(253, 203, 110, 0.1), rgba(255, 107, 107, 0.05));
+  border-color: rgba(253, 203, 110, 0.3);
+}
+
+.warning svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.warning b {
+  font-weight: 800;
+}
+
+/* ============================================================
+   FORM
+============================================================ */
+.form-group {
+  margin-bottom: 4px;
+}
+
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.label svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.counter {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+  transition: color 0.3s var(--ease);
+}
+
+.counter.warn { color: var(--brand-5); }
+.counter.full { color: var(--danger); }
+
+.name-input {
+  width: 100%;
+  padding: 15px 18px;
+  font-size: 16px;
+  font-weight: 600;
+  background: var(--input-bg);
+  border: 2px solid var(--input-border);
+  border-radius: var(--radius-md);
+  color: var(--text-1);
+  outline: none;
+  transition: border-color 0.2s var(--ease),
+              background 0.2s var(--ease),
+              transform 0.2s var(--ease),
+              box-shadow 0.2s var(--ease);
+  text-align: center;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.name-input::placeholder {
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+.name-input:focus {
+  border-color: var(--input-focus);
+  background: var(--card-bg);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px var(--input-glow);
+}
+
+.name-input.error {
+  border-color: var(--danger);
+  background: rgba(255, 107, 107, 0.06);
+  animation: shake 0.4s var(--ease);
+}
+
+.name-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+}
+
+/* ============================================================
+   SUGGESTIONS
+============================================================ */
+.suggestions-label {
+  font-size: 11px;
+  color: var(--text-3);
+  margin-top: 14px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.suggestion {
+  padding: 6px 12px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-2);
+  transition: all 0.2s var(--ease);
+  white-space: nowrap;
+}
+
+.suggestion:hover {
+  border-color: var(--brand-1);
+  color: var(--brand-1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--input-glow);
+}
+
+.suggestion:active {
+  transform: scale(0.96);
+}
+
+html.dark .suggestion:hover {
+  color: var(--brand-2);
+  border-color: var(--brand-2);
+}
+
+/* ============================================================
+   BUTTON
+============================================================ */
+.btn {
+  width: 100%;
+  padding: 16px 22px;
+  font-size: 15.5px;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, #6C5CE7 0%, #8E7CFF 100%);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 56px;
+  box-shadow: var(--shadow-btn);
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+  position: relative;
+  overflow: hidden;
+  margin-top: 20px;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transition: left 0.6s var(--ease);
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(108, 92, 231, 0.42);
+}
+
+.btn:hover:not(:disabled)::before {
+  left: 120%;
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn .label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+}
+
+.btn svg {
+  flex-shrink: 0;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============================================================
+   MESSAGE
+============================================================ */
+.message {
+  margin-top: 14px;
+  padding: 0 16px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  opacity: 0;
+  transform: translateY(-6px);
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.3s var(--ease);
+  line-height: 1.6;
+}
+
+.message.show {
+  opacity: 1;
+  transform: translateY(0);
+  max-height: 300px;
+  padding: 12px 16px;
+}
+
+.message.error {
+  background: rgba(255, 107, 107, 0.1);
+  color: var(--danger);
+  border: 1px solid rgba(255, 107, 107, 0.2);
+}
+
+.message.success {
+  background: rgba(0, 184, 148, 0.1);
+  color: var(--success);
+  border: 1px solid rgba(0, 184, 148, 0.2);
+}
+
+.message.info {
+  background: rgba(0, 206, 201, 0.08);
+  color: #008B88;
+  border: 1px solid rgba(0, 206, 201, 0.2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+html.dark .message.info { color: #4DE3DF; background: rgba(0, 206, 201, 0.1); }
+
+/* ============================================================
+   FOOTER
+============================================================ */
+.footer {
+  text-align: center;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--input-border);
+  font-size: 11px;
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+.footer .heart {
+  display: inline-block;
+  color: #FD79A8;
+  animation: heartbeat 1.8s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 520px) {
+  .app { padding: 76px 16px 32px; }
+  .card { padding: 34px 22px 24px; border-radius: var(--radius-lg); }
+  .avatar { width: 66px; height: 66px; border-radius: 20px; font-size: 26px; }
+  .title { font-size: 21px; }
+  .name-input { padding: 13px 16px; font-size: 15px; }
+  .btn { padding: 14px 20px; font-size: 14.5px; min-height: 52px; }
+  .top-bar { top: 14px; left: 14px; right: 14px; }
+  .icon-btn { width: 42px; height: 42px; }
+}
+
+@media (max-width: 380px) {
+  .card { padding: 28px 16px 22px; }
+  .app { padding: 68px 12px 28px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
 </head>
 <body>
 
-  <div class="bg-pattern" aria-hidden="true"></div>
-  <div class="bg-dots" aria-hidden="true"></div>
+<!-- Background -->
+<div class="bg-decor" aria-hidden="true"></div>
 
-  <div class="top-controls">
-    <button class="icon-btn" id="themeBtn" type="button" title="تغییر حالت روز/شب" aria-label="تغییر تم">
-      <span class="icon-wrap">
-        <svg class="icon-sun" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="4"/>
-          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
-        </svg>
-        <svg class="icon-moon" viewBox="0 0 24 24">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-        </svg>
-      </span>
-    </button>
+<!-- Top Bar -->
+<div class="top-bar">
+  <button class="icon-btn" id="themeBtn" type="button" title="تغییر حالت روز/شب" aria-label="تغییر تم">
+    <span class="icon-wrap">
+      <svg class="icon-sun" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="4"/>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+      </svg>
+      <svg class="icon-moon" viewBox="0 0 24 24">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </span>
+  </button>
+
+  <div class="net-indicator" id="netIndicator">
+    <span class="net-dot" id="netDot"></span>
+    <span id="netText">آنلاین</span>
   </div>
+</div>
 
-  <main class="app">
-    <div class="card">
+<!-- Main -->
+<main class="app">
+  <div class="card">
+    <div class="card-top-bar"></div>
 
-      <div class="avatar" id="avatar">؟</div>
+    <div class="avatar" id="avatar">؟</div>
 
-      <div class="header">
-        <h1 class="title">خوش آمدی!</h1>
-        <p class="subtitle">
-          برای شروع، نام و نام خانوادگی واقعی‌ت را وارد کن.
-          این نام در همه‌ی آزمون‌ها به معلم نمایش داده می‌شود.
-        </p>
-        <div class="code-badge">
-          <svg viewBox="0 0 24 24">
-            <rect x="3" y="11" width="18" height="11" rx="2"/>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-          </svg>
-          <span id="codeText">------</span>
-        </div>
-      </div>
-
-      <div class="warning">
+    <div class="header">
+      <h1 class="title">خوش آمدی!</h1>
+      <p class="subtitle">
+        برای شروع، نام و نام خانوادگی واقعی‌ت را وارد کن.
+        این نام در همه‌ی آزمون‌ها برای معلم نمایش داده می‌شود.
+      </p>
+      <div class="code-badge">
         <svg viewBox="0 0 24 24">
-          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-          <line x1="12" y1="9" x2="12" y2="13"/>
-          <line x1="12" y1="17" x2="12.01" y2="17"/>
+          <rect x="3" y="11" width="18" height="11" rx="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
         </svg>
-        <div>
-          <b>توجه:</b> بعد از تأیید، امکان تغییر نام وجود ندارد.
-        </div>
+        <span id="codeText">------</span>
       </div>
+    </div>
 
+    <div class="warning">
+      <svg viewBox="0 0 24 24">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      <div>
+        <b>توجه مهم:</b> بعد از تأیید، امکان تغییر نام وجود ندارد. با دقت واردش کن.
+      </div>
+    </div>
+
+    <div class="form-group">
       <div class="label-row">
         <label class="label" for="nameInput">
           <svg viewBox="0 0 24 24">
@@ -588,295 +859,462 @@
         spellcheck="false"
         aria-label="نام و نام خانوادگی"
       >
-
-      <div class="suggestions-label">پیشنهاد:</div>
-      <div class="suggestions" id="suggestions"></div>
-
-      <button class="btn" id="saveBtn" type="button">
-        <span class="label">
-          <span>تأیید و ادامه</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"/>
-          </svg>
-        </span>
-      </button>
-
-      <div class="message" id="message"></div>
-
-      <div class="footer">
-        ساخته شده با <span class="heart">♥</span> برای یادگیری بهتر
-      </div>
-
     </div>
-  </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-  (function() {
-    'use strict';
+    <div class="suggestions-label">پیشنهاد:</div>
+    <div class="suggestions" id="suggestions"></div>
 
-    var SUPABASE_URL = 'https://cfkwvzbqgapguuaqibmq.supabase.co';
-    var SUPABASE_KEY = 'sb_publishable_Qf3R9hPgjApwe2c-qQMoJA_jitobazq';
-    var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    <button class="btn" id="saveBtn" type="button">
+      <span class="label">
+        <span>تأیید و ادامه</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </span>
+    </button>
 
-    var nameInput = document.getElementById('nameInput');
-    var saveBtn = document.getElementById('saveBtn');
-    var message = document.getElementById('message');
-    var counter = document.getElementById('counter');
-    var avatar = document.getElementById('avatar');
-    var codeText = document.getElementById('codeText');
-    var themeBtn = document.getElementById('themeBtn');
-    var suggestionsEl = document.getElementById('suggestions');
+    <div class="message" id="message"></div>
 
-    var currentUser = null;
-    var currentRole = 'student';
-    var isSaving = false;
+    <div class="footer">
+      ساخته شده با <span class="heart">♥</span> برای یادگیری بهتر
+    </div>
+  </div>
+</main>
 
-    // ============================================
-    // THEME
-    // ============================================
-    function setTheme(isDark) {
-      var html = document.documentElement;
-      if (isDark) html.classList.add('dark');
-      else html.classList.remove('dark');
-      try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch(e) {}
-      var meta = document.getElementById('themeMeta');
-      if (meta) meta.setAttribute('content', isDark ? '#0F0C24' : '#6C5CE7');
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* ============================================================
+     CONFIG — Supabase
+  ============================================================ */
+  var SUPABASE_URL = 'https://cfkwvzbqgapguuaqibmq.supabase.co';
+  var SUPABASE_KEY = 'sb_publishable_Qf3R9hPgjApwe2c-qQMoJA_jitobazq';
+
+  var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: false
+    }
+  });
+
+  /* ============================================================
+     DOM
+  ============================================================ */
+  var nameInput = document.getElementById('nameInput');
+  var saveBtn = document.getElementById('saveBtn');
+  var message = document.getElementById('message');
+  var counter = document.getElementById('counter');
+  var avatar = document.getElementById('avatar');
+  var codeText = document.getElementById('codeText');
+  var themeBtn = document.getElementById('themeBtn');
+  var suggestionsEl = document.getElementById('suggestions');
+  var netIndicator = document.getElementById('netIndicator');
+  var netDot = document.getElementById('netDot');
+  var netText = document.getElementById('netText');
+
+  /* ============================================================
+     STATE
+  ============================================================ */
+  var currentUser = null;
+  var currentRole = 'student';
+  var isSaving = false;
+
+  /* ============================================================
+     THEME
+  ============================================================ */
+  function applyTheme(isDark) {
+    if (isDark) document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
+    try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch (e) {}
+    var meta = document.getElementById('themeMeta');
+    if (meta) meta.setAttribute('content', isDark ? '#0F0C24' : '#6C5CE7');
+  }
+
+  function initTheme() {
+    var saved = null;
+    try { saved = localStorage.getItem('theme'); } catch (e) {}
+    var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyTheme(saved === 'dark' || (!saved && prefersDark));
+  }
+
+  themeBtn.addEventListener('click', function () {
+    applyTheme(!document.documentElement.classList.contains('dark'));
+  });
+
+  /* ============================================================
+     NETWORK
+  ============================================================ */
+  function updateNetwork() {
+    var online = navigator.onLine;
+    netDot.classList.toggle('offline', !online);
+    netText.textContent = online ? 'آنلاین' : 'آفلاین';
+    if (!online) netIndicator.classList.add('show');
+    else setTimeout(function () { netIndicator.classList.remove('show'); }, 2000);
+  }
+
+  window.addEventListener('online', function () {
+    updateNetwork();
+    showMessage('✅ اتصال اینترنت برقرار شد', 'success', 2500);
+  });
+
+  window.addEventListener('offline', function () {
+    updateNetwork();
+    showMessage('⚠️ اتصال اینترنت قطع است', 'error', 5000);
+  });
+
+  /* ============================================================
+     MESSAGE
+  ============================================================ */
+  var msgTimer = null;
+
+  function showMessage(html, type, duration) {
+    clearTimeout(msgTimer);
+    message.className = 'message ' + type + ' show';
+    message.innerHTML = html;
+    if (duration) {
+      msgTimer = setTimeout(function () { message.classList.remove('show'); }, duration);
+    }
+  }
+
+  function hideMessage() {
+    clearTimeout(msgTimer);
+    message.classList.remove('show');
+  }
+
+  /* ============================================================
+     PERSIAN NUMBERS
+  ============================================================ */
+  var FA_DIGITS = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+
+  function toFa(n) {
+    return String(n).replace(/\d/g, function (d) { return FA_DIGITS[+d]; });
+  }
+
+  /* ============================================================
+     COUNTER
+  ============================================================ */
+  function updateCounter() {
+    var len = nameInput.value.length;
+    counter.textContent = toFa(len) + ' / ' + toFa(60);
+    counter.classList.remove('warn', 'full');
+    if (len >= 55) counter.classList.add('full');
+    else if (len >= 40) counter.classList.add('warn');
+  }
+
+  /* ============================================================
+     AVATAR
+  ============================================================ */
+  function updateAvatar(value) {
+    var clean = (value || '').trim();
+
+    if (!clean) {
+      avatar.textContent = '؟';
+      avatar.classList.remove('has-name');
+      return;
     }
 
-    function initTheme() {
-      var saved = null;
-      try { saved = localStorage.getItem('theme'); } catch(e) {}
-      var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setTheme(saved === 'dark' || (!saved && prefersDark));
+    var parts = clean.split(/\s+/).filter(function (p) { return p.length > 0; });
+    var initials = '';
+
+    if (parts.length === 0) {
+      avatar.textContent = '؟';
+      avatar.classList.remove('has-name');
+      return;
     }
 
-    themeBtn.addEventListener('click', function() {
-      setTheme(!document.documentElement.classList.contains('dark'));
-    });
+    initials = parts[0][0];
+    if (parts.length > 1) initials += parts[parts.length - 1][0];
 
-    // ============================================
-    // COUNTER + AVATAR
-    // ============================================
-    function toFa(n) {
-      var fa = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
-      return String(n).replace(/\d/g, function(d) { return fa[+d]; });
+    avatar.textContent = initials;
+    avatar.classList.add('has-name');
+  }
+
+  /* ============================================================
+     SUGGESTIONS
+  ============================================================ */
+  function buildSuggestions() {
+    var names = [
+      'علی رضایی',
+      'زهرا محمدی',
+      'امیر حسینی',
+      'فاطمه کریمی',
+      'محمد صادقی',
+      'مریم احمدی'
+    ];
+
+    var html = '';
+    for (var i = 0; i < names.length; i++) {
+      html += '<button type="button" class="suggestion" data-name="' +
+        names[i].replace(/"/g, '&quot;') +
+        '">' + names[i] + '</button>';
     }
+    suggestionsEl.innerHTML = html;
 
-    function updateCounter() {
-      var len = nameInput.value.length;
-      counter.textContent = toFa(len) + ' / ' + toFa(60);
-      counter.classList.remove('warn', 'full');
-      if (len >= 55) counter.classList.add('full');
-      else if (len >= 40) counter.classList.add('warn');
-    }
-
-    function updateAvatar(name) {
-      var clean = (name || '').trim();
-      if (!clean) {
-        avatar.textContent = '؟';
-        avatar.classList.remove('has-name');
-        return;
-      }
-      var parts = clean.split(/\s+/);
-      var initials = parts[0] ? parts[0][0] : '';
-      if (parts.length > 1 && parts[parts.length - 1][0]) {
-        initials += parts[parts.length - 1][0];
-      }
-      avatar.textContent = initials;
-      avatar.classList.add('has-name');
-    }
-
-    // ============================================
-    // MESSAGE
-    // ============================================
-    var msgTimer = null;
-    function showMessage(text, type) {
-      clearTimeout(msgTimer);
-      message.className = 'message ' + type + ' show';
-      message.textContent = text;
-    }
-
-    function hideMessage() {
-      clearTimeout(msgTimer);
-      message.classList.remove('show');
-    }
-
-    // ============================================
-    // VALIDATION
-    // ============================================
-    function validate(name) {
-      var trimmed = name.trim().replace(/\s+/g, ' ');
-      if (trimmed.length < 3) return { ok: false, msg: 'نام باید حداقل ۳ حرف باشد' };
-      if (trimmed.length > 60) return { ok: false, msg: 'نام بسیار طولانی است' };
-      if (!/^[\u0600-\u06FF\s\u200cA-Za-z]+$/.test(trimmed)) {
-        return { ok: false, msg: 'فقط حروف فارسی یا انگلیسی مجاز است' };
-      }
-      return { ok: true, value: trimmed };
-    }
-
-    // ============================================
-    // SUGGESTIONS
-    // ============================================
-    function buildSuggestions() {
-      var names = ['علی رضایی', 'زهرا محمدی', 'امیر حسینی', 'فاطمه کریمی', 'محمد صادقی', 'مریم احمدی'];
-      var html = '';
-      names.forEach(function(n) {
-        html += '<button type="button" class="suggestion" data-name="' + n + '">' + n + '</button>';
-      });
-      suggestionsEl.innerHTML = html;
-      suggestionsEl.addEventListener('click', function(e) {
-        var btn = e.target.closest('.suggestion');
-        if (!btn) return;
-        nameInput.value = btn.dataset.name;
-        updateCounter();
-        updateAvatar(nameInput.value);
-        hideMessage();
-        nameInput.focus();
-      });
-    }
-
-    // ============================================
-    // SAVE
-    // ============================================
-    function setBtn(loading) {
-      if (loading) {
-        saveBtn.disabled = true;
-        saveBtn.innerHTML = '<span class="label"><span>در حال ذخیره</span><span class="spinner"></span></span>';
-      } else {
-        saveBtn.disabled = false;
-        saveBtn.innerHTML = '<span class="label"><span>تأیید و ادامه</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>';
-      }
-    }
-
-    function shakeInput() {
-      nameInput.classList.add('error');
-      if (navigator.vibrate && window.matchMedia('(pointer: coarse)').matches) {
-        try { navigator.vibrate([30, 40, 30]); } catch(e) {}
-      }
-      setTimeout(function() { nameInput.classList.remove('error'); }, 400);
-    }
-
-    async function saveName() {
-      if (isSaving) return;
-
-      var v = validate(nameInput.value);
-      if (!v.ok) {
-        shakeInput();
-        showMessage('❌ ' + v.msg, 'error');
-        return;
-      }
-
-      if (v.value.split(' ').length < 2) {
-        if (!confirm('معمولاً نام و نام خانوادگی را با هم می‌نویسند. مطمئنی فقط همین کافی است؟')) {
-          return;
-        }
-      }
-
-      isSaving = true;
-      setBtn(true);
-      hideMessage();
-
-      try {
-        var result = await supabase
-          .from('profiles')
-          .update({
-            full_name: v.value,
-            name_confirmed: true
-          })
-          .eq('id', currentUser.id);
-
-        if (result.error) {
-          console.error('[save]', result.error);
-          setBtn(false);
-          isSaving = false;
-          shakeInput();
-
-          var msg = 'خطا در ذخیره نام';
-          if (result.error.message && result.error.message.indexOf('policy') !== -1) {
-            msg = 'این نام قبلاً تأیید شده';
-          }
-          showMessage('❌ ' + msg, 'error');
-          return;
-        }
-
-        if (navigator.vibrate) {
-          try { navigator.vibrate([50, 30, 50]); } catch(e) {}
-        }
-
-        showMessage('✅ نام با موفقیت ثبت شد!', 'success');
-        saveBtn.innerHTML = '<span class="label"><span>✅ موفق!</span></span>';
-
-        setTimeout(function() {
-          window.location.href = currentRole === 'teacher' ? 'teacher.html' : 'student.html';
-        }, 1000);
-
-      } catch (err) {
-        console.error('[fatal]', err);
-        setBtn(false);
-        isSaving = false;
-        shakeInput();
-        showMessage('❌ خطای غیرمنتظره', 'error');
-      }
-    }
-
-    // ============================================
-    // EVENTS
-    // ============================================
-    nameInput.addEventListener('input', function() {
+    suggestionsEl.addEventListener('click', function (e) {
+      var btn = e.target.closest('.suggestion');
+      if (!btn) return;
+      nameInput.value = btn.dataset.name;
       updateCounter();
       updateAvatar(nameInput.value);
       hideMessage();
+      nameInput.focus();
     });
+  }
 
-    nameInput.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        saveName();
+  /* ============================================================
+     BUTTON STATES
+  ============================================================ */
+  function setBtnLoading() {
+    saveBtn.disabled = true;
+    saveBtn.innerHTML =
+      '<span class="label">' +
+        '<span>در حال ذخیره</span>' +
+        '<span class="spinner"></span>' +
+      '</span>';
+  }
+
+  function setBtnDefault() {
+    saveBtn.disabled = false;
+    saveBtn.innerHTML =
+      '<span class="label">' +
+        '<span>تأیید و ادامه</span>' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">' +
+          '<polyline points="20 6 9 17 4 12"/>' +
+        '</svg>' +
+      '</span>';
+  }
+
+  function setBtnSuccess() {
+    saveBtn.innerHTML =
+      '<span class="label">' +
+        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
+          '<polyline points="20 6 9 17 4 12"/>' +
+        '</svg>' +
+        '<span>ثبت شد!</span>' +
+      '</span>';
+  }
+
+  /* ============================================================
+     SHAKE INPUT
+  ============================================================ */
+  function shakeInput() {
+    nameInput.classList.add('error');
+    if (navigator.vibrate && window.matchMedia('(pointer: coarse)').matches) {
+      try { navigator.vibrate([30, 40, 30]); } catch (e) {}
+    }
+    setTimeout(function () { nameInput.classList.remove('error'); }, 500);
+  }
+
+  /* ============================================================
+     VALIDATION
+  ============================================================ */
+  function validate(name) {
+    var trimmed = name.trim().replace(/\s+/g, ' ');
+
+    if (trimmed.length < 3) {
+      return { ok: false, msg: 'نام باید حداقل ۳ حرف باشد' };
+    }
+    if (trimmed.length > 60) {
+      return { ok: false, msg: 'نام بسیار طولانی است (حداکثر ۶۰ حرف)' };
+    }
+    if (!/^[\u0600-\u06FF\s\u200cA-Za-z]+$/.test(trimmed)) {
+      return { ok: false, msg: 'فقط حروف فارسی یا انگلیسی مجاز است' };
+    }
+    if (/^\s|\s$/.test(name)) {
+      return { ok: false, msg: 'نام نباید با فاصله شروع یا تمام شود' };
+    }
+    return { ok: true, value: trimmed };
+  }
+
+  /* ============================================================
+     SAVE NAME
+  ============================================================ */
+  async function saveName() {
+    if (isSaving) return;
+
+    var v = validate(nameInput.value);
+
+    if (!v.ok) {
+      shakeInput();
+      showMessage('❌ ' + v.msg, 'error');
+      return;
+    }
+
+    /* اگه تک‌کلمه بود، تأیید بگیر */
+    if (v.value.split(' ').length < 2) {
+      var proceed = confirm('معمولاً نام و نام خانوادگی را با هم می‌نویسند. مطمئنی فقط همین کافی است؟');
+      if (!proceed) return;
+    }
+
+    if (!navigator.onLine) {
+      shakeInput();
+      showMessage('⚠️ اتصال اینترنت قطع است', 'error');
+      return;
+    }
+
+    isSaving = true;
+    setBtnLoading();
+    hideMessage();
+    nameInput.disabled = true;
+
+    try {
+      /* ============================================
+         UPDATE PROFILES
+         RLS: فقط یک بار اجازه می‌ده (name_confirmed=false → true)
+      ============================================ */
+      var result = await supabase
+        .from('profiles')
+        .update({
+          full_name: v.value,
+          name_confirmed: true
+        })
+        .eq('id', currentUser.id);
+
+      if (result.error) {
+        console.error('[save]', result.error);
+        isSaving = false;
+        setBtnDefault();
+        nameInput.disabled = false;
+        nameInput.focus();
+        shakeInput();
+
+        var errMsg = 'خطا در ذخیره نام';
+
+        if (result.error.message && result.error.message.indexOf('policy') !== -1) {
+          errMsg = 'این نام قبلاً تأیید شده و قابل تغییر نیست';
+        } else if (result.error.message && result.error.message.indexOf('Failed to fetch') !== -1) {
+          errMsg = 'اتصال به سرور برقرار نشد';
+        }
+
+        showMessage('❌ ' + errMsg, 'error');
+        return;
       }
-    });
 
-    saveBtn.addEventListener('click', saveName);
+      /* ============================================
+         موفقیت
+      ============================================ */
+      if (navigator.vibrate) {
+        try { navigator.vibrate([60, 40, 60]); } catch (e) {}
+      }
 
-    // ============================================
-    // INIT
-    // ============================================
+      setBtnSuccess();
+      showMessage('✅ نام شما با موفقیت ثبت شد!', 'success');
+
+      var dest = currentRole === 'teacher' ? 'teacher.html' : 'student.html';
+
+      setTimeout(function () {
+        window.location.href = dest;
+      }, 1200);
+
+    } catch (err) {
+      console.error('[fatal]', err);
+      isSaving = false;
+      setBtnDefault();
+      nameInput.disabled = false;
+      nameInput.focus();
+      shakeInput();
+      showMessage('❌ خطای غیرمنتظره، دوباره تلاش کنید', 'error');
+    }
+  }
+
+  /* ============================================================
+     EVENTS
+  ============================================================ */
+  nameInput.addEventListener('input', function () {
+    updateCounter();
+    updateAvatar(nameInput.value);
+    hideMessage();
+  });
+
+  nameInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      saveName();
+    }
+  });
+
+  saveBtn.addEventListener('click', saveName);
+
+  /* ============================================================
+     INIT — بررسی کاربر
+  ============================================================ */
+  async function init() {
     initTheme();
+    updateNetwork();
     buildSuggestions();
     updateCounter();
 
-    (async function() {
-      var userResult = await supabase.auth.getUser();
-      var user = userResult.data.user;
+    /* ============================================
+       چک لاگین
+    ============================================ */
+    var userResult = await supabase.auth.getUser();
+    var user = userResult.data.user;
 
-      if (!user) {
-        window.location.href = 'index.html';
-        return;
-      }
-      currentUser = user;
+    if (!user) {
+      window.location.href = 'index.html';
+      return;
+    }
+    currentUser = user;
 
-      var profileResult = await supabase
-        .from('profiles')
-        .select('code, name_confirmed, role')
-        .eq('id', user.id)
-        .single();
+    /* ============================================
+       چک پروفایل
+    ============================================ */
+    var profileResult = await supabase
+      .from('profiles')
+      .select('code, name_confirmed, role')
+      .eq('id', user.id)
+      .maybeSingle();
 
-      var profile = profileResult.data;
+    var profile = profileResult.data;
 
-      if (profile && profile.name_confirmed === true) {
-        window.location.href = profile.role === 'teacher' ? 'teacher.html' : 'student.html';
-        return;
-      }
+    /* اگه قبلاً تأیید کرده → برو پنل */
+    if (profile && profile.name_confirmed === true) {
+      window.location.href = profile.role === 'teacher' ? 'teacher.html' : 'student.html';
+      return;
+    }
 
-      if (profile) {
-        currentRole = profile.role || 'student';
-        codeText.textContent = profile.code || '------';
-      }
+    /* پر کردن اطلاعات */
+    if (profile) {
+      currentRole = profile.role || 'student';
+      codeText.textContent = profile.code || '------';
+    }
 
-      setTimeout(function() { nameInput.focus(); }, 300);
-    })();
+    /* فوکوس روی input */
+    setTimeout(function () {
+      nameInput.focus();
+      try { nameInput.select(); } catch (e) {}
+    }, 400);
+  }
 
-  })();
-  </script>
+  init();
+
+  /* ============================================================
+     سیستم تم
+  ============================================================ */
+  if (window.matchMedia) {
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    var handler = function (e) {
+      var saved = null;
+      try { saved = localStorage.getItem('theme'); } catch (err) {}
+      if (!saved) applyTheme(e.matches);
+    };
+    if (mq.addEventListener) mq.addEventListener('change', handler);
+    else if (mq.addListener) mq.addListener(handler);
+  }
+
+  /* Console */
+  try {
+    console.log(
+      '%c👋 انتخاب نام\n%cطراحی: فاطمه جوادی',
+      'color: #00CEC9; font-size: 16px; font-weight: bold;',
+      'color: #6C5CE7; font-size: 12px;'
+    );
+  } catch (e) {}
+
+})();
+</script>
 </body>
 </html>
