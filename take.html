@@ -17,9 +17,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <style>
-/* ============================================================
-   RESET
-============================================================ */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -27,9 +24,6 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* ============================================================
-   TOKENS — LIGHT
-============================================================ */
 :root {
   --brand-1: #6C5CE7;
   --brand-2: #8E7CFF;
@@ -38,7 +32,6 @@
   --brand-5: #FDCB6E;
   --success: #00B894;
   --danger:  #FF6B6B;
-  --warning: #FDCB6E;
 
   --bg-1: #EEF0FF;
   --bg-2: #F5F0FF;
@@ -68,9 +61,6 @@
   --radius-xl: 28px;
 }
 
-/* ============================================================
-   TOKENS — DARK
-============================================================ */
 html.dark {
   --bg-1: #0F0C24;
   --bg-2: #14102E;
@@ -92,9 +82,6 @@ html.dark {
   --shadow-btn: 0 6px 18px rgba(108, 92, 231, 0.4);
 }
 
-/* ============================================================
-   BASE
-============================================================ */
 html, body {
   min-height: 100%;
   height: 100%;
@@ -114,9 +101,6 @@ body {
 
 button { font-family: inherit; cursor: pointer; border: none; background: none; }
 
-/* ============================================================
-   BACKGROUND DECOR
-============================================================ */
 .bg-decor {
   position: fixed;
   inset: 0;
@@ -173,7 +157,7 @@ html.dark .bg-decor::after {
 .top-bar-inner {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 12px 20px;
+  padding: 14px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -189,9 +173,9 @@ html.dark .bg-decor::after {
 }
 
 .exam-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 13px;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
   background: linear-gradient(135deg, #6C5CE7, #8E7CFF);
   display: flex;
   align-items: center;
@@ -233,7 +217,7 @@ html.dark .bg-decor::after {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 320px;
+  max-width: 420px;
 }
 
 .top-actions {
@@ -243,64 +227,6 @@ html.dark .bg-decor::after {
   flex-shrink: 0;
 }
 
-/* Timer */
-.timer {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 16px;
-  background: var(--input-bg);
-  border: 1px solid var(--input-border);
-  border-radius: var(--radius-md);
-  transition: all 0.3s var(--ease);
-  min-width: 130px;
-  justify-content: center;
-}
-
-.timer.warning {
-  background: rgba(255, 107, 107, 0.1);
-  border-color: rgba(255, 107, 107, 0.4);
-  animation: timerPulse 1.5s ease-in-out infinite;
-}
-
-@keyframes timerPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.4); }
-  50%      { box-shadow: 0 0 0 8px rgba(255, 107, 107, 0); }
-}
-
-.timer-icon {
-  width: 18px;
-  height: 18px;
-  stroke: var(--brand-1);
-  fill: none;
-  stroke-width: 2.4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  flex-shrink: 0;
-}
-
-.timer.warning .timer-icon {
-  stroke: var(--danger);
-}
-
-html.dark .timer-icon { stroke: var(--brand-2); }
-
-.timer-text {
-  font-size: 16px;
-  font-weight: 900;
-  color: var(--brand-1);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.5px;
-  font-family: 'Vazirmatn', monospace;
-}
-
-.timer.warning .timer-text {
-  color: var(--danger);
-}
-
-html.dark .timer-text { color: var(--brand-2); }
-
-/* Icon buttons */
 .icon-btn {
   width: 42px;
   height: 42px;
@@ -359,55 +285,6 @@ html.dark .icon-sun  { opacity: 0; transform: rotate(90deg) scale(0.5); }
 html.dark .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
 
 /* ============================================================
-   TIMER PROGRESS BAR
-============================================================ */
-.timer-progress-wrap {
-  position: sticky;
-  top: 66px;
-  z-index: 99;
-  height: 4px;
-  background: var(--input-bg);
-  overflow: hidden;
-}
-
-.timer-progress {
-  height: 100%;
-  width: 100%;
-  background: linear-gradient(90deg, #00B894, #55EFC4);
-  border-radius: 0 4px 4px 0;
-  transition: width 1s linear, background 0.5s var(--ease);
-  transform-origin: right center;
-  position: relative;
-  overflow: hidden;
-}
-
-.timer-progress::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.4),
-    transparent
-  );
-  animation: progressShine 2s linear infinite;
-}
-
-@keyframes progressShine {
-  from { transform: translateX(-100%); }
-  to   { transform: translateX(100%); }
-}
-
-.timer-progress.mid {
-  background: linear-gradient(90deg, #FDCB6E, #FFEAA7);
-}
-
-.timer-progress.low {
-  background: linear-gradient(90deg, #FF6B6B, #FF8E8E);
-}
-
-/* ============================================================
    BANNERS
 ============================================================ */
 .banners {
@@ -461,10 +338,7 @@ html.dark .banner.draft {
   flex-shrink: 0;
 }
 
-.banner-text {
-  flex: 1;
-  min-width: 0;
-}
+.banner-text { flex: 1; min-width: 0; }
 
 .banner-actions {
   display: flex;
@@ -518,9 +392,6 @@ html.dark .banner.draft {
   padding: 20px 20px 140px;
 }
 
-/* ============================================================
-   STATES
-============================================================ */
 .state-box {
   display: flex;
   flex-direction: column;
@@ -600,6 +471,7 @@ html.dark .banner.draft {
   box-shadow: var(--shadow-btn);
   transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
   margin-top: 8px;
+  text-decoration: none;
 }
 
 .btn-back:hover {
@@ -653,10 +525,6 @@ html.dark .banner.draft {
   min-height: 600px;
   background: #fff;
   display: block;
-}
-
-html.dark .exam-iframe {
-  background: #f5f5f5;
 }
 
 /* ============================================================
@@ -751,19 +619,9 @@ html.dark .footer-hint svg { stroke: var(--brand-2); }
   box-shadow: 0 12px 32px rgba(0, 184, 148, 0.45);
 }
 
-.btn-submit:hover:not(:disabled)::before {
-  left: 120%;
-}
-
-.btn-submit:active:not(:disabled) {
-  transform: translateY(0) scale(0.98);
-}
-
-.btn-submit:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
+.btn-submit:hover:not(:disabled)::before { left: 120%; }
+.btn-submit:active:not(:disabled) { transform: translateY(0) scale(0.98); }
+.btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
 .btn-submit svg {
   width: 20px;
@@ -777,10 +635,7 @@ html.dark .footer-hint svg { stroke: var(--brand-2); }
   z-index: 1;
 }
 
-.btn-submit span {
-  position: relative;
-  z-index: 1;
-}
+.btn-submit span { position: relative; z-index: 1; }
 
 /* ============================================================
    SUBMIT OVERLAY
@@ -890,24 +745,11 @@ html.dark .footer-hint svg { stroke: var(--brand-2); }
    RESPONSIVE
 ============================================================ */
 @media (max-width: 720px) {
-  .top-bar-inner {
-    padding: 10px 14px;
-    gap: 8px;
-  }
-
-  .exam-icon { width: 36px; height: 36px; border-radius: 11px; }
-  .exam-icon svg { width: 18px; height: 18px; }
-  .exam-title { font-size: 13.5px; max-width: 180px; }
+  .top-bar-inner { padding: 12px 14px; gap: 10px; }
+  .exam-icon { width: 38px; height: 38px; border-radius: 12px; }
+  .exam-icon svg { width: 19px; height: 19px; }
+  .exam-title { font-size: 13.5px; max-width: 220px; }
   .exam-label { font-size: 10px; }
-
-  .timer {
-    padding: 6px 12px;
-    min-width: 100px;
-    gap: 6px;
-  }
-
-  .timer-icon { width: 15px; height: 15px; }
-  .timer-text { font-size: 14px; }
 
   .icon-btn { width: 38px; height: 38px; }
   .icon-btn svg { width: 18px; height: 18px; }
@@ -938,10 +780,7 @@ html.dark .footer-hint svg { stroke: var(--brand-2); }
 
 @media (max-width: 420px) {
   .exam-label { display: none; }
-  .exam-title { font-size: 13px; max-width: 140px; }
-
-  .timer { min-width: 88px; padding: 6px 10px; }
-  .timer-text { font-size: 13px; }
+  .exam-title { font-size: 13px; max-width: 160px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -950,11 +789,7 @@ html.dark .footer-hint svg { stroke: var(--brand-2); }
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  .timer.warning,
-  .iframe-wrap::before,
-  .timer-progress::after {
-    animation: none;
-  }
+  .iframe-wrap::before { animation: none; }
 }
 </style>
 </head>
@@ -981,15 +816,6 @@ html.dark .footer-hint svg { stroke: var(--brand-2); }
     </div>
 
     <div class="top-actions">
-
-      <div class="timer" id="timerWrap">
-        <svg class="timer-icon" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="10"/>
-          <polyline points="12 6 12 12 16 14"/>
-        </svg>
-        <span class="timer-text" id="timerText">--:--</span>
-      </div>
-
       <button class="icon-btn" id="themeBtn" type="button" title="تغییر حالت" aria-label="تغییر تم">
         <span class="icon-wrap">
           <svg class="icon-sun" viewBox="0 0 24 24">
@@ -1001,21 +827,13 @@ html.dark .footer-hint svg { stroke: var(--brand-2); }
           </svg>
         </span>
       </button>
-
     </div>
 
   </div>
 </header>
 
-<!-- ============ TIMER PROGRESS ============ -->
-<div class="timer-progress-wrap">
-  <div class="timer-progress" id="timerProgress"></div>
-</div>
-
 <!-- ============ BANNERS ============ -->
 <div class="banners">
-
-  <!-- Draft Banner -->
   <div class="banner draft" id="draftBanner">
     <svg class="banner-icon" viewBox="0 0 24 24">
       <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
@@ -1037,7 +855,6 @@ html.dark .footer-hint svg { stroke: var(--brand-2); }
       </button>
     </div>
   </div>
-
 </div>
 
 <!-- ============ MAIN ============ -->
@@ -1095,7 +912,7 @@ html.dark .footer-hint svg { stroke: var(--brand-2); }
         <line x1="12" y1="16" x2="12" y2="12"/>
         <line x1="12" y1="8" x2="12.01" y2="8"/>
       </svg>
-      <span>پاسخ‌ها هر ۵ ثانیه ذخیره می‌شن — با <b>Ctrl+S</b> می‌تونی دستی ذخیره کنی</span>
+      <span>پاسخ‌ها هر ۵ ثانیه ذخیره می‌شن — با <b>Ctrl+S</b> دستی ذخیره کن</span>
     </div>
 
     <button class="btn-submit" id="submitBtn" type="button">
@@ -1124,28 +941,5 @@ html.dark .footer-hint svg { stroke: var(--brand-2); }
 <!-- ============ SCRIPTS ============ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/take.js"></script>
-
-<!-- نمایش footer بعد از لود -->
-<script>
-(function () {
-  'use strict';
-  // وقتی که examContent نشون داده شد، footer هم نشون بده
-  var examContent = document.getElementById('examContent');
-  var takeFooter = document.getElementById('takeFooter');
-
-  if (examContent && takeFooter) {
-    var observer = new MutationObserver(function (mutations) {
-      mutations.forEach(function (m) {
-        if (m.type === 'attributes' && m.attributeName === 'style') {
-          if (examContent.style.display === 'block') {
-            takeFooter.style.display = 'block';
-          }
-        }
-      });
-    });
-    observer.observe(examContent, { attributes: true, attributeFilter: ['style'] });
-  }
-})();
-</script>
 </body>
 </html>
