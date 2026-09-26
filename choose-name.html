@@ -38,7 +38,6 @@
   --brand-5: #FDCB6E;
   --success: #00B894;
   --danger:  #FF6B6B;
-  --warning: #FDCB6E;
 
   --bg-1: #EEF0FF;
   --bg-2: #F5F0FF;
@@ -57,8 +56,7 @@
   --input-glow: rgba(108, 92, 231, 0.18);
 
   --shadow-sm: 0 2px 8px rgba(108, 92, 231, 0.06);
-  --shadow-md: 0 6px 24px rgba(108, 92, 231, 0.1);
-  --shadow-lg: 0 12px 40px rgba(108, 92, 231, 0.15);
+  --shadow-md: 0 6px 24px rgba(108, 92, 231, 0.10);
   --shadow-btn: 0 6px 18px rgba(108, 92, 231, 0.28);
 
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
@@ -92,7 +90,6 @@ html.dark {
 
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.5);
   --shadow-btn: 0 6px 18px rgba(108, 92, 231, 0.4);
 }
 
@@ -222,44 +219,6 @@ html.dark .bg-decor::after {
 html.dark .icon-sun  { opacity: 0; transform: rotate(90deg) scale(0.5); }
 html.dark .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
 
-.net-indicator {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius-md);
-  font-size: 11.5px;
-  font-weight: 700;
-  color: var(--text-2);
-  box-shadow: var(--shadow-sm);
-  opacity: 0;
-  transform: translateY(-6px);
-  transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
-}
-
-.net-indicator.show { opacity: 1; transform: translateY(0); }
-
-.net-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--success);
-  box-shadow: 0 0 0 3px rgba(0, 184, 148, 0.18);
-  animation: netPulse 2s ease-in-out infinite;
-}
-
-.net-dot.offline {
-  background: var(--danger);
-  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.18);
-}
-
-@keyframes netPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-}
-
 /* ============================================================
    APP LAYOUT
 ============================================================ */
@@ -302,7 +261,7 @@ html.dark .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
 @keyframes shimmer { to { background-position: 200% 0; } }
 
 /* ============================================================
-   AVATAR PREVIEW
+   AVATAR
 ============================================================ */
 .avatar {
   width: 76px;
@@ -421,11 +380,10 @@ html.dark .code-badge {
   stroke-width: 2.4;
   stroke-linecap: round;
   stroke-linejoin: round;
-  letter-spacing: normal;
 }
 
 /* ============================================================
-   WARNING BOX
+   WARNING
 ============================================================ */
 .warning {
   display: flex;
@@ -460,16 +418,12 @@ html.dark .warning {
   stroke-linejoin: round;
 }
 
-.warning b {
-  font-weight: 800;
-}
+.warning b { font-weight: 800; }
 
 /* ============================================================
    FORM
 ============================================================ */
-.form-group {
-  margin-bottom: 4px;
-}
+.form-group { margin-bottom: 4px; }
 
 .label-row {
   display: flex;
@@ -595,9 +549,7 @@ html.dark .warning {
   box-shadow: 0 4px 12px var(--input-glow);
 }
 
-.suggestion:active {
-  transform: scale(0.96);
-}
+.suggestion:active { transform: scale(0.96); }
 
 html.dark .suggestion:hover {
   color: var(--brand-2);
@@ -643,19 +595,11 @@ html.dark .suggestion:hover {
   box-shadow: 0 10px 28px rgba(108, 92, 231, 0.42);
 }
 
-.btn:hover:not(:disabled)::before {
-  left: 120%;
-}
+.btn:hover:not(:disabled)::before { left: 120%; }
 
-.btn:active:not(:disabled) {
-  transform: translateY(0) scale(0.98);
-}
+.btn:active:not(:disabled) { transform: translateY(0) scale(0.98); }
 
-.btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-  transform: none;
-}
+.btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
 
 .btn .label {
   display: inline-flex;
@@ -665,9 +609,7 @@ html.dark .suggestion:hover {
   z-index: 1;
 }
 
-.btn svg {
-  flex-shrink: 0;
-}
+.btn svg { flex-shrink: 0; }
 
 .spinner {
   width: 18px;
@@ -716,16 +658,6 @@ html.dark .suggestion:hover {
   color: var(--success);
   border: 1px solid rgba(0, 184, 148, 0.2);
 }
-
-.message.info {
-  background: rgba(0, 206, 201, 0.08);
-  color: #008B88;
-  border: 1px solid rgba(0, 206, 201, 0.2);
-  font-size: 12px;
-  font-weight: 600;
-}
-
-html.dark .message.info { color: #4DE3DF; background: rgba(0, 206, 201, 0.1); }
 
 /* ============================================================
    FOOTER
@@ -797,11 +729,6 @@ html.dark .message.info { color: #4DE3DF; background: rgba(0, 206, 201, 0.1); }
       </svg>
     </span>
   </button>
-
-  <div class="net-indicator" id="netIndicator">
-    <span class="net-dot" id="netDot"></span>
-    <span id="netText">آنلاین</span>
-  </div>
 </div>
 
 <!-- Main -->
@@ -887,7 +814,7 @@ html.dark .message.info { color: #4DE3DF; background: rgba(0, 206, 201, 0.1); }
   'use strict';
 
   /* ============================================================
-     CONFIG — Supabase
+     CONFIG
   ============================================================ */
   var SUPABASE_URL = 'https://cfkwvzbqgapguuaqibmq.supabase.co';
   var SUPABASE_KEY = 'sb_publishable_Qf3R9hPgjApwe2c-qQMoJA_jitobazq';
@@ -911,9 +838,6 @@ html.dark .message.info { color: #4DE3DF; background: rgba(0, 206, 201, 0.1); }
   var codeText = document.getElementById('codeText');
   var themeBtn = document.getElementById('themeBtn');
   var suggestionsEl = document.getElementById('suggestions');
-  var netIndicator = document.getElementById('netIndicator');
-  var netDot = document.getElementById('netDot');
-  var netText = document.getElementById('netText');
 
   /* ============================================================
      STATE
@@ -945,37 +869,18 @@ html.dark .message.info { color: #4DE3DF; background: rgba(0, 206, 201, 0.1); }
   });
 
   /* ============================================================
-     NETWORK
-  ============================================================ */
-  function updateNetwork() {
-    var online = navigator.onLine;
-    netDot.classList.toggle('offline', !online);
-    netText.textContent = online ? 'آنلاین' : 'آفلاین';
-    if (!online) netIndicator.classList.add('show');
-    else setTimeout(function () { netIndicator.classList.remove('show'); }, 2000);
-  }
-
-  window.addEventListener('online', function () {
-    updateNetwork();
-    showMessage('✅ اتصال اینترنت برقرار شد', 'success', 2500);
-  });
-
-  window.addEventListener('offline', function () {
-    updateNetwork();
-    showMessage('⚠️ اتصال اینترنت قطع است', 'error', 5000);
-  });
-
-  /* ============================================================
      MESSAGE
   ============================================================ */
   var msgTimer = null;
 
-  function showMessage(html, type, duration) {
+  function showMessage(text, type, duration) {
     clearTimeout(msgTimer);
     message.className = 'message ' + type + ' show';
-    message.innerHTML = html;
+    message.textContent = text;
     if (duration) {
-      msgTimer = setTimeout(function () { message.classList.remove('show'); }, duration);
+      msgTimer = setTimeout(function () {
+        message.classList.remove('show');
+      }, duration);
     }
   }
 
@@ -1017,15 +922,14 @@ html.dark .message.info { color: #4DE3DF; background: rgba(0, 206, 201, 0.1); }
     }
 
     var parts = clean.split(/\s+/).filter(function (p) { return p.length > 0; });
-    var initials = '';
 
-    if (parts.length === 0) {
+    if (!parts.length) {
       avatar.textContent = '؟';
       avatar.classList.remove('has-name');
       return;
     }
 
-    initials = parts[0][0];
+    var initials = parts[0][0];
     if (parts.length > 1) initials += parts[parts.length - 1][0];
 
     avatar.textContent = initials;
@@ -1098,7 +1002,7 @@ html.dark .message.info { color: #4DE3DF; background: rgba(0, 206, 201, 0.1); }
   }
 
   /* ============================================================
-     SHAKE INPUT
+     SHAKE
   ============================================================ */
   function shakeInput() {
     nameInput.classList.add('error');
@@ -1130,6 +1034,14 @@ html.dark .message.info { color: #4DE3DF; background: rgba(0, 206, 201, 0.1); }
   }
 
   /* ============================================================
+     GO TO PANEL — بدون تأخیر
+  ============================================================ */
+  function goToPanel(role) {
+    var dest = role === 'teacher' ? 'teacher.html' : 'student.html';
+    window.location.replace(dest);
+  }
+
+  /* ============================================================
      SAVE NAME
   ============================================================ */
   async function saveName() {
@@ -1141,12 +1053,6 @@ html.dark .message.info { color: #4DE3DF; background: rgba(0, 206, 201, 0.1); }
       shakeInput();
       showMessage('❌ ' + v.msg, 'error');
       return;
-    }
-
-    /* اگه تک‌کلمه بود، تأیید بگیر */
-    if (v.value.split(' ').length < 2) {
-      var proceed = confirm('معمولاً نام و نام خانوادگی را با هم می‌نویسند. مطمئنی فقط همین کافی است؟');
-      if (!proceed) return;
     }
 
     if (!navigator.onLine) {
@@ -1161,53 +1067,96 @@ html.dark .message.info { color: #4DE3DF; background: rgba(0, 206, 201, 0.1); }
     nameInput.disabled = true;
 
     try {
-      /* ============================================
-         UPDATE PROFILES
-         RLS: فقط یک بار اجازه می‌ده (name_confirmed=false → true)
-      ============================================ */
+      /* ─── ۱) چک کن شاید قبلاً ذخیره شده ─── */
+      var check = await supabase
+        .from('profiles')
+        .select('name_confirmed, role')
+        .eq('id', currentUser.id)
+        .maybeSingle();
+
+      /* اگه الان true بود → بی‌صدا برو پنل */
+      if (check.data && check.data.name_confirmed === true) {
+        setBtnSuccess();
+        showMessage('✅ قبلاً ثبت شده!', 'success');
+        setTimeout(function () {
+          goToPanel(check.data.role);
+        }, 250);
+        return;
+      }
+
+      /* ─── ۲) ذخیره‌ی اصلی ─── */
       var result = await supabase
         .from('profiles')
         .update({
           full_name: v.value,
           name_confirmed: true
         })
-        .eq('id', currentUser.id);
+        .eq('id', currentUser.id)
+        .select('name_confirmed, role')
+        .maybeSingle();
 
-      if (result.error) {
-        console.error('[save]', result.error);
-        isSaving = false;
-        setBtnDefault();
-        nameInput.disabled = false;
-        nameInput.focus();
-        shakeInput();
+      /* ─── ۳) اگه خطا داد یا data نبود، دوباره چک کن ─── */
+      var saved = false;
+      var finalRole = currentRole;
 
-        var errMsg = 'خطا در ذخیره نام';
+      if (result.data && result.data.name_confirmed === true) {
+        saved = true;
+        finalRole = result.data.role || currentRole;
+      } else {
+        /* دوباره چک کن شاید ذخیره شده ولی response نگرفتیم */
+        var finalCheck = await supabase
+          .from('profiles')
+          .select('name_confirmed, role')
+          .eq('id', currentUser.id)
+          .maybeSingle();
 
-        if (result.error.message && result.error.message.indexOf('policy') !== -1) {
-          errMsg = 'این نام قبلاً تأیید شده و قابل تغییر نیست';
-        } else if (result.error.message && result.error.message.indexOf('Failed to fetch') !== -1) {
-          errMsg = 'اتصال به سرور برقرار نشد';
+        if (finalCheck.data && finalCheck.data.name_confirmed === true) {
+          saved = true;
+          finalRole = finalCheck.data.role || currentRole;
+        }
+      }
+
+      /* ─── ۴) موفقیت ─── */
+      if (saved) {
+        setBtnSuccess();
+        showMessage('✅ نام ثبت شد!', 'success');
+
+        if (navigator.vibrate) {
+          try { navigator.vibrate([60, 40, 60]); } catch (e) {}
         }
 
-        showMessage('❌ ' + errMsg, 'error');
+        /* 🔥 بدون تأخیر */
+        setTimeout(function () {
+          goToPanel(finalRole);
+        }, 250);
         return;
       }
 
-      /* ============================================
-         موفقیت
-      ============================================ */
-      if (navigator.vibrate) {
-        try { navigator.vibrate([60, 40, 60]); } catch (e) {}
+      /* ─── ۵) خطای واقعی ─── */
+      console.error('[save] error:', result.error);
+      isSaving = false;
+      setBtnDefault();
+      nameInput.disabled = false;
+      nameInput.focus();
+      shakeInput();
+
+      var errMsg = 'خطا در ذخیره. دوباره تلاش کن';
+      if (result.error && result.error.message) {
+        if (result.error.message.indexOf('policy') !== -1) {
+          /* احتمالاً قبلاً ذخیره شده — بازم برو پنل */
+          var roleCheck = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', currentUser.id)
+            .maybeSingle();
+          goToPanel(roleCheck.data ? roleCheck.data.role : currentRole);
+          return;
+        }
+        if (result.error.message.indexOf('Failed to fetch') !== -1) {
+          errMsg = 'اتصال به سرور برقرار نشد';
+        }
       }
-
-      setBtnSuccess();
-      showMessage('✅ نام شما با موفقیت ثبت شد!', 'success');
-
-      var dest = currentRole === 'teacher' ? 'teacher.html' : 'student.html';
-
-      setTimeout(function () {
-        window.location.href = dest;
-      }, 1200);
+      showMessage('❌ ' + errMsg, 'error');
 
     } catch (err) {
       console.error('[fatal]', err);
@@ -1216,7 +1165,7 @@ html.dark .message.info { color: #4DE3DF; background: rgba(0, 206, 201, 0.1); }
       nameInput.disabled = false;
       nameInput.focus();
       shakeInput();
-      showMessage('❌ خطای غیرمنتظره، دوباره تلاش کنید', 'error');
+      showMessage('❌ خطای غیرمنتظره، دوباره تلاش کن', 'error');
     }
   }
 
@@ -1239,29 +1188,24 @@ html.dark .message.info { color: #4DE3DF; background: rgba(0, 206, 201, 0.1); }
   saveBtn.addEventListener('click', saveName);
 
   /* ============================================================
-     INIT — بررسی کاربر
+     INIT
   ============================================================ */
   async function init() {
     initTheme();
-    updateNetwork();
     buildSuggestions();
     updateCounter();
 
-    /* ============================================
-       چک لاگین
-    ============================================ */
+    /* چک لاگین */
     var userResult = await supabase.auth.getUser();
     var user = userResult.data.user;
 
     if (!user) {
-      window.location.href = 'index.html';
+      window.location.replace('index.html');
       return;
     }
     currentUser = user;
 
-    /* ============================================
-       چک پروفایل
-    ============================================ */
+    /* چک پروفایل */
     var profileResult = await supabase
       .from('profiles')
       .select('code, name_confirmed, role')
@@ -1270,9 +1214,9 @@ html.dark .message.info { color: #4DE3DF; background: rgba(0, 206, 201, 0.1); }
 
     var profile = profileResult.data;
 
-    /* اگه قبلاً تأیید کرده → برو پنل */
+    /* اگه قبلاً تأیید کرده → بی‌صدا برو پنل */
     if (profile && profile.name_confirmed === true) {
-      window.location.href = profile.role === 'teacher' ? 'teacher.html' : 'student.html';
+      goToPanel(profile.role);
       return;
     }
 
@@ -1286,7 +1230,7 @@ html.dark .message.info { color: #4DE3DF; background: rgba(0, 206, 201, 0.1); }
     setTimeout(function () {
       nameInput.focus();
       try { nameInput.select(); } catch (e) {}
-    }, 400);
+    }, 350);
   }
 
   init();
