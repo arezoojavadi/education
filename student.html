@@ -1,75 +1,1755 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="پنل دانش‌آموز — سامانه آزمون فاطمه جوادی">
+<meta name="author" content="فاطمه جوادی">
+<meta name="theme-color" content="#6C5CE7" id="themeMeta">
+<meta name="color-scheme" content="light dark">
+
+<title>پنل دانش‌آموز | سامانه آزمون فاطمه جوادی</title>
+
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#6C5CE7">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="آزمون">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/components.css">
-<link rel="stylesheet" href="css/animations.css">
-<link rel="stylesheet" href="css/skeletons.css">
-<link rel="stylesheet" href="css/print.css" media="print">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#6C5CE7">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="آزمون">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>پنل دانش‌آموز</title>
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/components.css">
+<style>
+/* ============================================================
+   RESET
+============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ============================================================
+   DESIGN TOKENS — LIGHT
+============================================================ */
+:root {
+  --brand-1: #6C5CE7;
+  --brand-2: #8E7CFF;
+  --brand-3: #00CEC9;
+  --brand-4: #FD79A8;
+  --brand-5: #FDCB6E;
+  --success: #00B894;
+  --danger:  #FF6B6B;
+
+  --bg-1: #EEF0FF;
+  --bg-2: #F5F0FF;
+  --bg-3: #FFF0F8;
+
+  --card-bg: #FFFFFF;
+  --card-border: rgba(108, 92, 231, 0.08);
+
+  --text-1: #1E1B3A;
+  --text-2: #6B6789;
+  --text-3: #A5A0C0;
+
+  --input-bg: #F8F7FF;
+  --input-border: #E5E0FF;
+
+  --shadow-sm: 0 2px 8px rgba(108, 92, 231, 0.06);
+  --shadow-md: 0 6px 24px rgba(108, 92, 231, 0.10);
+  --shadow-lg: 0 12px 40px rgba(108, 92, 231, 0.15);
+  --shadow-btn: 0 6px 18px rgba(108, 92, 231, 0.28);
+
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+}
+
+/* ============================================================
+   DESIGN TOKENS — DARK
+============================================================ */
+html.dark {
+  --bg-1: #0F0C24;
+  --bg-2: #14102E;
+  --bg-3: #1A1030;
+
+  --card-bg: #1A1638;
+  --card-border: rgba(162, 155, 254, 0.12);
+
+  --text-1: #F2F0FF;
+  --text-2: #A5A0C0;
+  --text-3: #6B6789;
+
+  --input-bg: #14102E;
+  --input-border: #2A2456;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.5);
+  --shadow-btn: 0 6px 18px rgba(108, 92, 231, 0.4);
+}
+
+/* ============================================================
+   BASE
+============================================================ */
+html, body {
+  min-height: 100%;
+}
+
+body {
+  font-family: 'Vazirmatn', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 50%, var(--bg-3) 100%);
+  background-attachment: fixed;
+  color: var(--text-1);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background 0.4s var(--ease), color 0.4s var(--ease);
+}
+
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+input, textarea { font-family: inherit; }
+
+/* ============================================================
+   BACKGROUND DECORATION
+============================================================ */
+.bg-decor {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bg-decor::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='2' cy='2' r='1' fill='%236C5CE7' opacity='0.35'/></svg>");
+  background-size: 32px 32px;
+  opacity: 0.3;
+  mask-image: radial-gradient(ellipse at top, #000 10%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse at top, #000 10%, transparent 70%);
+}
+
+html.dark .bg-decor::before {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='2' cy='2' r='1' fill='%23A29BFE' opacity='0.5'/></svg>");
+  opacity: 0.45;
+}
+
+.bg-decor::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(108, 92, 231, 0.1) 0%, transparent 35%),
+    radial-gradient(circle at 85% 85%, rgba(0, 206, 201, 0.08) 0%, transparent 35%);
+}
+
+html.dark .bg-decor::after {
+  background:
+    radial-gradient(circle at 15% 15%, rgba(162, 155, 254, 0.13) 0%, transparent 35%),
+    radial-gradient(circle at 85% 85%, rgba(0, 206, 201, 0.1) 0%, transparent 35%);
+}
+
+/* ============================================================
+   TOP BAR
+============================================================ */
+.top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--card-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-sm);
+}
+
+.top-bar-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 14px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--text-1);
+}
+
+.brand-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6C5CE7 0%, #00CEC9 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(108, 92, 231, 0.25);
+  flex-shrink: 0;
+}
+
+.brand-logo svg {
+  width: 20px;
+  height: 20px;
+  stroke: #fff;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  line-height: 1.2;
+}
+
+.brand-title {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--text-1);
+}
+
+.brand-sub {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-3);
+  letter-spacing: 0.3px;
+}
+
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px 6px 6px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-lg);
+  transition: all 0.2s var(--ease);
+}
+
+.user-chip:hover {
+  border-color: var(--brand-1);
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  line-height: 1.2;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-1);
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-role {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--brand-1);
+}
+
+html.dark .user-role { color: var(--brand-2); }
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6C5CE7 0%, #00CEC9 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(108, 92, 231, 0.25);
+  user-select: none;
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-1);
+  transition: all 0.2s var(--ease);
+  flex-shrink: 0;
+}
+
+.icon-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--brand-1);
+  color: var(--brand-1);
+}
+
+html.dark .icon-btn:hover {
+  border-color: var(--brand-2);
+  color: var(--brand-2);
+}
+
+.icon-btn:active { transform: scale(0.94); }
+
+.icon-btn svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.icon-wrap {
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+
+.icon-wrap svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.25s, transform 0.35s var(--ease);
+}
+
+.icon-sun  { opacity: 1; transform: rotate(0) scale(1); }
+.icon-moon { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+
+html.dark .icon-sun  { opacity: 0; transform: rotate(90deg) scale(0.5); }
+html.dark .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
+
+/* ============================================================
+   MAIN
+============================================================ */
+.main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+}
+
+/* ============================================================
+   WELCOME HERO
+============================================================ */
+.hero {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-xl);
+  padding: 32px 28px;
+  margin-bottom: 28px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #6C5CE7, #00CEC9, #FD79A8, #6C5CE7);
+  background-size: 200% 100%;
+  animation: shimmer 8s linear infinite;
+}
+
+@keyframes shimmer { to { background-position: 200% 0; } }
+
+.hero-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-text { flex: 1; min-width: 220px; }
+
+.hero-greeting {
+  font-size: 22px;
+  font-weight: 900;
+  margin-bottom: 6px;
+  line-height: 1.3;
+  letter-spacing: -0.3px;
+  background: linear-gradient(135deg, #6C5CE7 0%, #00CEC9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+html.dark .hero-greeting {
+  background: linear-gradient(135deg, #A29BFE 0%, #00CEC9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-subtitle {
+  font-size: 13.5px;
+  color: var(--text-2);
+  font-weight: 500;
+  line-height: 1.75;
+}
+
+.hero-emoji {
+  font-size: 60px;
+  line-height: 1;
+  flex-shrink: 0;
+  animation: heroFloat 4s ease-in-out infinite;
+  user-select: none;
+}
+
+@keyframes heroFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(5deg); }
+}
+
+/* ============================================================
+   STATS
+============================================================ */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: 20px 18px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.stat-icon {
+  width: 44px;
+  height: 44px;
+  margin: 0 auto 10px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke: #fff;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.stat-icon.brand {
+  background: linear-gradient(135deg, #6C5CE7, #8E7CFF);
+  box-shadow: 0 6px 16px rgba(108, 92, 231, 0.3);
+}
+
+.stat-icon.success {
+  background: linear-gradient(135deg, #00B894, #55EFC4);
+  box-shadow: 0 6px 16px rgba(0, 184, 148, 0.3);
+}
+
+.stat-icon.warning {
+  background: linear-gradient(135deg, #FDCB6E, #FFEAA7);
+  box-shadow: 0 6px 16px rgba(253, 203, 110, 0.3);
+}
+
+.stat-icon.pink {
+  background: linear-gradient(135deg, #FD79A8, #FF9EC4);
+  box-shadow: 0 6px 16px rgba(253, 121, 168, 0.3);
+}
+
+.stat-value {
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--text-1);
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-2);
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+/* ============================================================
+   SECTION
+============================================================ */
+.section {
+  margin-bottom: 32px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 17px;
+  font-weight: 900;
+  color: var(--text-1);
+}
+
+.section-title-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.section-title-icon svg {
+  width: 17px;
+  height: 17px;
+  stroke: #fff;
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.section-title-icon.brand {
+  background: linear-gradient(135deg, #6C5CE7, #8E7CFF);
+}
+
+.section-title-icon.success {
+  background: linear-gradient(135deg, #00B894, #55EFC4);
+}
+
+.section-count {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--text-2);
+  font-size: 11.5px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+/* ============================================================
+   EXAM GRID
+============================================================ */
+.exam-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.exam-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), border-color 0.25s var(--ease);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: cardIn 0.5s var(--ease) both;
+}
+
+.exam-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: rgba(108, 92, 231, 0.25);
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.exam-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #6C5CE7, #00CEC9);
+  opacity: 0;
+  transition: opacity 0.3s var(--ease);
+}
+
+.exam-card:hover::before { opacity: 1; }
+
+.exam-card.done::before {
+  background: linear-gradient(90deg, #00B894, #55EFC4);
+}
+
+.exam-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.exam-card-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #6C5CE7, #8E7CFF);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 6px 16px rgba(108, 92, 231, 0.28);
+}
+
+.exam-card.done .exam-card-icon {
+  background: linear-gradient(135deg, #00B894, #55EFC4);
+  box-shadow: 0 6px 16px rgba(0, 184, 148, 0.28);
+}
+
+.exam-card-icon svg {
+  width: 24px;
+  height: 24px;
+  stroke: #fff;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.exam-card-title-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.exam-card-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-1);
+  line-height: 1.4;
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+
+.exam-card-desc {
+  font-size: 12.5px;
+  color: var(--text-2);
+  line-height: 1.65;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.exam-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.meta-pill svg {
+  width: 12px;
+  height: 12px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+.meta-pill.success {
+  background: rgba(0, 184, 148, 0.1);
+  border-color: rgba(0, 184, 148, 0.22);
+  color: var(--success);
+}
+
+.meta-pill.brand {
+  background: rgba(108, 92, 231, 0.1);
+  border-color: rgba(108, 92, 231, 0.22);
+  color: var(--brand-1);
+}
+
+html.dark .meta-pill.brand { color: var(--brand-2); }
+
+.exam-card-footer {
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+.btn-start {
+  width: 100%;
+  padding: 13px 20px;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, #6C5CE7 0%, #8E7CFF 100%);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 6px 18px rgba(108, 92, 231, 0.28);
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+}
+
+.btn-start::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transition: left 0.6s var(--ease);
+}
+
+.btn-start:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(108, 92, 231, 0.42);
+}
+
+.btn-start:hover::before { left: 120%; }
+
+.btn-start:active { transform: translateY(0) scale(0.98); }
+
+.btn-start svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.badge-done {
+  width: 100%;
+  padding: 13px 20px;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--success);
+  background: rgba(0, 184, 148, 0.1);
+  border: 1.5px solid rgba(0, 184, 148, 0.3);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: default;
+}
+
+.badge-done svg {
+  width: 17px;
+  height: 17px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ============================================================
+   EMPTY / LOADING
+============================================================ */
+.empty-state {
+  text-align: center;
+  padding: 56px 20px;
+  color: var(--text-2);
+  background: var(--card-bg);
+  border: 1px dashed var(--input-border);
+  border-radius: var(--radius-lg);
+}
+
+.empty-icon {
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 18px;
+  border-radius: var(--radius-xl);
+  background: var(--input-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-icon svg {
+  width: 36px;
+  height: 36px;
+  stroke: var(--brand-1);
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+html.dark .empty-icon svg { stroke: var(--brand-2); }
+
+.empty-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-1);
+  margin-bottom: 6px;
+}
+
+.empty-text {
+  font-size: 13px;
+  color: var(--text-2);
+  max-width: 340px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* Loading skeleton */
+.skeleton-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--input-bg) 25%,
+    var(--input-border) 50%,
+    var(--input-bg) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeletonLoad 1.5s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes skeletonLoad {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+.skel-line {
+  height: 12px;
+}
+
+.skel-line.title { height: 18px; width: 60%; }
+.skel-line.short { width: 40%; }
+.skel-line.tiny  { width: 25%; }
+.skel-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+}
+.skel-btn {
+  height: 44px;
+  border-radius: var(--radius-md);
+  margin-top: 4px;
+}
+
+/* ============================================================
+   FOOTER
+============================================================ */
+.footer {
+  text-align: center;
+  padding: 24px 20px;
+  font-size: 11.5px;
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+.footer .heart {
+  display: inline-block;
+  color: #FD79A8;
+  animation: heartbeat 1.8s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+/* ============================================================
+   TOAST
+============================================================ */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 9000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+  max-width: 360px;
+}
+
+.toast {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  padding: 13px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-1);
+  box-shadow: var(--shadow-lg);
+  border-right: 4px solid var(--brand-1);
+  animation: toastIn 0.35s var(--bounce) both;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.5;
+}
+
+.toast.success { border-right-color: var(--success); }
+.toast.error   { border-right-color: var(--danger); }
+.toast.removing { animation: toastOut 0.25s var(--ease) forwards; }
+
+@keyframes toastIn {
+  0% { opacity: 0; transform: translateX(-30px) scale(0.95); }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes toastOut {
+  to { opacity: 0; transform: translateX(-30px) scale(0.95); }
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 720px) {
+  .top-bar-inner { padding: 12px 16px; }
+  .main { padding: 24px 16px 48px; }
+  .hero { padding: 26px 22px; }
+  .hero-emoji { font-size: 48px; }
+  .hero-greeting { font-size: 19px; }
+  .brand-text { display: none; }
+  .exam-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .top-bar-inner { padding: 10px 12px; gap: 8px; }
+  .user-name { max-width: 90px; font-size: 12px; }
+  .user-role { font-size: 10px; }
+  .user-avatar { width: 32px; height: 32px; font-size: 13px; }
+  .user-chip { padding: 5px 12px 5px 5px; gap: 8px; }
+  .icon-btn { width: 36px; height: 36px; }
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  .main { padding: 18px 12px 40px; }
+  .hero { padding: 22px 18px; border-radius: var(--radius-lg); }
+  .hero-emoji { font-size: 42px; }
+  .hero-greeting { font-size: 17px; }
+
+  .stats { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stat-card { padding: 16px 12px; }
+  .stat-value { font-size: 22px; }
+  .stat-label { font-size: 11px; }
+
+  .section-title { font-size: 15px; }
+  .exam-card { padding: 18px; }
+  .exam-card-icon { width: 42px; height: 42px; border-radius: 12px; }
+  .exam-card-icon svg { width: 22px; height: 22px; }
+  .exam-card-title { font-size: 15px; }
+}
+
+@media (max-width: 360px) {
+  .stats { grid-template-columns: 1fr 1fr; }
+  .stat-icon { width: 38px; height: 38px; }
+  .stat-icon svg { width: 20px; height: 20px; }
+  .stat-value { font-size: 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .hero-emoji { animation: none; }
+}
+</style>
 </head>
 <body>
 
-  <header class="app-header">
-    <h2>📚 پنل دانش‌آموز</h2>
-    <div class="user-info">
-      <span class="user-name" id="userName">—</span>
-      <div class="user-avatar" id="userAvatar">؟</div>
-      <button class="btn-icon" onclick="toggleTheme()" title="تغییر تم">
-        <span id="themeIcon">🌙</span>
+<!-- Background -->
+<div class="bg-decor" aria-hidden="true"></div>
+
+<!-- Top Bar -->
+<header class="top-bar">
+  <div class="top-bar-inner">
+
+    <div class="brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <path d="M14 2v6h6"/>
+          <path d="M9 15l2 2 4-4"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-title">سامانه آزمون</span>
+        <span class="brand-sub">فاطمه جوادی</span>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <button class="icon-btn" id="themeBtn" type="button" title="تغییر حالت" aria-label="تغییر تم">
+        <span class="icon-wrap">
+          <svg class="icon-sun" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+          </svg>
+          <svg class="icon-moon" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </span>
       </button>
-      <button class="btn-icon" onclick="logout()" title="خروج">🚪</button>
+
+      <div class="user-chip">
+        <div class="user-info">
+          <span class="user-name" id="userName">—</span>
+          <span class="user-role">دانش‌آموز</span>
+        </div>
+        <div class="user-avatar" id="userAvatar">؟</div>
+      </div>
+
+      <button class="icon-btn" id="logoutBtn" type="button" title="خروج" aria-label="خروج">
+        <svg viewBox="0 0 24 24">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
     </div>
-  </header>
 
-  <main class="container">
-    <h1 class="section-title" id="greeting">خوش آمدی 👋</h1>
+  </div>
+</header>
 
-    <!-- آزمون‌های فعال -->
-    <h3 class="section-title">🎯 آزمون‌های فعال</h3>
-    <div id="activeExams">
-      <div class="loading"><div class="spinner"></div>در حال بارگذاری...</div>
+<!-- Main -->
+<main class="main">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-greeting" id="heroGreeting">سلام 👋</h1>
+        <p class="hero-subtitle" id="heroSubtitle">
+          به سامانه آزمون خوش آمدی. از این‌جا می‌تونی آزمون‌های فعالت رو ببینی و شرکت کنی.
+        </p>
+      </div>
+      <div class="hero-emoji" id="heroEmoji">🎓</div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="stats">
+    <div class="stat-card">
+      <div class="stat-icon brand">
+        <svg viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <path d="M14 2v6h6"/>
+        </svg>
+      </div>
+      <div class="stat-value" id="statActive">۰</div>
+      <div class="stat-label">آزمون فعال</div>
     </div>
 
-    <!-- آزمون‌های انجام‌شده -->
-    <h3 class="section-title">✅ آزمون‌های انجام‌شده</h3>
-    <div id="doneExams">
-      <div class="loading"><div class="spinner"></div>در حال بارگذاری...</div>
+    <div class="stat-card">
+      <div class="stat-icon success">
+        <svg viewBox="0 0 24 24">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+      </div>
+      <div class="stat-value" id="statDone">۰</div>
+      <div class="stat-label">آزمون انجام‌شده</div>
     </div>
-  </main>
 
-  <script src="js/errors.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/utils.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/student.js"></script>
-</body>
+    <div class="stat-card">
+      <div class="stat-icon pink">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+      </div>
+      <div class="stat-value" id="statTotal">۰</div>
+      <div class="stat-label">کل آزمون‌ها</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon warning">
+        <svg viewBox="0 0 24 24">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+      </div>
+      <div class="stat-value" id="statRate">۰٪</div>
+      <div class="stat-label">میزان مشارکت</div>
+    </div>
+  </section>
+
+  <!-- Active Exams -->
+  <section class="section">
+    <div class="section-header">
+      <h2 class="section-title">
+        <span class="section-title-icon brand">
+          <svg viewBox="0 0 24 24">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+        </span>
+        آزمون‌های فعال
+      </h2>
+      <span class="section-count" id="activeCount">۰</span>
+    </div>
+
+    <div class="exam-grid" id="activeExams">
+      <!-- Skeletons -->
+      <div class="skeleton-card">
+        <div style="display:flex; gap:12px;">
+          <div class="skeleton skel-icon"></div>
+          <div style="flex:1;">
+            <div class="skeleton skel-line title" style="margin-bottom:8px;"></div>
+            <div class="skeleton skel-line short"></div>
+          </div>
+        </div>
+        <div class="skeleton skel-line tiny"></div>
+        <div class="skeleton skel-btn"></div>
+      </div>
+      <div class="skeleton-card">
+        <div style="display:flex; gap:12px;">
+          <div class="skeleton skel-icon"></div>
+          <div style="flex:1;">
+            <div class="skeleton skel-line title" style="margin-bottom:8px;"></div>
+            <div class="skeleton skel-line short"></div>
+          </div>
+        </div>
+        <div class="skeleton skel-line tiny"></div>
+        <div class="skeleton skel-btn"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Done Exams -->
+  <section class="section">
+    <div class="section-header">
+      <h2 class="section-title">
+        <span class="section-title-icon success">
+          <svg viewBox="0 0 24 24">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+        </span>
+        آزمون‌های انجام‌شده
+      </h2>
+      <span class="section-count" id="doneCount">۰</span>
+    </div>
+
+    <div class="exam-grid" id="doneExams">
+      <div class="empty-state" style="grid-column: 1/-1;">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+        </div>
+        <div class="empty-title">هنوز آزمونی انجام ندادی</div>
+        <div class="empty-text">وقتی آزمونی رو انجام بدی، این‌جا نمایش داده می‌شه.</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+  ساخته شده با <span class="heart">♥</span> برای یادگیری بهتر — طراحی: فاطمه جوادی
+</footer>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/utils.js"></script>
-<script src="js/errors.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/a11y.js"></script>
-<!-- اسکریپت مخصوص صفحه -->
-</html>
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<script src="js/a11y.js"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', initAccessibility);
+(function () {
+  'use strict';
+
+  /* ============================================================
+     CONFIG
+  ============================================================ */
+  var SUPABASE_URL = 'https://cfkwvzbqgapguuaqibmq.supabase.co';
+  var SUPABASE_KEY = 'sb_publishable_Qf3R9hPgjApwe2c-qQMoJA_jitobazq';
+
+  var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: false
+    }
+  });
+
+  /* ============================================================
+     DOM
+  ============================================================ */
+  var els = {
+    themeBtn:     document.getElementById('themeBtn'),
+    logoutBtn:    document.getElementById('logoutBtn'),
+    userName:     document.getElementById('userName'),
+    userAvatar:   document.getElementById('userAvatar'),
+    heroGreeting: document.getElementById('heroGreeting'),
+    heroSubtitle: document.getElementById('heroSubtitle'),
+    heroEmoji:    document.getElementById('heroEmoji'),
+    statActive:   document.getElementById('statActive'),
+    statDone:     document.getElementById('statDone'),
+    statTotal:    document.getElementById('statTotal'),
+    statRate:     document.getElementById('statRate'),
+    activeCount:  document.getElementById('activeCount'),
+    doneCount:    document.getElementById('doneCount'),
+    activeExams:  document.getElementById('activeExams'),
+    doneExams:    document.getElementById('doneExams'),
+    toasts:       document.getElementById('toastContainer')
+  };
+
+  /* ============================================================
+     STATE
+  ============================================================ */
+  var state = {
+    user: null,
+    profile: null,
+    activeExams: [],
+    doneExams: []
+  };
+
+  /* ============================================================
+     HELPERS
+  ============================================================ */
+  var FA_DIGITS = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+
+  function toFa(n) {
+    return String(n).replace(/\d/g, function (d) { return FA_DIGITS[+d]; });
+  }
+
+  function escapeHtml(text) {
+    if (text === null || text === undefined) return '';
+    var div = document.createElement('div');
+    div.textContent = String(text);
+    return div.innerHTML;
+  }
+
+  function getInitials(name) {
+    if (!name || typeof name !== 'string') return '؟';
+    var parts = name.trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return '؟';
+    if (parts.length === 1) return parts[0][0] || '؟';
+    return (parts[0][0] || '') + (parts[parts.length - 1][0] || '');
+  }
+
+  function formatDate(iso) {
+    if (!iso) return '—';
+    try {
+      return new Intl.DateTimeFormat('fa-IR', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      }).format(new Date(iso));
+    } catch (e) {
+      return '—';
+    }
+  }
+
+  function formatDateTime(iso) {
+    if (!iso) return '—';
+    try {
+      return new Intl.DateTimeFormat('fa-IR', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(new Date(iso));
+    } catch (e) {
+      return '—';
+    }
+  }
+
+  function formatDuration(seconds) {
+    if (seconds === null || seconds === undefined) return '—';
+    var s = parseInt(seconds, 10) || 0;
+    var m = Math.floor(s / 60);
+    var sec = s % 60;
+    if (m === 0) return toFa(sec) + ' ثانیه';
+    if (sec === 0) return toFa(m) + ' دقیقه';
+    return toFa(m) + ':' + (sec < 10 ? '۰' : '') + toFa(sec) + ' دقیقه';
+  }
+
+  /* ============================================================
+     THEME
+  ============================================================ */
+  function applyTheme(isDark) {
+    if (isDark) document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
+    try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch (e) {}
+    var meta = document.getElementById('themeMeta');
+    if (meta) meta.setAttribute('content', isDark ? '#0F0C24' : '#6C5CE7');
+  }
+
+  function initTheme() {
+    var saved = null;
+    try { saved = localStorage.getItem('theme'); } catch (e) {}
+    var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyTheme(saved === 'dark' || (!saved && prefersDark));
+  }
+
+  els.themeBtn.addEventListener('click', function () {
+    applyTheme(!document.documentElement.classList.contains('dark'));
+  });
+
+  /* ============================================================
+     TOAST
+  ============================================================ */
+  function toast(message, type, duration) {
+    type = type || 'info';
+    duration = duration || 3000;
+
+    var el = document.createElement('div');
+    el.className = 'toast ' + type;
+    el.textContent = message;
+    els.toasts.appendChild(el);
+
+    setTimeout(function () {
+      el.classList.add('removing');
+      setTimeout(function () { el.remove(); }, 300);
+    }, duration);
+  }
+
+  /* ============================================================
+     HERO GREETING
+  ============================================================ */
+  function updateGreeting(name) {
+    var h = new Date().getHours();
+    var greet = 'سلام';
+    var emoji = '👋';
+
+    if (h >= 5 && h < 11) { greet = 'صبح بخیر'; emoji = '☀️'; }
+    else if (h >= 11 && h < 15) { greet = 'ظهر بخیر'; emoji = '🌤️'; }
+    else if (h >= 15 && h < 19) { greet = 'عصر بخیر'; emoji = '🌇'; }
+    else if (h >= 19 && h < 23) { greet = 'شب بخیر'; emoji = '🌙'; }
+    else { greet = 'شب آرام'; emoji = '✨'; }
+
+    var first = (name || '').split(/\s+/)[0] || '';
+    els.heroGreeting.textContent = greet + (first ? '، ' + first : '') + ' ' + emoji;
+    els.heroEmoji.textContent = emoji;
+  }
+
+  /* ============================================================
+     AUTH GUARD
+  ============================================================ */
+  async function requireStudent() {
+    /* نشست */
+    var sessionResult = await supabase.auth.getSession();
+    if (!sessionResult.data || !sessionResult.data.session) {
+      window.location.replace('index.html');
+      return null;
+    }
+
+    /* کاربر */
+    var userResult = await supabase.auth.getUser();
+    var user = userResult.data && userResult.data.user;
+    if (!user) {
+      window.location.replace('index.html');
+      return null;
+    }
+
+    /* پروفایل */
+    var profileResult = await supabase
+      .from('profiles')
+      .select('id, code, full_name, role, name_confirmed')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    var profile = profileResult.data;
+
+    /* اگه پروفایل نیست یا نام تأیید نشده → choose-name */
+    if (!profile || !profile.name_confirmed) {
+      window.location.replace('choose-name.html');
+      return null;
+    }
+
+    /* اگه معلمه → teacher.html */
+    if (profile.role === 'teacher') {
+      window.location.replace('teacher.html');
+      return null;
+    }
+
+    return { user: user, profile: profile };
+  }
+
+  /* ============================================================
+     LOGOUT
+  ============================================================ */
+  async function logout() {
+    try { await supabase.auth.signOut(); } catch (e) {}
+    try { localStorage.removeItem('auth_profile_cache'); } catch (e) {}
+    window.location.replace('index.html');
+  }
+
+  els.logoutBtn.addEventListener('click', function () {
+    if (confirm('از حساب خود خارج می‌شوید؟')) logout();
+  });
+
+  /* ============================================================
+     LOAD EXAMS
+  ============================================================ */
+  async function loadData() {
+    /* آزمون‌های فعال */
+    var examsResult = await supabase
+      .from('exams')
+      .select('id, title, description, created_at, is_active')
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
+
+    if (examsResult.error) {
+      console.warn('[exams]', examsResult.error);
+      showActiveError();
+      return;
+    }
+
+    var allExams = examsResult.data || [];
+
+    /* پاسخ‌های کاربر */
+    var subsResult = await supabase
+      .from('submissions')
+      .select('exam_id, submitted_at, duration_seconds')
+      .eq('student_id', state.user.id)
+      .order('submitted_at', { ascending: false });
+
+    var submissions = (subsResult.error ? [] : subsResult.data) || [];
+
+    /* Map: exam_id → submission */
+    var subMap = {};
+    submissions.forEach(function (s) { subMap[s.exam_id] = s; });
+
+    /* تفکیک */
+    var active = [];
+    var done = [];
+
+    allExams.forEach(function (exam) {
+      if (subMap[exam.id]) {
+        done.push({
+          exam: exam,
+          submission: subMap[exam.id]
+        });
+      } else {
+        active.push(exam);
+      }
+    });
+
+    state.activeExams = active;
+    state.doneExams = done;
+
+    renderActive(active);
+    renderDone(done);
+    renderStats(active.length, done.length, allExams.length);
+  }
+
+  /* ============================================================
+     RENDER — STATS
+  ============================================================ */
+  function renderStats(activeCount, doneCount, total) {
+    els.statActive.textContent = toFa(activeCount);
+    els.statDone.textContent = toFa(doneCount);
+    els.statTotal.textContent = toFa(total);
+
+    var rate = total > 0 ? Math.round((doneCount / total) * 100) : 0;
+    els.statRate.textContent = toFa(rate) + '٪';
+
+    els.activeCount.textContent = toFa(activeCount);
+    els.doneCount.textContent = toFa(doneCount);
+  }
+
+  /* ============================================================
+     RENDER — ACTIVE
+  ============================================================ */
+  function renderActive(list) {
+    if (!list.length) {
+      els.activeExams.innerHTML =
+        '<div class="empty-state" style="grid-column: 1/-1;">' +
+          '<div class="empty-icon">' +
+            '<svg viewBox="0 0 24 24">' +
+              '<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>' +
+            '</svg>' +
+          '</div>' +
+          '<div class="empty-title">هیچ آزمون فعالی نیست</div>' +
+          '<div class="empty-text">منتظر باش تا معلم آزمون جدید آپلود کنه. وقتی فعال شد، همین‌جا نمایش داده می‌شه.</div>' +
+        '</div>';
+      return;
+    }
+
+    var html = '';
+    list.forEach(function (exam, i) {
+      var delay = (i * 0.06).toFixed(2) + 's';
+      html +=
+        '<div class="exam-card" style="animation-delay:' + delay + ';">' +
+          '<div class="exam-card-head">' +
+            '<div class="exam-card-icon">' +
+              '<svg viewBox="0 0 24 24">' +
+                '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>' +
+                '<path d="M14 2v6h6"/>' +
+                '<path d="M9 15l2 2 4-4"/>' +
+              '</svg>' +
+            '</div>' +
+            '<div class="exam-card-title-wrap">' +
+              '<div class="exam-card-title">' + escapeHtml(exam.title) + '</div>' +
+              (exam.description
+                ? '<div class="exam-card-desc">' + escapeHtml(exam.description) + '</div>'
+                : '') +
+            '</div>' +
+          '</div>' +
+          '<div class="exam-card-meta">' +
+            '<span class="meta-pill brand">' +
+              '<svg viewBox="0 0 24 24">' +
+                '<rect x="3" y="4" width="18" height="18" rx="2"/>' +
+                '<line x1="16" y1="2" x2="16" y2="6"/>' +
+                '<line x1="8" y1="2" x2="8" y2="6"/>' +
+                '<line x1="3" y1="10" x2="21" y2="10"/>' +
+              '</svg>' +
+              formatDate(exam.created_at) +
+            '</span>' +
+            '<span class="meta-pill">' +
+              '<svg viewBox="0 0 24 24">' +
+                '<circle cx="12" cy="12" r="10"/>' +
+                '<polyline points="12 6 12 12 16 14"/>' +
+              '</svg>' +
+              'آماده شرکت' +
+            '</span>' +
+          '</div>' +
+          '<div class="exam-card-footer">' +
+            '<a href="take.html?id=' + encodeURIComponent(exam.id) + '" class="btn-start">' +
+              '<span>شروع آزمون</span>' +
+              '<svg viewBox="0 0 24 24">' +
+                '<line x1="19" y1="12" x2="5" y2="12"/>' +
+                '<polyline points="12 19 5 12 12 5"/>' +
+              '</svg>' +
+            '</a>' +
+          '</div>' +
+        '</div>';
+    });
+
+    els.activeExams.innerHTML = html;
+  }
+
+  /* ============================================================
+     RENDER — DONE
+  ============================================================ */
+  function renderDone(list) {
+    if (!list.length) {
+      els.doneExams.innerHTML =
+        '<div class="empty-state" style="grid-column: 1/-1;">' +
+          '<div class="empty-icon">' +
+            '<svg viewBox="0 0 24 24">' +
+              '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>' +
+              '<polyline points="22 4 12 14.01 9 11.01"/>' +
+            '</svg>' +
+          '</div>' +
+          '<div class="empty-title">هنوز آزمونی انجام ندادی</div>' +
+          '<div class="empty-text">وقتی آزمونی رو انجام بدی، این‌جا نمایش داده می‌شه.</div>' +
+        '</div>';
+      return;
+    }
+
+    var html = '';
+    list.forEach(function (item, i) {
+      var exam = item.exam;
+      var sub = item.submission;
+      var delay = (i * 0.06).toFixed(2) + 's';
+
+      html +=
+        '<div class="exam-card done" style="animation-delay:' + delay + ';">' +
+          '<div class="exam-card-head">' +
+            '<div class="exam-card-icon">' +
+              '<svg viewBox="0 0 24 24">' +
+                '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>' +
+                '<polyline points="22 4 12 14.01 9 11.01"/>' +
+              '</svg>' +
+            '</div>' +
+            '<div class="exam-card-title-wrap">' +
+              '<div class="exam-card-title">' + escapeHtml(exam.title) + '</div>' +
+              (exam.description
+                ? '<div class="exam-card-desc">' + escapeHtml(exam.description) + '</div>'
+                : '') +
+            '</div>' +
+          '</div>' +
+          '<div class="exam-card-meta">' +
+            '<span class="meta-pill success">' +
+              '<svg viewBox="0 0 24 24">' +
+                '<polyline points="20 6 9 17 4 12"/>' +
+              '</svg>' +
+              'ثبت‌شده' +
+            '</span>' +
+            '<span class="meta-pill">' +
+              '<svg viewBox="0 0 24 24">' +
+                '<rect x="3" y="4" width="18" height="18" rx="2"/>' +
+                '<line x1="16" y1="2" x2="16" y2="6"/>' +
+                '<line x1="8" y1="2" x2="8" y2="6"/>' +
+                '<line x1="3" y1="10" x2="21" y2="10"/>' +
+              '</svg>' +
+              formatDateTime(sub.submitted_at) +
+            '</span>' +
+            (sub.duration_seconds
+              ? '<span class="meta-pill">' +
+                  '<svg viewBox="0 0 24 24">' +
+                    '<circle cx="12" cy="12" r="10"/>' +
+                    '<polyline points="12 6 12 12 16 14"/>' +
+                  '</svg>' +
+                  formatDuration(sub.duration_seconds) +
+                '</span>'
+              : '') +
+          '</div>' +
+          '<div class="exam-card-footer">' +
+            '<div class="badge-done">' +
+              '<svg viewBox="0 0 24 24">' +
+                '<polyline points="20 6 9 17 4 12"/>' +
+              '</svg>' +
+              'تحویل داده شد' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+    });
+
+    els.doneExams.innerHTML = html;
+  }
+
+  function showActiveError() {
+    els.activeExams.innerHTML =
+      '<div class="empty-state" style="grid-column: 1/-1;">' +
+        '<div class="empty-icon">' +
+          '<svg viewBox="0 0 24 24">' +
+            '<circle cx="12" cy="12" r="10"/>' +
+            '<line x1="12" y1="8" x2="12" y2="12"/>' +
+            '<line x1="12" y1="16" x2="12.01" y2="16"/>' +
+          '</svg>' +
+        '</div>' +
+        '<div class="empty-title">خطا در بارگذاری</div>' +
+        '<div class="empty-text">اتصال اینترنت خود را بررسی کن و صفحه را رفرش کن.</div>' +
+      '</div>';
+  }
+
+  /* ============================================================
+     INIT
+  ============================================================ */
+  async function init() {
+    initTheme();
+
+    /* Auth Guard */
+    var auth = await requireStudent();
+    if (!auth) return;
+
+    state.user = auth.user;
+    state.profile = auth.profile;
+
+    /* پر کردن هدر */
+    els.userName.textContent = state.profile.full_name || 'کاربر';
+    els.userAvatar.textContent = getInitials(state.profile.full_name);
+
+    /* Greeting */
+    updateGreeting(state.profile.full_name);
+
+    /* بارگذاری آزمون‌ها */
+    await loadData();
+
+    /* Console */
+    try {
+      console.log(
+        '%c🎓 پنل دانش‌آموز آماده\n%c' + (state.profile.full_name || 'کاربر'),
+        'color: #00CEC9; font-size: 14px; font-weight: bold;',
+        'color: #6C5CE7; font-size: 12px;'
+      );
+    } catch (e) {}
+  }
+
+  init();
+
+  /* سیستم تم */
+  if (window.matchMedia) {
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    var handler = function (e) {
+      var saved = null;
+      try { saved = localStorage.getItem('theme'); } catch (err) {}
+      if (!saved) applyTheme(e.matches);
+    };
+    if (mq.addEventListener) mq.addEventListener('change', handler);
+    else if (mq.addListener) mq.addListener(handler);
+  }
+
+})();
 </script>
+</body>
+</html>
