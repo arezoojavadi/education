@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="انتخاب نام کاربری — سامانه آزمون فاطمه جوادی">
+  <meta name="author" content="فاطمه جوادی">
   <meta name="theme-color" content="#6C5CE7" id="themeMeta">
   <meta name="color-scheme" content="light dark">
-  <title>ورود | سامانه آزمون فاطمه جوادی</title>
+
+  <title>انتخاب نام | سامانه آزمون فاطمه جوادی</title>
 
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="manifest" href="manifest.json">
@@ -14,7 +17,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
 
     :root {
       --brand-1: #6C5CE7;
@@ -22,20 +30,26 @@
       --brand-3: #00CEC9;
       --brand-4: #FD79A8;
       --brand-5: #FDCB6E;
+
       --success: #00B894;
       --danger: #FF6B6B;
+
       --bg: linear-gradient(135deg, #EEF0FF 0%, #F5F0FF 50%, #FFF0F8 100%);
       --card-bg: #FFFFFF;
       --card-border: rgba(108, 92, 231, 0.08);
+
       --text-1: #1E1B3A;
       --text-2: #6B6789;
       --text-3: #A5A0C0;
+
       --input-bg: #F8F7FF;
       --input-border: #E5E0FF;
       --input-focus: #6C5CE7;
       --input-glow: rgba(108, 92, 231, 0.18);
+
       --shadow: 0 4px 20px rgba(108, 92, 231, 0.08), 0 1px 3px rgba(0,0,0,0.03);
       --shadow-hover: 0 8px 32px rgba(108, 92, 231, 0.15);
+
       --ease: cubic-bezier(0.4, 0, 0.2, 1);
       --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
     }
@@ -65,6 +79,7 @@
       line-height: 1.6;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       transition: background 0.4s var(--ease), color 0.4s var(--ease);
     }
 
@@ -72,11 +87,16 @@
     input { font-family: inherit; }
 
     .bg-pattern {
-      position: fixed; inset: 0; z-index: -2; opacity: 0.4; pointer-events: none;
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      opacity: 0.4;
+      pointer-events: none;
       background-image:
         radial-gradient(circle at 20% 20%, rgba(108, 92, 231, 0.08) 0%, transparent 40%),
         radial-gradient(circle at 80% 80%, rgba(0, 206, 201, 0.06) 0%, transparent 40%),
         radial-gradient(circle at 50% 50%, rgba(253, 121, 168, 0.05) 0%, transparent 50%);
+      transition: opacity 0.4s;
     }
 
     html.dark .bg-pattern {
@@ -88,7 +108,11 @@
     }
 
     .bg-dots {
-      position: fixed; inset: 0; z-index: -1; opacity: 0.35; pointer-events: none;
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      opacity: 0.35;
+      pointer-events: none;
       background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='2' cy='2' r='1' fill='%236C5CE7' opacity='0.35'/></svg>");
       background-size: 32px 32px;
       mask-image: radial-gradient(ellipse at center, black 10%, transparent 70%);
@@ -100,11 +124,15 @@
       opacity: 0.5;
     }
 
-    .top-controls { position: fixed; top: 20px; left: 20px; z-index: 100; display: flex; gap: 8px; }
+    .top-controls {
+      position: fixed; top: 20px; left: 20px; z-index: 100;
+    }
 
     .icon-btn {
-      width: 46px; height: 46px; border-radius: 14px;
-      background: var(--card-bg); border: 1px solid var(--card-border);
+      width: 46px; height: 46px;
+      border-radius: 14px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
       display: flex; align-items: center; justify-content: center;
       color: var(--text-1);
       box-shadow: var(--shadow);
@@ -116,7 +144,8 @@
 
     .icon-wrap { position: relative; width: 22px; height: 22px; }
     .icon-wrap svg {
-      position: absolute; inset: 0; width: 100%; height: 100%;
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
       stroke: currentColor; fill: none;
       stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
       transition: opacity 0.25s, transform 0.3s var(--ease);
@@ -127,22 +156,31 @@
     html.dark .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
 
     .app {
-      position: relative; min-height: 100vh; min-height: 100dvh;
+      position: relative;
+      min-height: 100vh;
+      min-height: 100dvh;
       display: flex; align-items: center; justify-content: center;
       padding: 80px 20px 40px;
     }
 
     .card {
-      width: 100%; max-width: 440px;
-      background: var(--card-bg); border: 1px solid var(--card-border);
-      border-radius: 28px; padding: 42px 36px 30px;
+      width: 100%;
+      max-width: 480px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 28px;
+      padding: 42px 36px 30px;
       box-shadow: var(--shadow);
-      position: relative; overflow: hidden;
+      position: relative;
+      overflow: hidden;
       transition: background 0.4s var(--ease), border 0.4s var(--ease), box-shadow 0.4s var(--ease);
     }
 
     .card::before {
-      content: ''; position: absolute; top: 0; right: 0; left: 0; height: 4px;
+      content: '';
+      position: absolute;
+      top: 0; right: 0; left: 0;
+      height: 4px;
       background: linear-gradient(90deg, #6C5CE7, #00CEC9, #FD79A8, #6C5CE7);
       background-size: 200% 100%;
       animation: shimmer 6s linear infinite;
@@ -150,93 +188,170 @@
 
     @keyframes shimmer { to { background-position: 200% 0; } }
 
-    .logo-wrap { text-align: center; margin-bottom: 24px; }
-
-    .logo {
-      width: 76px; height: 76px; margin: 0 auto 18px; border-radius: 22px;
+    .avatar {
+      width: 76px; height: 76px;
+      margin: 0 auto 18px;
+      border-radius: 22px;
       background: linear-gradient(135deg, #6C5CE7, #00CEC9);
       display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      font-size: 30px;
+      font-weight: 900;
+      letter-spacing: 1px;
       box-shadow: 0 10px 28px rgba(108, 92, 231, 0.3);
-      animation: logoPop 0.6s var(--ease-bounce) both;
+      animation: avatarPop 0.6s var(--ease-bounce) both;
+      transition: background 0.3s var(--ease);
     }
 
-    @keyframes logoPop {
+    .avatar.has-name {
+      background: linear-gradient(135deg, #00CEC9, #55EFC4);
+    }
+
+    @keyframes avatarPop {
       0% { opacity: 0; transform: scale(0.4); }
       100% { opacity: 1; transform: scale(1); }
     }
 
-    .logo svg {
-      width: 40px; height: 40px; color: #fff;
-      stroke: currentColor; fill: none;
-      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
-    }
+    .header { text-align: center; margin-bottom: 20px; }
 
     .title {
-      font-size: 26px; font-weight: 900; letter-spacing: -0.3px;
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: -0.3px;
       background: linear-gradient(135deg, #6C5CE7, #00CEC9);
-      -webkit-background-clip: text; background-clip: text;
+      -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-bottom: 6px; line-height: 1.3;
+      margin-bottom: 8px;
+      line-height: 1.3;
     }
 
-    .subtitle { font-size: 13px; color: var(--text-2); font-weight: 500; line-height: 1.7; }
+    .subtitle {
+      font-size: 12.5px;
+      color: var(--text-2);
+      font-weight: 500;
+      line-height: 1.75;
+      max-width: 320px;
+      margin: 0 auto;
+    }
 
-    .designer-badge {
-      display: inline-flex; align-items: center; gap: 5px;
-      margin-top: 12px; padding: 5px 13px;
-      background: linear-gradient(135deg, rgba(108, 92, 231, 0.08), rgba(0, 206, 201, 0.08));
+    .code-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+      padding: 6px 14px;
+      background: linear-gradient(135deg, rgba(108, 92, 231, 0.08), rgba(0, 206, 201, 0.06));
       border: 1px solid rgba(108, 92, 231, 0.15);
-      border-radius: 16px; font-size: 11px; font-weight: 700;
-      color: var(--brand-1); letter-spacing: 0.2px;
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--brand-1);
+      letter-spacing: 2px;
+      font-family: 'Vazirmatn', monospace;
     }
 
-    html.dark .designer-badge {
+    html.dark .code-badge {
       background: linear-gradient(135deg, rgba(162, 155, 254, 0.12), rgba(0, 206, 201, 0.1));
       border-color: rgba(162, 155, 254, 0.2);
     }
 
-    .otp-hint {
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-      margin: 22px 0 14px; font-size: 12px; font-weight: 700;
-      color: var(--text-2); letter-spacing: 0.4px;
+    .code-badge svg {
+      width: 13px; height: 13px;
+      stroke: currentColor; fill: none;
+      stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;
     }
 
-    .otp-hint::before, .otp-hint::after {
-      content: ''; flex: 1; height: 1px;
-      background: linear-gradient(90deg, transparent, var(--input-border), transparent);
+    .warning {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 12px 16px;
+      background: rgba(253, 203, 110, 0.1);
+      border: 1px solid rgba(253, 203, 110, 0.3);
+      border-right: 3px solid var(--brand-5);
+      border-radius: 12px;
+      font-size: 12px;
+      line-height: 1.75;
+      color: #8B6914;
+      margin-bottom: 20px;
     }
 
-    .otp { display: flex; gap: 8px; justify-content: center; direction: ltr; margin-bottom: 20px; }
-
-    .otp input {
-      width: 50px; height: 62px; text-align: center;
-      font-size: 28px; font-weight: 800;
-      font-family: 'Vazirmatn', monospace;
-      background: var(--input-bg); border: 2px solid var(--input-border);
-      border-radius: 14px; color: var(--text-1); outline: none;
-      transition: border-color 0.2s var(--ease), background 0.2s var(--ease), transform 0.15s var(--ease);
-      caret-color: var(--brand-1);
-      -webkit-user-select: none; user-select: none;
+    html.dark .warning {
+      color: var(--brand-5);
+      background: rgba(253, 203, 110, 0.08);
     }
 
-    .otp input:focus {
-      border-color: var(--input-focus); background: var(--card-bg);
-      transform: translateY(-3px);
+    .warning svg {
+      width: 18px; height: 18px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      stroke: currentColor; fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    .label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .label {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-2);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .label svg {
+      width: 14px; height: 14px;
+      stroke: currentColor; fill: none;
+      stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    .counter {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-3);
+      font-variant-numeric: tabular-nums;
+      transition: color 0.3s;
+    }
+
+    .counter.warn { color: var(--brand-5); }
+    .counter.full { color: var(--danger); }
+
+    .name-input {
+      width: 100%;
+      padding: 15px 18px;
+      font-size: 16px;
+      font-weight: 600;
+      background: var(--input-bg);
+      border: 2px solid var(--input-border);
+      border-radius: 14px;
+      color: var(--text-1);
+      outline: none;
+      transition: border-color 0.2s var(--ease), background 0.2s var(--ease), transform 0.2s var(--ease);
+      text-align: center;
+    }
+
+    .name-input::placeholder {
+      color: var(--text-3);
+      font-weight: 500;
+    }
+
+    .name-input:focus {
+      border-color: var(--input-focus);
+      background: var(--card-bg);
+      transform: translateY(-2px);
       box-shadow: 0 6px 16px var(--input-glow);
     }
 
-    .otp input.filled {
-      border-color: var(--brand-1);
-      background: linear-gradient(135deg, rgba(108, 92, 231, 0.08), rgba(0, 206, 201, 0.06));
-    }
-
-    html.dark .otp input.filled {
-      background: linear-gradient(135deg, rgba(162, 155, 254, 0.15), rgba(0, 206, 201, 0.1));
-    }
-
-    .otp input.error {
+    .name-input.error {
       border-color: var(--danger);
-      background: rgba(255, 107, 107, 0.08);
+      background: rgba(255, 107, 107, 0.06);
       animation: shake 0.35s var(--ease);
     }
 
@@ -246,51 +361,103 @@
       75% { transform: translateX(8px); }
     }
 
-    .otp input.success {
-      border-color: var(--success);
-      background: rgba(0, 184, 148, 0.08);
+    .suggestions-label {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 14px;
+      margin-bottom: 8px;
+      font-weight: 600;
     }
 
+    .suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .suggestion {
+      padding: 6px 12px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 10px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-2);
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+    }
+
+    .suggestion:hover {
+      border-color: var(--brand-1);
+      color: var(--brand-1);
+      transform: translateY(-1px);
+    }
+
+    .suggestion:active { transform: scale(0.96); }
+
     .btn {
-      width: 100%; padding: 16px 22px;
-      font-size: 15.5px; font-weight: 800;
+      width: 100%;
+      padding: 16px 22px;
+      font-size: 15.5px;
+      font-weight: 800;
       color: #fff;
       background: linear-gradient(135deg, #6C5CE7, #8E7CFF);
-      border: none; border-radius: 16px;
-      display: flex; align-items: center; justify-content: center; gap: 10px;
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
       min-height: 56px;
       box-shadow: 0 6px 18px rgba(108, 92, 231, 0.28);
       transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+      margin-top: 20px;
     }
 
-    .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(108, 92, 231, 0.4); }
+    .btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 26px rgba(108, 92, 231, 0.4);
+    }
+
     .btn:active:not(:disabled) { transform: translateY(0) scale(0.98); }
     .btn:disabled { opacity: 0.7; cursor: not-allowed; }
 
-    .btn .label { display: inline-flex; align-items: center; gap: 8px; }
+    .btn .label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
 
     .spinner {
       width: 18px; height: 18px;
       border: 2.5px solid rgba(255,255,255,0.3);
-      border-top-color: #fff; border-radius: 50%;
+      border-top-color: #fff;
+      border-radius: 50%;
       animation: spin 0.7s linear infinite;
     }
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
     .message {
-      margin-top: 14px; padding: 0 16px;
-      text-align: center; font-size: 13px; font-weight: 700;
+      margin-top: 14px;
+      padding: 0 16px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
       border-radius: 12px;
-      opacity: 0; transform: translateY(-6px);
-      max-height: 0; overflow: hidden;
+      opacity: 0;
+      transform: translateY(-6px);
+      max-height: 0;
+      overflow: hidden;
       transition: all 0.3s var(--ease);
-      line-height: 1.6;
     }
 
     .message.show {
-      opacity: 1; transform: translateY(0);
-      max-height: 250px; padding: 11px 16px;
+      opacity: 1;
+      transform: translateY(0);
+      max-height: 100px;
+      padding: 11px 16px;
     }
 
     .message.error {
@@ -305,74 +472,32 @@
       border: 1px solid rgba(0, 184, 148, 0.2);
     }
 
-    .message.info {
-      background: rgba(0, 206, 201, 0.08);
-      color: #008B88;
-      border: 1px solid rgba(0, 206, 201, 0.2);
-      font-size: 12px;
-      text-align: right;
-      direction: rtl;
-      font-weight: 600;
-      word-break: break-all;
-    }
-
-    html.dark .message.info { color: #4DE3DF; }
-
-    .debug-toggle {
-      margin-top: 10px;
-      background: transparent;
-      border: none;
-      color: var(--text-3);
-      font-size: 11px;
-      font-weight: 600;
-      text-decoration: underline;
-      padding: 4px;
-    }
-
-    .debug-toggle:hover { color: var(--brand-1); }
-
-    .debug-panel {
-      margin-top: 12px;
-      padding: 12px;
-      background: var(--input-bg);
-      border: 1px solid var(--input-border);
-      border-radius: 12px;
-      font-family: monospace;
-      font-size: 11px;
-      color: var(--text-2);
-      line-height: 1.7;
-      direction: ltr;
-      text-align: left;
-      max-height: 200px;
-      overflow-y: auto;
-      display: none;
-      word-break: break-all;
-    }
-
-    .debug-panel.show { display: block; }
-
-    .debug-panel b { color: var(--brand-1); }
-
     .footer {
-      text-align: center; margin-top: 20px; padding-top: 16px;
+      text-align: center;
+      margin-top: 20px;
+      padding-top: 16px;
       border-top: 1px solid var(--input-border);
-      font-size: 11px; color: var(--text-3); font-weight: 500;
+      font-size: 11px;
+      color: var(--text-3);
+      font-weight: 500;
     }
 
     .footer .heart {
-      display: inline-block; color: #FD79A8;
+      display: inline-block;
+      color: #FD79A8;
       animation: heartbeat 1.8s ease-in-out infinite;
     }
 
-    @keyframes heartbeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
 
     @media (max-width: 520px) {
       .card { padding: 34px 22px 24px; border-radius: 24px; }
-      .logo { width: 66px; height: 66px; border-radius: 20px; }
-      .logo svg { width: 34px; height: 34px; }
-      .title { font-size: 22px; }
-      .otp { gap: 6px; }
-      .otp input { width: 44px; height: 56px; font-size: 24px; border-radius: 12px; }
+      .avatar { width: 66px; height: 66px; border-radius: 20px; font-size: 26px; }
+      .title { font-size: 21px; }
+      .name-input { padding: 13px 16px; font-size: 15px; }
       .btn { padding: 14px 20px; font-size: 14.5px; min-height: 52px; }
       .top-controls { top: 14px; left: 14px; }
       .icon-btn { width: 42px; height: 42px; }
@@ -380,14 +505,13 @@
 
     @media (max-width: 380px) {
       .card { padding: 28px 16px 20px; }
-      .otp { gap: 4px; }
-      .otp input { width: 38px; height: 48px; font-size: 20px; border-radius: 10px; }
       .app { padding: 70px 12px 30px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
       }
     }
@@ -395,11 +519,11 @@
 </head>
 <body>
 
-  <div class="bg-pattern"></div>
-  <div class="bg-dots"></div>
+  <div class="bg-pattern" aria-hidden="true"></div>
+  <div class="bg-dots" aria-hidden="true"></div>
 
   <div class="top-controls">
-    <button class="icon-btn" id="themeBtn" type="button" title="تغییر حالت" aria-label="تغییر تم">
+    <button class="icon-btn" id="themeBtn" type="button" title="تغییر حالت روز/شب" aria-label="تغییر تم">
       <span class="icon-wrap">
         <svg class="icon-sun" viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="4"/>
@@ -415,54 +539,69 @@
   <main class="app">
     <div class="card">
 
-      <div class="logo-wrap">
-        <div class="logo">
+      <div class="avatar" id="avatar">؟</div>
+
+      <div class="header">
+        <h1 class="title">خوش آمدی!</h1>
+        <p class="subtitle">
+          برای شروع، نام و نام خانوادگی واقعی‌ت را وارد کن.
+          این نام در همه‌ی آزمون‌ها به معلم نمایش داده می‌شود.
+        </p>
+        <div class="code-badge">
           <svg viewBox="0 0 24 24">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <path d="M14 2v6h6"/>
-            <path d="M9 15l2 2 4-4"/>
+            <rect x="3" y="11" width="18" height="11" rx="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
           </svg>
-        </div>
-        <h1 class="title">سامانه آزمون</h1>
-        <p class="subtitle">برای شروع، کد ورود ۶ رقمی خود را وارد کنید</p>
-        <div class="designer-badge">
-          <span>✨</span>
-          <span>طراحی: فاطمه جوادی</span>
+          <span id="codeText">------</span>
         </div>
       </div>
 
-      <div class="otp-hint">
-        <span>کد ۶ رقمی</span>
+      <div class="warning">
+        <svg viewBox="0 0 24 24">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <div>
+          <b>توجه:</b> بعد از تأیید، امکان تغییر نام وجود ندارد.
+        </div>
       </div>
 
-      <div class="otp" id="otp" dir="ltr">
-        <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="رقم ۱" spellcheck="false">
-        <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="رقم ۲" spellcheck="false">
-        <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="رقم ۳" spellcheck="false">
-        <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="رقم ۴" spellcheck="false">
-        <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="رقم ۵" spellcheck="false">
-        <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="رقم ۶" spellcheck="false">
+      <div class="label-row">
+        <label class="label" for="nameInput">
+          <svg viewBox="0 0 24 24">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          <span>نام و نام خانوادگی</span>
+        </label>
+        <span class="counter" id="counter">۰ / ۶۰</span>
       </div>
 
-      <button class="btn" id="loginBtn" type="button">
+      <input
+        type="text"
+        id="nameInput"
+        class="name-input"
+        placeholder="مثلاً: علی رضایی"
+        maxlength="60"
+        autocomplete="off"
+        spellcheck="false"
+        aria-label="نام و نام خانوادگی"
+      >
+
+      <div class="suggestions-label">پیشنهاد:</div>
+      <div class="suggestions" id="suggestions"></div>
+
+      <button class="btn" id="saveBtn" type="button">
         <span class="label">
-          <span>ورود به سامانه</span>
+          <span>تأیید و ادامه</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
         </span>
       </button>
 
       <div class="message" id="message"></div>
-
-      <div style="text-align:center;">
-        <button type="button" class="debug-toggle" id="debugToggle">نمایش اطلاعات فنی</button>
-      </div>
-
-      <div class="debug-panel" id="debugPanel">
-        <div><b>URL:</b> <span id="dbgUrl">-</span></div>
-        <div><b>Email test:</b> <span id="dbgEmail">-</span></div>
-        <div><b>Password test:</b> <span id="dbgPass">-</span></div>
-        <div><b>Last error:</b> <span id="dbgError">-</span></div>
-        <div><b>Status:</b> <span id="dbgStatus">-</span></div>
-      </div>
 
       <div class="footer">
         ساخته شده با <span class="heart">♥</span> برای یادگیری بهتر
@@ -477,38 +616,21 @@
     'use strict';
 
     var SUPABASE_URL = 'https://cfkwvzbqgapguuaqibmq.supabase.co';
-    var SUPABASE_KEY = 'sb_publishable_Qf3R9hPgjAwep2c-qQMoJA_jitobazq';
+    var SUPABASE_KEY = 'sb_publishable_Qf3R9hPgjApwe2c-qQMoJA_jitobazq';
     var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    var inputs = Array.prototype.slice.call(document.querySelectorAll('#otp input'));
-    var loginBtn = document.getElementById('loginBtn');
+    var nameInput = document.getElementById('nameInput');
+    var saveBtn = document.getElementById('saveBtn');
     var message = document.getElementById('message');
+    var counter = document.getElementById('counter');
+    var avatar = document.getElementById('avatar');
+    var codeText = document.getElementById('codeText');
     var themeBtn = document.getElementById('themeBtn');
-    var debugToggle = document.getElementById('debugToggle');
-    var debugPanel = document.getElementById('debugPanel');
+    var suggestionsEl = document.getElementById('suggestions');
 
-    var isLogging = false;
-
-    // ============================================
-    // DEBUG HELPERS
-    // ============================================
-    function dbg(id, val) {
-      var el = document.getElementById(id);
-      if (el) el.textContent = val;
-    }
-
-    function logError(context, error) {
-      var msg = '';
-      if (error) {
-        if (error.message) msg = error.message;
-        else if (error.error_description) msg = error.error_description;
-        else if (typeof error === 'string') msg = error;
-        else msg = JSON.stringify(error);
-      }
-      console.error('[' + context + ']', error);
-      dbg('dbgError', context + ': ' + msg);
-      dbg('dbgStatus', error && error.status ? error.status : '-');
-    }
+    var currentUser = null;
+    var currentRole = 'student';
+    var isSaving = false;
 
     // ============================================
     // THEME
@@ -533,313 +655,226 @@
       setTheme(!document.documentElement.classList.contains('dark'));
     });
 
-    debugToggle.addEventListener('click', function() {
-      debugPanel.classList.toggle('show');
-      debugToggle.textContent = debugPanel.classList.contains('show')
-        ? 'بستن اطلاعات فنی'
-        : 'نمایش اطلاعات فنی';
-    });
-
     // ============================================
-    // HELPERS
+    // COUNTER + AVATAR
     // ============================================
-    function getCode() {
-      var s = '';
-      for (var i = 0; i < inputs.length; i++) s += inputs[i].value;
-      return s;
+    function toFa(n) {
+      var fa = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+      return String(n).replace(/\d/g, function(d) { return fa[+d]; });
     }
 
-    function hideMessage() { message.classList.remove('show'); }
+    function updateCounter() {
+      var len = nameInput.value.length;
+      counter.textContent = toFa(len) + ' / ' + toFa(60);
+      counter.classList.remove('warn', 'full');
+      if (len >= 55) counter.classList.add('full');
+      else if (len >= 40) counter.classList.add('warn');
+    }
 
+    function updateAvatar(name) {
+      var clean = (name || '').trim();
+      if (!clean) {
+        avatar.textContent = '؟';
+        avatar.classList.remove('has-name');
+        return;
+      }
+      var parts = clean.split(/\s+/);
+      var initials = parts[0] ? parts[0][0] : '';
+      if (parts.length > 1 && parts[parts.length - 1][0]) {
+        initials += parts[parts.length - 1][0];
+      }
+      avatar.textContent = initials;
+      avatar.classList.add('has-name');
+    }
+
+    // ============================================
+    // MESSAGE
+    // ============================================
+    var msgTimer = null;
     function showMessage(text, type) {
+      clearTimeout(msgTimer);
       message.className = 'message ' + type + ' show';
-      message.innerHTML = text;
+      message.textContent = text;
     }
 
-    function focusIdx(i) {
-      if (i >= 0 && i < inputs.length) inputs[i].focus();
+    function hideMessage() {
+      clearTimeout(msgTimer);
+      message.classList.remove('show');
     }
 
-    function clearErrors() {
-      inputs.forEach(function(inp) {
-        inp.classList.remove('error');
-        inp.classList.remove('success');
+    // ============================================
+    // VALIDATION
+    // ============================================
+    function validate(name) {
+      var trimmed = name.trim().replace(/\s+/g, ' ');
+      if (trimmed.length < 3) return { ok: false, msg: 'نام باید حداقل ۳ حرف باشد' };
+      if (trimmed.length > 60) return { ok: false, msg: 'نام بسیار طولانی است' };
+      if (!/^[\u0600-\u06FF\s\u200cA-Za-z]+$/.test(trimmed)) {
+        return { ok: false, msg: 'فقط حروف فارسی یا انگلیسی مجاز است' };
+      }
+      return { ok: true, value: trimmed };
+    }
+
+    // ============================================
+    // SUGGESTIONS
+    // ============================================
+    function buildSuggestions() {
+      var names = ['علی رضایی', 'زهرا محمدی', 'امیر حسینی', 'فاطمه کریمی', 'محمد صادقی', 'مریم احمدی'];
+      var html = '';
+      names.forEach(function(n) {
+        html += '<button type="button" class="suggestion" data-name="' + n + '">' + n + '</button>';
+      });
+      suggestionsEl.innerHTML = html;
+      suggestionsEl.addEventListener('click', function(e) {
+        var btn = e.target.closest('.suggestion');
+        if (!btn) return;
+        nameInput.value = btn.dataset.name;
+        updateCounter();
+        updateAvatar(nameInput.value);
+        hideMessage();
+        nameInput.focus();
       });
     }
 
     // ============================================
-    // OTP
-    // ============================================
-    inputs.forEach(function(input, idx) {
-      input.addEventListener('keydown', function(e) {
-        if (e.ctrlKey || e.metaKey || e.altKey) return;
-
-        if (e.key.length === 1 && e.key >= '0' && e.key <= '9') {
-          e.preventDefault();
-          input.value = e.key;
-          input.classList.add('filled');
-          clearErrors();
-          hideMessage();
-
-          if (idx < inputs.length - 1) {
-            focusIdx(idx + 1);
-          } else {
-            input.blur();
-            if (getCode().length === 6) setTimeout(doLogin, 200);
-          }
-          return;
-        }
-
-        if (e.key === 'Backspace') {
-          e.preventDefault();
-          if (input.value) {
-            input.value = '';
-            input.classList.remove('filled');
-            hideMessage();
-          } else if (idx > 0) {
-            inputs[idx - 1].value = '';
-            inputs[idx - 1].classList.remove('filled');
-            focusIdx(idx - 1);
-            hideMessage();
-          }
-          return;
-        }
-
-        if (e.key === 'Delete') { e.preventDefault(); input.value = ''; input.classList.remove('filled'); return; }
-        if (e.key === 'ArrowLeft') { e.preventDefault(); focusIdx(idx - 1); return; }
-        if (e.key === 'ArrowRight') { e.preventDefault(); focusIdx(idx + 1); return; }
-        if (e.key === 'Home') { e.preventDefault(); focusIdx(0); return; }
-        if (e.key === 'End') { e.preventDefault(); focusIdx(inputs.length - 1); return; }
-        if (e.key === 'Enter') { e.preventDefault(); doLogin(); return; }
-        if (e.key === 'Tab') return;
-        if (e.key.length === 1) e.preventDefault();
-      });
-
-      input.addEventListener('paste', function(e) {
-        e.preventDefault();
-        var text = '';
-        try {
-          text = (e.clipboardData || window.clipboardData).getData('text') || '';
-        } catch(err) { return; }
-        var digits = text.replace(/\D/g, '').slice(0, 6);
-        if (!digits) return;
-        clearErrors(); hideMessage();
-        for (var i = 0; i < inputs.length; i++) {
-          if (i < digits.length) {
-            inputs[i].value = digits[i];
-            inputs[i].classList.add('filled');
-          } else {
-            inputs[i].value = '';
-            inputs[i].classList.remove('filled');
-          }
-        }
-        if (digits.length === 6) {
-          inputs[5].blur();
-          setTimeout(doLogin, 200);
-        } else {
-          focusIdx(Math.min(digits.length, 5));
-        }
-      });
-
-      input.addEventListener('focus', function() {
-        setTimeout(function() { input.select(); }, 0);
-      });
-    });
-
-    // ============================================
-    // LOGIN — چند استراتژی مقاوم
+    // SAVE
     // ============================================
     function setBtn(loading) {
       if (loading) {
-        loginBtn.disabled = true;
-        loginBtn.innerHTML = '<span class="label"><span>در حال ورود</span><span class="spinner"></span></span>';
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<span class="label"><span>در حال ذخیره</span><span class="spinner"></span></span>';
       } else {
-        loginBtn.disabled = false;
-        loginBtn.innerHTML = '<span class="label"><span>ورود به سامانه</span></span>';
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<span class="label"><span>تأیید و ادامه</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>';
       }
     }
 
-    function shake() {
-      inputs.forEach(function(i) { i.classList.add('error'); });
+    function shakeInput() {
+      nameInput.classList.add('error');
       if (navigator.vibrate && window.matchMedia('(pointer: coarse)').matches) {
         try { navigator.vibrate([30, 40, 30]); } catch(e) {}
       }
-      setTimeout(function() {
-        inputs.forEach(function(i) { i.classList.remove('error'); });
-      }, 400);
+      setTimeout(function() { nameInput.classList.remove('error'); }, 400);
     }
 
-    function clearInputs() {
-      inputs.forEach(function(i) {
-        i.value = '';
-        i.classList.remove('filled');
-      });
-      focusIdx(0);
-    }
+    async function saveName() {
+      if (isSaving) return;
 
-    // تلاش برای ورود با فرمت‌های مختلف ایمیل
-    async function attemptLogin(code) {
-      // چند فرمت ایمیل که ممکنه کاربران باهاش ساخته شده باشن
-      var formats = [
-        { email: code + '@exam.local', pass: code + code, label: 'exam.local + 2x' },
-        { email: code + '@exam.local', pass: code, label: 'exam.local + 1x' }
-      ];
+      var v = validate(nameInput.value);
+      if (!v.ok) {
+        shakeInput();
+        showMessage('❌ ' + v.msg, 'error');
+        return;
+      }
 
-      var lastError = null;
-      var lastAttempt = null;
-
-      for (var i = 0; i < formats.length; i++) {
-        var f = formats[i];
-        dbg('dbgEmail', f.email);
-        dbg('dbgPass', f.pass.slice(0, 4) + '****');
-
-        try {
-          var result = await supabase.auth.signInWithPassword({
-            email: f.email,
-            password: f.pass
-          });
-
-          if (!result.error && result.data && result.data.user) {
-            dbg('dbgStatus', 'SUCCESS via: ' + f.label);
-            return { ok: true, user: result.data.user };
-          }
-
-          lastError = result.error;
-          lastAttempt = f.label;
-
-        } catch (err) {
-          lastError = err;
-          lastAttempt = f.label;
+      if (v.value.split(' ').length < 2) {
+        if (!confirm('معمولاً نام و نام خانوادگی را با هم می‌نویسند. مطمئنی فقط همین کافی است؟')) {
+          return;
         }
       }
 
-      logError('login-after-tries', lastError);
-      return { ok: false, error: lastError, attempt: lastAttempt };
-    }
-
-    async function doLogin() {
-      if (isLogging) return;
-
-      var code = getCode();
-      if (code.length !== 6) {
-        shake();
-        showMessage('⚠️ کد باید ۶ رقم باشد', 'error');
-        return;
-      }
-
-      if (!navigator.onLine) {
-        shake();
-        showMessage('⚠️ اتصال اینترنت قطع است', 'error');
-        return;
-      }
-
-      isLogging = true;
-      clearErrors(); hideMessage();
+      isSaving = true;
       setBtn(true);
-      dbg('dbgError', 'در حال تلاش...');
+      hideMessage();
 
       try {
-        var loginResult = await attemptLogin(code);
+        var result = await supabase
+          .from('profiles')
+          .update({
+            full_name: v.value,
+            name_confirmed: true
+          })
+          .eq('id', currentUser.id);
 
-        if (!loginResult.ok) {
-          // خطای واقعی از Supabase
-          var errMsg = 'خطای نامشخص';
-          if (loginResult.error) {
-            if (loginResult.error.message) errMsg = loginResult.error.message;
-            else if (loginResult.error.error_description) errMsg = loginResult.error.error_description;
-          }
-
-          var userMsg = 'کد وارد شده معتبر نیست';
-          if (errMsg.indexOf('Invalid login') !== -1) {
-            userMsg = 'کد وارد شده معتبر نیست (کاربر یافت نشد یا رمز اشتباه)';
-          } else if (errMsg.indexOf('Failed to fetch') !== -1) {
-            userMsg = 'اتصال به سرور برقرار نشد';
-          } else if (errMsg.indexOf('Email not confirmed') !== -1) {
-            userMsg = 'ایمیل کاربر تأیید نشده';
-          } else if (errMsg.indexOf('rate limit') !== -1 || errMsg.indexOf('Too many') !== -1) {
-            userMsg = 'تلاش‌های زیاد. لطفاً چند دقیقه صبر کنید';
-          }
-
+        if (result.error) {
+          console.error('[save]', result.error);
           setBtn(false);
-          isLogging = false;
-          shake();
-          showMessage('❌ ' + userMsg, 'error');
-          setTimeout(clearInputs, 500);
+          isSaving = false;
+          shakeInput();
+
+          var msg = 'خطا در ذخیره نام';
+          if (result.error.message && result.error.message.indexOf('policy') !== -1) {
+            msg = 'این نام قبلاً تأیید شده';
+          }
+          showMessage('❌ ' + msg, 'error');
           return;
         }
 
-        // ✅ لاگین موفق — گرفتن پروفایل
-        var user = loginResult.user;
-
-        var profileResult = await supabase
-          .from('profiles')
-          .select('role, name_confirmed')
-          .eq('id', user.id)
-          .maybeSingle();
-
-        if (profileResult.error) {
-          logError('profile-fetch', profileResult.error);
+        if (navigator.vibrate) {
+          try { navigator.vibrate([50, 30, 50]); } catch(e) {}
         }
 
-        var profile = profileResult.data;
-
-        // حتی اگه پروفایل نبود، کاربر وارد شده
-        inputs.forEach(function(i) { i.classList.add('success'); });
-        loginBtn.innerHTML = '<span class="label"><span>✅ موفق!</span></span>';
-        showMessage('✅ خوش آمدی!', 'success');
-
-        var dest = 'student.html';
-        if (profile) {
-          if (!profile.name_confirmed) dest = 'choose-name.html';
-          else if (profile.role === 'teacher') dest = 'teacher.html';
-          else dest = 'student.html';
-        } else {
-          // پروفایل نیست — برو صفحه انتخاب نام
-          dest = 'choose-name.html';
-        }
+        showMessage('✅ نام با موفقیت ثبت شد!', 'success');
+        saveBtn.innerHTML = '<span class="label"><span>✅ موفق!</span></span>';
 
         setTimeout(function() {
-          window.location.href = dest;
-        }, 600);
+          window.location.href = currentRole === 'teacher' ? 'teacher.html' : 'student.html';
+        }, 1000);
 
       } catch (err) {
-        logError('fatal', err);
+        console.error('[fatal]', err);
         setBtn(false);
-        isLogging = false;
-        shake();
-        showMessage('❌ خطای غیرمنتظره، دوباره تلاش کنید', 'error');
+        isSaving = false;
+        shakeInput();
+        showMessage('❌ خطای غیرمنتظره', 'error');
       }
     }
 
-    loginBtn.addEventListener('click', doLogin);
+    // ============================================
+    // EVENTS
+    // ============================================
+    nameInput.addEventListener('input', function() {
+      updateCounter();
+      updateAvatar(nameInput.value);
+      hideMessage();
+    });
 
-    // Ctrl+K — پاک کن
-    document.addEventListener('keydown', function(e) {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    nameInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
         e.preventDefault();
-        clearInputs();
-        clearErrors();
-        hideMessage();
+        saveName();
       }
     });
+
+    saveBtn.addEventListener('click', saveName);
 
     // ============================================
     // INIT
     // ============================================
     initTheme();
-    dbg('dbgUrl', SUPABASE_URL.replace('https://', '').split('.')[0]);
-    setTimeout(function() { focusIdx(0); }, 300);
+    buildSuggestions();
+    updateCounter();
 
-    if (window.matchMedia) {
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
-        var saved = null;
-        try { saved = localStorage.getItem('theme'); } catch(err) {}
-        if (!saved) setTheme(e.matches);
-      });
-    }
+    (async function() {
+      var userResult = await supabase.auth.getUser();
+      var user = userResult.data.user;
 
-    console.log('%c🔐 سامانه آزمون — فاطمه جوادی', 'color: #6C5CE7; font-size: 16px; font-weight: bold;');
-    console.log('%cاگر کد کار نکرد، روی «نمایش اطلاعات فنی» کلیک کن.', 'color: #00CEC9;');
+      if (!user) {
+        window.location.href = 'index.html';
+        return;
+      }
+      currentUser = user;
+
+      var profileResult = await supabase
+        .from('profiles')
+        .select('code, name_confirmed, role')
+        .eq('id', user.id)
+        .single();
+
+      var profile = profileResult.data;
+
+      if (profile && profile.name_confirmed === true) {
+        window.location.href = profile.role === 'teacher' ? 'teacher.html' : 'student.html';
+        return;
+      }
+
+      if (profile) {
+        currentRole = profile.role || 'student';
+        codeText.textContent = profile.code || '------';
+      }
+
+      setTimeout(function() { nameInput.focus(); }, 300);
+    })();
 
   })();
   </script>
