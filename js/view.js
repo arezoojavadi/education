@@ -6,11 +6,18 @@
  *
  * قابلیت‌ها:
  *   • لیست دانش‌آموزانی که آزمون رو حل کردن
- *   • کلیک روی هر نام → مشاهده‌ی پاسخ‌ها
- *   • نمره‌دهی + یادداشت برای هر دانش‌آموز
- *   • نمایش نمره در لیست
- *   • جستجو + مرتب‌سازی
+ *   • کلیک روی هر اسم → مشاهده‌ی پاسخ‌ها
+ *   • نمره‌دهی (۰ تا ۲۰) + یادداشت برای هر دانش‌آموز
+ *   • نمایش نمره در لیست (با رنگ‌بندی)
+ *   • جستجو در نام و کد
+ *   • مرتب‌سازی (جدیدترین / قدیمی‌ترین / الفبا / تصحیح‌نشده‌ها اول)
+ *   • شمارش (کل / تصحیح‌شده / در انتظار)
  *   • خروجی CSV
+ *   • Realtime — پاسخ جدید زنده میاد
+ *   • تاریخ و ساعت کامل ثبت
+ *   • حالت شب/روز + ریسپانسیو
+ *
+ * وابستگی: @supabase/supabase-js از CDN
  * ============================================================ */
 
 (function () {
@@ -18,21 +25,47 @@
 
   if (window.ViewPanel && window.ViewPanel.__loaded) return;
 
+  /* ============================================================
+   * CONFIG
+   * ============================================================ */
   var SUPABASE_URL = 'https://cfkwvzbqgapguuaqibmq.supabase.co';
   var SUPABASE_KEY = 'sb_publishable_Qf3R9hPgjApwe2c-qQMoJA_jitobazq';
+
   var MAX_SCORE = 20;
+
+  var DEBUG = true;
+
+  /* ============================================================
+   * LOGGER
+   * ============================================================ */
+  function log() {
+    if (!DEBUG) return;
+    var args = Array.prototype.slice.call(arguments);
+    try { console.log.apply(console, args); } catch (e) {}
+  }
+  function logError() {
+    var args = Array.prototype.slice.call(arguments);
+    try { console.error.apply(console, args); } catch (e) {}
+  }
+  function logWarn() {
+    var args = Array.prototype.slice.call(arguments);
+    try { console.warn.apply(console, args); } catch (e) {}
+  }
 
   /* ============================================================
    * SUPABASE
    * ============================================================ */
   function getSupabase() {
     if (window.supabaseClient) return window.supabaseClient;
+
     if (!window.supabase || typeof window.supabase.createClient !== 'function') {
-      throw new Error('Supabase SDK not loaded');
+      throw new Error('Supabase SDK بارگذاری نشده');
     }
+
     window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
       auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
     });
+
     return window.supabaseClient;
   }
 
@@ -49,7 +82,8 @@
     currentId: null,
     view: 'list',
     sort: 'date-desc',
-    query: ''
+    query: '',
+    channel: null
   };
 
   /* ============================================================
@@ -137,6 +171,7 @@
     return (parts[0][0] || '') + (parts[parts.length - 1][0] || '');
   }
 
+  /* ─── Date & Time ─── */
   function formatDate(iso) {
     if (!iso) return '—';
     try {
@@ -183,6 +218,10 @@
     }
   }
 
+  function hasScore(sub) {
+    return sub && sub.score !== null && sub.score !== undefined && sub.score !== '';
+  }
+
   /* ============================================================
    * THEME
    * ============================================================ */
@@ -213,13 +252,15 @@
    * TOAST
    * ============================================================ */
   function toast(message, type, duration) {
-    if (!el.toasts) { console.log('[' + (type || 'info') + ']', message); return; }
+    if (!el.toasts) { log('[' + (type || 'info') + '] ' + message); return; }
     type = type || 'info';
     duration = duration || 3000;
+
     var node = document.createElement('div');
     node.className = 'toast ' + type;
     node.textContent = message;
     el.toasts.appendChild(node);
+
     setTimeout(function () {
       node.classList.add('removing');
       setTimeout(function () { node.remove(); }, 300);
@@ -232,21 +273,38 @@
   async function requireTeacher() {
     var sb = state.supabase;
 
-    var sessionResult;
-    try { sessionResult = await sb.auth.getSession(); }
-    catch (e) { showError('خطا در دریافت نشست'); return null; }
+    log('%c🔐 [Auth] شروع...', 'color: #6C5CE7; font-weight: bold;');
 
-    if (!sessionResult || !sessionResult.data || !sessionResult.data.session) {
+    var sessionResult;
+    try {
+      sessionResult = await sb.auth.getSession();
+    } catch (e) {
+      logError('❌ [Auth] session:', e);
+      showError('خطا در بررسی نشست. اینترنت را بررسی کن.');
+      return null;
+    }
+
+    var session = sessionResult && sessionResult.data && sessionResult.data.session;
+    if (!session) {
+      log('➡️ [Auth] نشست نیست → index.html');
       window.location.replace('index.html');
       return null;
     }
 
     var userResult;
-    try { userResult = await sb.auth.getUser(); }
-    catch (e) { showError('خطا در دریافت کاربر'); return null; }
+    try {
+      userResult = await sb.auth.getUser();
+    } catch (e) {
+      logError('❌ [Auth] user:', e);
+      showError('خطا در دریافت کاربر');
+      return null;
+    }
 
     var user = userResult && userResult.data && userResult.data.user;
-    if (!user) { window.location.replace('index.html'); return null; }
+    if (!user) {
+      window.location.replace('index.html');
+      return null;
+    }
 
     var profile = null;
 
@@ -290,6 +348,7 @@
       return null;
     }
 
+    log('✅ [Auth] موفق');
     return { user: user, profile: profile };
   }
 
@@ -299,6 +358,9 @@
   async function logout() {
     try { await state.supabase.auth.signOut(); } catch (e) {}
     try { localStorage.removeItem('auth_profile_cache'); } catch (e) {}
+    if (state.channel) {
+      try { state.supabase.removeChannel(state.channel); } catch (e) {}
+    }
     window.location.replace('index.html');
   }
 
@@ -348,6 +410,7 @@
 
       return state.exam;
     } catch (e) {
+      logError('❌ [loadExam]', e);
       showError('خطا در بارگذاری آزمون');
       return null;
     }
@@ -359,6 +422,8 @@
   async function loadSubmissions() {
     if (!state.exam) return;
 
+    log('📥 [Load] بارگذاری پاسخ‌ها...');
+
     try {
       var r = await state.supabase
         .from('submissions')
@@ -367,6 +432,7 @@
         .order('submitted_at', { ascending: false });
 
       if (r.error) {
+        logError('❌ [Load]', r.error);
         showError('خطا در بارگذاری پاسخ‌ها: ' + (r.error.message || ''));
         return;
       }
@@ -392,7 +458,9 @@
           (pr.data || []).forEach(function (p) {
             profilesMap[p.id] = p;
           });
-        } catch (e) {}
+        } catch (e) {
+          logWarn('⚠️ [Load] profiles:', e);
+        }
       }
 
       subs.forEach(function (s) {
@@ -400,11 +468,14 @@
       });
 
       state.submissions = subs;
+      log('✅ [Load] ' + subs.length + ' پاسخ');
+
       applyFilter();
       renderCounts();
       renderList();
 
     } catch (e) {
+      logError('❌ [Load]', e);
       showError('خطا در بارگذاری');
     }
   }
@@ -414,9 +485,7 @@
    * ============================================================ */
   function renderCounts() {
     var total = state.submissions.length;
-    var graded = state.submissions.filter(function (s) {
-      return s.score !== null && s.score !== undefined && s.score !== '';
-    }).length;
+    var graded = state.submissions.filter(hasScore).length;
 
     if (el.countAll) el.countAll.textContent = toFa(total);
     if (el.countGraded) el.countGraded.textContent = toFa(graded);
@@ -454,9 +523,9 @@
       });
     } else if (state.sort === 'pending-first') {
       list.sort(function (a, b) {
-        var aGraded = (a.score !== null && a.score !== undefined && a.score !== '') ? 1 : 0;
-        var bGraded = (b.score !== null && b.score !== undefined && b.score !== '') ? 1 : 0;
-        return aGraded - bGraded;
+        var aG = hasScore(a) ? 1 : 0;
+        var bG = hasScore(b) ? 1 : 0;
+        return aG - bG;
       });
     }
 
@@ -510,8 +579,8 @@
       var initials = getInitials(name);
       var delay = (i * 0.03).toFixed(2) + 's';
 
-      var hasScore = s.score !== null && s.score !== undefined && s.score !== '';
-      var scoreDisplay = hasScore ? toFa(s.score) : '—';
+      var graded = hasScore(s);
+      var scoreDisplay = graded ? toFa(s.score) : '—';
 
       var answerCount = 0;
       if (s.answers && s.answers.inputs) {
@@ -521,7 +590,7 @@
       }
 
       html +=
-        '<div class="student-row ' + (hasScore ? 'graded' : 'pending') + '" data-id="' + s.id + '" style="animation-delay:' + delay + ';">' +
+        '<div class="student-row ' + (graded ? 'graded' : 'pending') + '" data-id="' + s.id + '" style="animation-delay:' + delay + ';">' +
           '<div class="student-avatar">' + escapeHtml(initials) + '</div>' +
 
           '<div class="student-info">' +
@@ -540,9 +609,9 @@
             '<div class="extra-duration">' + formatDuration(s.duration_seconds) + '</div>' +
           '</div>' +
 
-          '<div class="student-score ' + (hasScore ? 'graded' : 'pending') + '">' +
+          '<div class="student-score ' + (graded ? 'graded' : 'pending') + '">' +
             '<div class="score-value">' + scoreDisplay + '</div>' +
-            '<div class="score-label">' + (hasScore ? 'از ۲۰' : 'تصحیح نشده') + '</div>' +
+            '<div class="score-label">' + (graded ? 'از ۲۰' : 'تصحیح نشده') + '</div>' +
           '</div>' +
 
           '<div class="student-arrow">' +
@@ -599,12 +668,8 @@
       el.detailTime.textContent = formatDateTime(sub.submitted_at) + ' • مدت: ' + formatDuration(sub.duration_seconds);
     }
 
-    /* پرش به پاسخ‌ها */
     renderAnswers(sub.answers);
-
-    /* فرم نمره‌دهی */
     renderGrading(sub);
-
     updatePosition();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -689,12 +754,14 @@
    * GRADING
    * ============================================================ */
   function renderGrading(sub) {
-    var hasScore = sub.score !== null && sub.score !== undefined && sub.score !== '';
+    if (!sub) return;
+
+    var graded = hasScore(sub);
 
     if (el.gradeMax) el.gradeMax.textContent = toFa(MAX_SCORE);
 
     if (el.gradeInput) {
-      el.gradeInput.value = hasScore ? String(sub.score) : '';
+      el.gradeInput.value = graded ? String(sub.score) : '';
       el.gradeInput.max = MAX_SCORE;
     }
 
@@ -703,7 +770,7 @@
     }
 
     if (el.gradeStatus) {
-      if (hasScore) {
+      if (graded) {
         var gradedAt = sub.graded_at ? formatDateTime(sub.graded_at) : '';
         el.gradeStatus.innerHTML =
           '<div class="grade-status-box ok">' +
@@ -723,7 +790,7 @@
     }
 
     if (el.clearGradeBtn) {
-      el.clearGradeBtn.style.display = hasScore ? 'inline-flex' : 'none';
+      el.clearGradeBtn.style.display = graded ? 'inline-flex' : 'none';
     }
   }
 
@@ -735,22 +802,25 @@
 
     if (isNaN(score)) {
       toast('نمره رو وارد کن', 'error');
-      el.gradeInput.focus();
+      if (el.gradeInput) el.gradeInput.focus();
       return;
     }
 
     if (score < 0 || score > MAX_SCORE) {
       toast('نمره باید بین ۰ تا ' + toFa(MAX_SCORE) + ' باشه', 'error');
-      el.gradeInput.focus();
+      if (el.gradeInput) el.gradeInput.focus();
       return;
     }
 
     var btn = el.saveGradeBtn;
     var oldHTML = btn ? btn.innerHTML : '';
+
     if (btn) {
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner-sm"></span><span>در حال ذخیره...</span>';
     }
+
+    log('💾 [Grade] ذخیره: ' + score + ' برای ' + state.currentId);
 
     try {
       var r = await state.supabase
@@ -765,8 +835,8 @@
         .select('id, score, teacher_note, graded_at, graded_by');
 
       if (r.error) {
-        console.warn('[view] saveGrade:', r.error);
-        toast('خطا در ذخیره نمره: ' + (r.error.message || ''), 'error');
+        logError('❌ [Grade]', r.error);
+        toast('خطا: ' + (r.error.message || ''), 'error');
         return;
       }
 
@@ -782,11 +852,21 @@
       }
 
       toast('✅ نمره ذخیره شد', 'success');
-      renderGrading(state.submissions.find(function (s) { return s.id === state.currentId; }));
+
+      var updated = null;
+      for (var j = 0; j < state.submissions.length; j++) {
+        if (state.submissions[j].id === state.currentId) {
+          updated = state.submissions[j];
+          break;
+        }
+      }
+
+      renderGrading(updated);
       renderCounts();
+      applyFilter();
 
     } catch (e) {
-      console.warn('[view] saveGrade fatal:', e);
+      logError('❌ [Grade]', e);
       toast('خطای غیرمنتظره', 'error');
     } finally {
       if (btn) {
@@ -800,6 +880,8 @@
     if (!state.currentId) return;
     if (!confirm('مطمئنی می‌خوای نمره رو پاک کنی؟')) return;
 
+    log('🗑 [Grade] پاک کردن نمره: ' + state.currentId);
+
     try {
       var r = await state.supabase
         .from('submissions')
@@ -812,7 +894,8 @@
         .eq('id', state.currentId);
 
       if (r.error) {
-        toast('خطا در پاک کردن: ' + (r.error.message || ''), 'error');
+        logError('❌ [Grade]', r.error);
+        toast('خطا: ' + (r.error.message || ''), 'error');
         return;
       }
 
@@ -827,10 +910,21 @@
       }
 
       toast('🗑 نمره پاک شد', 'info');
-      renderGrading(state.submissions.find(function (s) { return s.id === state.currentId; }));
+
+      var updated = null;
+      for (var j = 0; j < state.submissions.length; j++) {
+        if (state.submissions[j].id === state.currentId) {
+          updated = state.submissions[j];
+          break;
+        }
+      }
+
+      renderGrading(updated);
       renderCounts();
+      applyFilter();
 
     } catch (e) {
+      logError('❌ [Grade]', e);
       toast('خطای غیرمنتظره', 'error');
     }
   }
@@ -890,6 +984,7 @@
     state.submissions.forEach(function (s, i) {
       var profile = s.profiles || {};
       var answerCount = 0;
+
       if (s.answers && s.answers.inputs) {
         answerCount = s.answers.inputs.filter(function (x) {
           return x.value !== null && x.value !== undefined && String(x.value).trim() !== '';
@@ -904,7 +999,7 @@
         formatTime(s.submitted_at),
         s.duration_seconds || 0,
         answerCount,
-        (s.score !== null && s.score !== undefined && s.score !== '') ? s.score : '—',
+        hasScore(s) ? s.score : '—',
         s.teacher_note || '—'
       ]);
     });
@@ -914,7 +1009,11 @@
     }).join('\n');
 
     var blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
-    var filename = 'نمرات_' + (state.exam && state.exam.title ? state.exam.title.replace(/[^\u0600-\u06FF\w]/g, '_') : 'آزمون') + '_' + Date.now() + '.csv';
+    var filename = 'نمرات_' +
+      (state.exam && state.exam.title
+        ? state.exam.title.replace(/[^\u0600-\u06FF\w]/g, '_')
+        : 'آزمون') +
+      '_' + Date.now() + '.csv';
 
     downloadBlob(blob, filename);
     toast('✅ CSV دانلود شد', 'success');
@@ -944,20 +1043,74 @@
   }
 
   /* ============================================================
+   * REALTIME
+   * ============================================================ */
+  function subscribeRealtime() {
+    if (!state.exam) return;
+
+    try {
+      var channel = state.supabase
+        .channel('exam_subs_' + state.exam.id)
+        .on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'submissions',
+          filter: 'exam_id=eq.' + state.exam.id
+        }, async function (payload) {
+          try {
+            var pr = await state.supabase
+              .from('profiles')
+              .select('id, code, full_name')
+              .eq('id', payload.new.student_id)
+              .maybeSingle();
+
+            var full = Object.assign({}, payload.new, {
+              profiles: pr.data || null
+            });
+
+            state.submissions.unshift(full);
+            applyFilter();
+            renderCounts();
+            if (state.view === 'list') renderList();
+
+            toast('📬 پاسخ جدید از ' +
+              (pr.data && pr.data.full_name || 'دانش‌آموز'),
+              'success', 4000);
+          } catch (e) {
+            logWarn('⚠️ [Realtime]', e);
+          }
+        })
+        .subscribe();
+
+      state.channel = channel;
+    } catch (e) {
+      logWarn('⚠️ [Realtime] subscribe:', e);
+    }
+  }
+
+  function unsubscribeRealtime() {
+    if (state.channel) {
+      try { state.supabase.removeChannel(state.channel); } catch (e) {}
+      state.channel = null;
+    }
+  }
+
+  /* ============================================================
    * ERROR
    * ============================================================ */
   function showError(message) {
     if (el.loading) el.loading.style.display = 'none';
     if (el.studentsView) el.studentsView.style.display = 'none';
     if (el.detailView) el.detailView.style.display = 'none';
+
     if (el.errorBox) {
-      el.errorBox.style.display = 'flex';
+      el.errorBox.style.display = 'block';
       if (el.errorText) el.errorText.textContent = message;
     }
   }
 
   /* ============================================================
-   * BIND
+   * BIND EVENTS
    * ============================================================ */
   function bindEvents() {
     if (el.searchInput) {
@@ -1015,14 +1168,29 @@
         }
       }
     });
+
+    window.addEventListener('beforeunload', function () {
+      unsubscribeRealtime();
+    });
   }
 
   /* ============================================================
    * INIT
    * ============================================================ */
   async function init() {
-    try { state.supabase = getSupabase(); }
-    catch (e) { showError('Supabase لود نشد'); return; }
+    log(
+      '%c📋 پنل نمره‌دهی — سامانه آزمون\n%cطراحی: فاطمه جوادی',
+      'color: #6C5CE7; font-size: 16px; font-weight: bold;',
+      'color: #00CEC9; font-size: 12px;'
+    );
+
+    try {
+      state.supabase = getSupabase();
+    } catch (e) {
+      logError('❌ [Init] Supabase:', e);
+      showError('خطا در بارگذاری سیستم');
+      return;
+    }
 
     cacheElements();
     initTheme();
@@ -1053,14 +1221,14 @@
     if (el.loading) el.loading.style.display = 'none';
     if (el.studentsView) el.studentsView.style.display = 'block';
 
+    subscribeRealtime();
+
     var subId = params.get('sub');
     if (subId) {
       setTimeout(function () { showDetail(subId); }, 200);
     }
 
-    try {
-      console.log('%c📋 پنل نمره‌دهی آماده', 'color: #6C5CE7; font-size: 14px; font-weight: bold;');
-    } catch (e) {}
+    log('%c✅ [Init] پنل نمره‌دهی آماده', 'color: #00B894; font-weight: bold;');
   }
 
   /* ============================================================
