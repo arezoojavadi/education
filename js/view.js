@@ -4,13 +4,18 @@
  * منطق مشاهده‌ی پاسخ‌های دانش‌آموزان توسط معلم
  * طراحی: فاطمه جوادی
  *
+ * 🆕 در این نسخه:
+ *   • نمایش تاریخ + ساعت + ثانیه‌ی ثبت آزمون
+ *   • زمان نسبی («۵ دقیقه پیش»، «دیروز»)
+ *   • بج ویژه‌ی تاریخ/ساعت در کارت و جزئیات
+ *
  * قابلیت‌ها:
  *   • چک لاگین + نقش معلم
  *   • لود آزمون و پاسخ‌های مربوطه
  *   • لیست دانش‌آموزان با جستجوی زنده
  *   • نمایش جزئیات یک پاسخ
  *   • مرتب‌سازی بر اساس تاریخ / نام
- *   • خروجی CSV
+ *   • خروجی CSV (شامل تاریخ و ساعت دقیق)
  *   • Realtime — پاسخ جدید زنده میاد
  *   • Toast + Theme + ریسپانسیو
  *
@@ -53,7 +58,7 @@
     submissions: [],
     filtered: [],
     currentId: null,
-    view: 'list', // 'list' | 'detail'
+    view: 'list',
     sort: 'date-desc',
     query: '',
     channel: null,
@@ -93,6 +98,8 @@
       detailAvatar:  document.getElementById('detailAvatar'),
       detailName:    document.getElementById('detailName'),
       detailMeta:    document.getElementById('detailMeta'),
+      detailTime:    document.getElementById('detailTime'),
+      detailTimeRelative: document.getElementById('detailTimeRelative'),
       answersList:   document.getElementById('answersList'),
 
       prevBtn:       document.getElementById('prevBtn'),
@@ -128,26 +135,151 @@
     return (parts[0][0] || '') + (parts[parts.length - 1][0] || '');
   }
 
+  /* ============================================================
+   * 🆕 DATE & TIME — نمایش کامل و حرفه‌ای
+   * ============================================================ */
+
+  /**
+   * تاریخ کامل: «۱۴۰۳/۰۷/۰۵»
+   */
   function formatDate(iso) {
     if (!iso) return '—';
     try {
       return new Intl.DateTimeFormat('fa-IR', {
-        year: 'numeric', month: 'short', day: 'numeric'
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
       }).format(new Date(iso));
     } catch (e) { return '—'; }
   }
 
-  function formatDateTime(iso) {
+  /**
+   * تاریخ کامل فارسی: «۵ مهر ۱۴۰۳»
+   */
+  function formatDateLong(iso) {
     if (!iso) return '—';
     try {
       return new Intl.DateTimeFormat('fa-IR', {
-        year: 'numeric', month: 'short', day: 'numeric',
-        hour: '2-digit', minute: '2-digit'
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
       }).format(new Date(iso));
     } catch (e) { return '—'; }
   }
 
-  function formatTime(seconds) {
+  /**
+   * ساعت کامل با ثانیه: «۱۰:۳۲:۴۵»
+   */
+  function formatTimeWithSeconds(iso) {
+    if (!iso) return '—';
+    try {
+      return new Intl.DateTimeFormat('fa-IR', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      }).format(new Date(iso));
+    } catch (e) { return '—'; }
+  }
+
+  /**
+   * 🆕 تاریخ + ساعت + ثانیه کامل
+   * «۱۴۰۳/۰۷/۰۵ ساعت ۱۰:۳۲:۴۵»
+   */
+  function formatDateTimeFull(iso) {
+    if (!iso) return '—';
+    try {
+      var d = new Date(iso);
+      var datePart = new Intl.DateTimeFormat('fa-IR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      }).format(d);
+      var timePart = new Intl.DateTimeFormat('fa-IR', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      }).format(d);
+      return datePart + ' — ساعت ' + timePart;
+    } catch (e) { return '—'; }
+  }
+
+  /**
+   * 🆕 تاریخ و ساعت به فرمت کوتاه (برای کارت‌ها)
+   * «۱۴۰۳/۰۷/۰۵ — ۱۰:۳۲»
+   */
+  function formatDateTime(iso) {
+    if (!iso) return '—';
+    try {
+      var d = new Date(iso);
+      var datePart = new Intl.DateTimeFormat('fa-IR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      }).format(d);
+      var timePart = new Intl.DateTimeFormat('fa-IR', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }).format(d);
+      return datePart + ' — ' + timePart;
+    } catch (e) { return '—'; }
+  }
+
+  /**
+   * 🆕 زمان نسبی: «۵ دقیقه پیش»، «دیروز»، «همین الان»
+   */
+  function formatRelativeTime(iso) {
+    if (!iso) return '';
+
+    try {
+      var now = Date.now();
+      var then = new Date(iso).getTime();
+      var diffSec = Math.floor((now - then) / 1000);
+
+      /* آینده */
+      if (diffSec < 0) return 'به‌زودی';
+
+      /* کمتر از ۳۰ ثانیه */
+      if (diffSec < 30) return 'همین الان';
+
+      /* کمتر از ۶۰ ثانیه */
+      if (diffSec < 60) return toFa(diffSec) + ' ثانیه پیش';
+
+      /* دقیقه‌ها */
+      var diffMin = Math.floor(diffSec / 60);
+      if (diffMin < 60) {
+        if (diffMin === 1) return 'یک دقیقه پیش';
+        if (diffMin === 2) return 'دو دقیقه پیش';
+        if (diffMin < 10) return toFa(diffMin) + ' دقیقه پیش';
+        return toFa(diffMin) + ' دقیقه پیش';
+      }
+
+      /* ساعت‌ها */
+      var diffHour = Math.floor(diffMin / 60);
+      if (diffHour < 24) {
+        if (diffHour === 1) return 'یک ساعت پیش';
+        if (diffHour === 2) return 'دو ساعت پیش';
+        if (diffHour < 10) return toFa(diffHour) + ' ساعت پیش';
+        return toFa(diffHour) + ' ساعت پیش';
+      }
+
+      /* روزها */
+      var diffDay = Math.floor(diffHour / 24);
+      if (diffDay === 1) return 'دیروز';
+      if (diffDay === 2) return 'پریروز';
+      if (diffDay < 7) return toFa(diffDay) + ' روز پیش';
+      if (diffDay < 30) return toFa(Math.floor(diffDay / 7)) + ' هفته پیش';
+      if (diffDay < 365) return toFa(Math.floor(diffDay / 30)) + ' ماه پیش';
+      return toFa(Math.floor(diffDay / 365)) + ' سال پیش';
+
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function formatDuration(seconds) {
     if (seconds === null || seconds === undefined) return '—';
     var s = parseInt(seconds, 10) || 0;
     var m = Math.floor(s / 60);
@@ -223,7 +355,7 @@
   }
 
   /* ============================================================
-   * AUTH GUARD — فقط معلم
+   * AUTH GUARD
    * ============================================================ */
   async function requireTeacher() {
     var sb = state.supabase;
@@ -246,13 +378,11 @@
 
     var profile = null;
 
-    /* RPC */
     try {
       var rpc = await sb.rpc('get_my_profile');
       if (!rpc.error && rpc.data) profile = rpc.data;
     } catch (e) {}
 
-    /* fallback */
     if (!profile) {
       try {
         var sel = await sb
@@ -342,7 +472,7 @@
 
       if (el.examMeta) {
         var parts = [];
-        parts.push(formatDate(state.exam.created_at));
+        parts.push(formatDateLong(state.exam.created_at));
         if (state.exam.file_size) {
           parts.push(toFa((state.exam.file_size / 1024).toFixed(0)) + ' کیلوبایت');
         }
@@ -367,13 +497,7 @@
     try {
       var r = await state.supabase
         .from('submissions')
-        .select(`
-          id,
-          submitted_at,
-          duration_seconds,
-          answers,
-          student_id
-        `)
+        .select('id, submitted_at, duration_seconds, answers, student_id')
         .eq('exam_id', state.exam.id)
         .order('submitted_at', { ascending: false });
 
@@ -385,7 +509,6 @@
 
       var subs = r.data || [];
 
-      /* اطلاعات پروفایل رو جدا می‌گیریم (چون join ممکنه RLS داشته باشه) */
       var userIds = [];
       subs.forEach(function (s) {
         if (s.student_id && userIds.indexOf(s.student_id) === -1) {
@@ -409,7 +532,6 @@
         }
       }
 
-      /* ادغام */
       subs.forEach(function (s) {
         s.profiles = profilesMap[s.student_id] || null;
       });
@@ -431,7 +553,6 @@
   function applySortAndFilter() {
     var list = state.submissions.slice();
 
-    /* فیلتر جستجو */
     if (state.query) {
       var q = state.query.toLowerCase();
       list = list.filter(function (s) {
@@ -442,7 +563,6 @@
       });
     }
 
-    /* مرتب‌سازی */
     if (state.sort === 'date-desc') {
       list.sort(function (a, b) {
         return new Date(b.submitted_at) - new Date(a.submitted_at);
@@ -472,12 +592,10 @@
   function renderList() {
     if (!el.submissionsList) return;
 
-    /* نمایش view لیست */
     if (el.studentsView) el.studentsView.style.display = 'block';
     if (el.detailView) el.detailView.style.display = 'none';
     state.view = 'list';
 
-    /* تعداد کل */
     if (el.totalCount) {
       el.totalCount.textContent = toFa(state.submissions.length);
     }
@@ -523,6 +641,11 @@
       var answersCount = (s.answers && s.answers.inputs) ? s.answers.inputs.length : 0;
       var delay = (i * 0.04).toFixed(2) + 's';
 
+      /* 🆕 زمان‌ها */
+      var dateStr = formatDate(s.submitted_at);
+      var timeStr = formatTimeWithSeconds(s.submitted_at);
+      var relative = formatRelativeTime(s.submitted_at);
+
       html +=
         '<div class="submission-card" data-id="' + s.id + '" style="animation-delay:' + delay + ';">' +
           '<div class="submission-avatar">' + escapeHtml(initials) + '</div>' +
@@ -530,8 +653,23 @@
             '<div class="submission-name">' + escapeHtml(name) + '</div>' +
             '<div class="submission-meta">' +
               '<span class="submission-code">' + escapeHtml(code) + '</span>' +
-              '<span class="meta-dot">•</span>' +
-              '<span>' + formatDateTime(s.submitted_at) + '</span>' +
+            '</div>' +
+            /* 🆕 بلوک تاریخ و ساعت */
+            '<div class="submission-time">' +
+              '<svg viewBox="0 0 24 24">' +
+                '<rect x="3" y="4" width="18" height="18" rx="2"/>' +
+                '<line x1="16" y1="2" x2="16" y2="6"/>' +
+                '<line x1="8" y1="2" x2="8" y2="6"/>' +
+                '<line x1="3" y1="10" x2="21" y2="10"/>' +
+              '</svg>' +
+              '<span class="time-date">' + escapeHtml(dateStr) + '</span>' +
+              '<span class="time-sep">•</span>' +
+              '<svg viewBox="0 0 24 24">' +
+                '<circle cx="12" cy="12" r="10"/>' +
+                '<polyline points="12 6 12 12 16 14"/>' +
+              '</svg>' +
+              '<span class="time-clock">' + escapeHtml(timeStr) + '</span>' +
+              (relative ? '<span class="time-relative">(' + escapeHtml(relative) + ')</span>' : '') +
             '</div>' +
           '</div>' +
           '<div class="submission-stats">' +
@@ -547,7 +685,7 @@
                 '<circle cx="12" cy="12" r="10"/>' +
                 '<polyline points="12 6 12 12 16 14"/>' +
               '</svg>' +
-              '<span>' + formatTime(s.duration_seconds) + '</span>' +
+              '<span>' + formatDuration(s.duration_seconds) + '</span>' +
             '</div>' +
           '</div>' +
           '<div class="submission-arrow">' +
@@ -560,7 +698,6 @@
 
     el.submissionsList.innerHTML = html;
 
-    /* رویداد کلیک */
     el.submissionsList.querySelectorAll('.submission-card').forEach(function (card) {
       card.addEventListener('click', function () {
         var id = card.getAttribute('data-id');
@@ -601,7 +738,6 @@
     }
 
     if (!sub) {
-      /* شاید توی کل لیست باشه ولی فیلتر شده */
       for (var j = 0; j < state.submissions.length; j++) {
         if (state.submissions[j].id === submissionId) {
           sub = state.submissions[j];
@@ -618,14 +754,12 @@
     state.currentId = submissionId;
     state.view = 'detail';
 
-    /* تغییر URL بدون reload */
     try {
       var url = new URL(window.location.href);
       url.searchParams.set('sub', submissionId);
       window.history.replaceState({}, '', url.toString());
     } catch (e) {}
 
-    /* هدر */
     if (el.studentsView) el.studentsView.style.display = 'none';
     if (el.detailView) el.detailView.style.display = 'block';
 
@@ -638,18 +772,33 @@
     if (el.detailMeta) {
       var parts = [];
       if (profile.code) parts.push('کد: ' + profile.code);
-      parts.push(formatDateTime(sub.submitted_at));
-      if (sub.duration_seconds) parts.push('مدت: ' + formatTime(sub.duration_seconds));
+      if (sub.duration_seconds) parts.push('مدت پاسخ‌دهی: ' + formatDuration(sub.duration_seconds));
       el.detailMeta.textContent = parts.join(' • ');
     }
 
-    /* پاسخ‌ها */
-    renderAnswers(sub.answers);
+    /* 🆕 بلوک تاریخ و ساعت کامل */
+    if (el.detailTime) {
+      el.detailTime.innerHTML =
+        '<svg viewBox="0 0 24 24">' +
+          '<rect x="3" y="4" width="18" height="18" rx="2"/>' +
+          '<line x1="16" y1="2" x2="16" y2="6"/>' +
+          '<line x1="8" y1="2" x2="8" y2="6"/>' +
+          '<line x1="3" y1="10" x2="21" y2="10"/>' +
+        '</svg>' +
+        '<div class="detail-time-content">' +
+          '<div class="detail-time-label">تاریخ و ساعت ثبت آزمون</div>' +
+          '<div class="detail-time-value">' + escapeHtml(formatDateTimeFull(sub.submitted_at)) + '</div>' +
+        '</div>';
+    }
 
-    /* موقعیت */
+    if (el.detailTimeRelative) {
+      var rel = formatRelativeTime(sub.submitted_at);
+      el.detailTimeRelative.textContent = rel ? rel : '';
+    }
+
+    renderAnswers(sub.answers);
     updatePosition();
 
-    /* اسکرول به بالا */
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -657,7 +806,6 @@
     state.currentId = null;
     state.view = 'list';
 
-    /* حذف از URL */
     try {
       var url = new URL(window.location.href);
       url.searchParams.delete('sub');
@@ -668,7 +816,7 @@
   }
 
   /* ============================================================
-   * POSITION (Prev / Next)
+   * NAV
    * ============================================================ */
   function updatePosition() {
     if (!state.currentId) return;
@@ -777,7 +925,7 @@
   }
 
   /* ============================================================
-   * EXPORT CSV
+   * EXPORT CSV — 🆕 با تاریخ و ساعت کامل
    * ============================================================ */
   function exportCSV() {
     if (!state.submissions.length) {
@@ -786,7 +934,7 @@
     }
 
     var rows = [
-      ['ردیف', 'نام دانش‌آموز', 'کد', 'تاریخ ثبت', 'مدت (ثانیه)', 'تعداد پاسخ', 'جزئیات پاسخ‌ها']
+      ['ردیف', 'نام دانش‌آموز', 'کد', 'تاریخ ثبت', 'ساعت ثبت', 'مدت (ثانیه)', 'تعداد پاسخ', 'جزئیات پاسخ‌ها']
     ];
 
     state.submissions.forEach(function (s, i) {
@@ -799,11 +947,27 @@
         return '[' + a.index + '] ' + label + ': ' + value;
       }).join(' | ');
 
+      /* 🆕 تفکیک تاریخ و ساعت */
+      var dateStr = '—';
+      var timeStr = '—';
+      if (s.submitted_at) {
+        try {
+          var d = new Date(s.submitted_at);
+          dateStr = new Intl.DateTimeFormat('fa-IR', {
+            year: 'numeric', month: '2-digit', day: '2-digit'
+          }).format(d);
+          timeStr = new Intl.DateTimeFormat('fa-IR', {
+            hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+          }).format(d);
+        } catch (e) {}
+      }
+
       rows.push([
         i + 1,
         profile.full_name || '—',
         profile.code || '—',
-        s.submitted_at ? new Date(s.submitted_at).toLocaleString('fa-IR') : '—',
+        dateStr,
+        timeStr,
         s.duration_seconds || 0,
         answers.length,
         detail
@@ -814,7 +978,6 @@
       return r.map(escapeCSV).join(',');
     }).join('\n');
 
-    /* BOM برای Excel فارسی */
     var blob = new Blob(['\ufeff' + csv], {
       type: 'text/csv;charset=utf-8'
     });
@@ -867,7 +1030,6 @@
           filter: 'exam_id=eq.' + state.exam.id
         }, async function (payload) {
           try {
-            /* گرفتن اطلاعات پروفایل */
             var pr = await state.supabase
               .from('profiles')
               .select('id, code, full_name')
@@ -882,7 +1044,9 @@
             applySortAndFilter();
             if (state.view === 'list') renderList();
 
-            toast('📬 پاسخ جدید از ' + (pr.data && pr.data.full_name || 'دانش‌آموز'), 'success', 4000);
+            var now = formatTimeWithSeconds(new Date().toISOString());
+            toast('📬 پاسخ جدید در ساعت ' + now + ' از ' +
+                  (pr.data && pr.data.full_name || 'دانش‌آموز'), 'success', 5000);
           } catch (e) {
             console.warn('[view] realtime insert:', e);
           }
@@ -927,29 +1091,15 @@
       });
     }
 
-    if (el.exportBtn) {
-      el.exportBtn.addEventListener('click', exportCSV);
-    }
+    if (el.exportBtn) el.exportBtn.addEventListener('click', exportCSV);
+    if (el.backToList) el.backToList.addEventListener('click', backToList);
+    if (el.prevBtn) el.prevBtn.addEventListener('click', goPrev);
+    if (el.nextBtn) el.nextBtn.addEventListener('click', goNext);
 
-    if (el.backToList) {
-      el.backToList.addEventListener('click', backToList);
-    }
-
-    if (el.prevBtn) {
-      el.prevBtn.addEventListener('click', goPrev);
-    }
-
-    if (el.nextBtn) {
-      el.nextBtn.addEventListener('click', goNext);
-    }
-
-    /* کیبورد */
     document.addEventListener('keydown', function (e) {
       if (state.view === 'detail') {
-        if (e.key === 'Escape') {
-          backToList();
-        } else if (e.key === 'ArrowLeft') {
-          /* در RTL: چپ = بعدی */
+        if (e.key === 'Escape') backToList();
+        else if (e.key === 'ArrowLeft') {
           if (!el.nextBtn || !el.nextBtn.disabled) goNext();
         } else if (e.key === 'ArrowRight') {
           if (!el.prevBtn || !el.prevBtn.disabled) goPrev();
@@ -957,7 +1107,6 @@
       }
     });
 
-    /* قبل از خروج */
     window.addEventListener('beforeunload', function () {
       unsubscribeRealtime();
     });
@@ -976,7 +1125,6 @@
     bindLogout();
     bindEvents();
 
-    /* Auth */
     var auth = await requireTeacher();
     if (!auth) return;
 
@@ -985,7 +1133,6 @@
 
     fillHeader();
 
-    /* گرفتن id از URL */
     var params = getQuery();
     var examId = params.get('id');
 
@@ -997,21 +1144,16 @@
       return;
     }
 
-    /* لود آزمون */
     var exam = await loadExam(examId);
     if (!exam) return;
 
-    /* لود پاسخ‌ها */
     await loadSubmissions();
 
-    /* مخفی کردن loading */
     if (el.loading) el.loading.style.display = 'none';
     if (el.studentsView) el.studentsView.style.display = 'block';
 
-    /* Realtime */
     subscribeRealtime();
 
-    /* اگه ?sub=xxx توی URL بود، مستقیم باز کن */
     var subId = params.get('sub');
     if (subId) {
       setTimeout(function () { showDetail(subId); }, 200);
@@ -1040,7 +1182,10 @@
     reload: loadSubmissions,
     showDetail: showDetail,
     backToList: backToList,
-    exportCSV: exportCSV
+    exportCSV: exportCSV,
+    formatDateTime: formatDateTime,
+    formatDateTimeFull: formatDateTimeFull,
+    formatRelativeTime: formatRelativeTime
   };
 
   if (document.readyState === 'loading') {
