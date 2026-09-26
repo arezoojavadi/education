@@ -4,14 +4,10 @@
  * منطق پنل معلم
  * طراحی: فاطمه جوادی
  *
- * قابلیت‌ها:
- *   • چک لاگین + نقش معلم
- *   • لود آزمون‌های معلم + آمار
- *   • آپلود فایل HTML با progress
- *   • فعال/غیرفعال کردن آزمون
- *   • حذف آزمون (با فایل Storage)
- *   • مودال آپلود کامل
- *   • Toast + Theme + ریسپانسیو
+ * نسخه‌ی جدید:
+ *   • فیلد مدت زمان آزمون (duration_minutes)
+ *   • presets برای انتخاب سریع
+ *   • ارسال duration به دیتابیس
  *
  * وابستگی: @supabase/supabase-js از CDN
  * ============================================================ */
@@ -28,8 +24,12 @@
   var SUPABASE_KEY = 'sb_publishable_Qf3R9hPgjApwe2c-qQMoJA_jitobazq';
 
   var BUCKET = 'exam-files';
-  var MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  var MAX_FILE_SIZE = 10 * 1024 * 1024;
   var ALLOWED_EXT = ['.html', '.htm'];
+
+  var DEFAULT_DURATION = 15;
+  var MIN_DURATION = 1;
+  var MAX_DURATION = 240;
 
   /* ============================================================
    * SUPABASE
@@ -84,6 +84,8 @@
       uploadModal:  document.getElementById('uploadModal'),
       modalTitle:   document.getElementById('examTitle'),
       modalDesc:    document.getElementById('examDesc'),
+      modalDuration: document.getElementById('examDuration'),
+      durationPresets: document.getElementById('durationPresets'),
       uploadZone:   document.getElementById('uploadZone'),
       fileInput:    document.getElementById('fileInput'),
       filePreview:  document.getElementById('filePreview'),
@@ -141,6 +143,16 @@
     return toFa(val) + ' ' + sizes[i];
   }
 
+  function formatDuration(minutes) {
+    if (!minutes && minutes !== 0) return '—';
+    var m = parseInt(minutes, 10) || 0;
+    if (m < 60) return toFa(m) + ' دقیقه';
+    var h = Math.floor(m / 60);
+    var rem = m % 60;
+    if (rem === 0) return toFa(h) + ' ساعت';
+    return toFa(h) + ':' + (rem < 10 ? '۰' : '') + toFa(rem) + ' ساعت';
+  }
+
   function sleep(ms) {
     return new Promise(function (r) { setTimeout(r, ms); });
   }
@@ -194,25 +206,23 @@
     if (!el.toasts) { console.log('[' + (type || 'info') + ']', message); return; }
     type = type || 'info';
     duration = duration || 3000;
-
     var node = document.createElement('div');
     node.className = 'toast ' + type;
     node.textContent = message;
     el.toasts.appendChild(node);
-
     setTimeout(function () {
+      node.classList.remove('showing');
       node.classList.add('removing');
       setTimeout(function () { node.remove(); }, 300);
     }, duration);
   }
 
   /* ============================================================
-   * AUTH GUARD — فقط معلم
+   * AUTH GUARD
    * ============================================================ */
   async function requireTeacher() {
     var sb = state.supabase;
 
-    /* ۱) نشست */
     var sessionResult;
     try { sessionResult = await sb.auth.getSession(); }
     catch (e) { window.location.replace('index.html'); return null; }
@@ -222,7 +232,6 @@
       return null;
     }
 
-    /* ۲) کاربر */
     var userResult;
     try { userResult = await sb.auth.getUser(); }
     catch (e) { window.location.replace('index.html'); return null; }
@@ -230,17 +239,12 @@
     var user = userResult && userResult.data && userResult.data.user;
     if (!user) { window.location.replace('index.html'); return null; }
 
-    /* ۳) پروفایل — با RPC امن */
     var profile = null;
-
     try {
-      var rpcResult = await sb.rpc('get_my_profile');
-      if (!rpcResult.error && rpcResult.data) profile = rpcResult.data;
-    } catch (e) {
-      console.warn('[teacher] RPC failed:', e);
-    }
+      var rpc = await sb.rpc('get_my_profile');
+      if (!rpc.error && rpc.data) profile = rpc.data;
+    } catch (e) {}
 
-    /* فallback: SELECT */
     if (!profile) {
       try {
         var sel = await sb
@@ -252,13 +256,11 @@
       } catch (e) {}
     }
 
-    /* اگه پروفایل نیست → انتخاب نام */
     if (!profile) {
       window.location.replace('choose-name.html');
       return null;
     }
 
-    /* اگه نام تأیید نشده → انتخاب نام */
     if (profile.name_confirmed !== true) {
       await sleep(500);
       try {
@@ -267,14 +269,12 @@
           profile = retry.data;
         }
       } catch (e) {}
-
       if (profile.name_confirmed !== true) {
         window.location.replace('choose-name.html');
         return null;
       }
     }
 
-    /* اگه معلم نیست → پنل دانش‌آموز */
     if (profile.role !== 'teacher') {
       window.location.replace('student.html');
       return null;
@@ -300,7 +300,7 @@
   }
 
   /* ============================================================
-   * HEADER FILL
+   * HEADER
    * ============================================================ */
   function fillHeader() {
     if (!state.profile) return;
@@ -343,7 +343,7 @@
     try {
       result = await sb
         .from('exams')
-        .select('id, title, description, file_path, file_size, is_active, created_at')
+        .select('id, title, description, file_path, file_size, is_active, duration_minutes, created_at')
         .order('created_at', { ascending: false });
     } catch (e) {
       renderExamsError();
@@ -358,7 +358,6 @@
 
     state.exams = result.data || [];
 
-    /* تعداد پاسخ‌ها */
     try {
       var subsResult = await sb.from('submissions').select('exam_id');
       state.counts = {};
@@ -393,13 +392,6 @@
           '<div class="empty-text">' +
             'روی «آزمون جدید» بزن و یه فایل HTML آپلود کن تا شروع کنیم.' +
           '</div>' +
-          '<button class="btn-primary" onclick="TeacherPanel.openUpload()" style="margin-top:16px;">' +
-            '<svg viewBox="0 0 24 24" style="width:18px;height:18px;">' +
-              '<line x1="12" y1="5" x2="12" y2="19"/>' +
-              '<line x1="5" y1="12" x2="19" y2="12"/>' +
-            '</svg>' +
-            '<span>ساخت اولین آزمون</span>' +
-          '</button>' +
         '</div>';
       return;
     }
@@ -409,6 +401,7 @@
       var delay = (i * 0.05).toFixed(2) + 's';
       var subsCount = state.counts[exam.id] || 0;
       var active = exam.is_active === true;
+      var dur = exam.duration_minutes || 15;
 
       html +=
         '<div class="exam-card" style="animation-delay:' + delay + ';">' +
@@ -433,6 +426,13 @@
           '</div>' +
 
           '<div class="exam-card-stats">' +
+            '<div class="stat-pill duration">' +
+              '<svg viewBox="0 0 24 24">' +
+                '<circle cx="12" cy="12" r="10"/>' +
+                '<polyline points="12 6 12 12 16 14"/>' +
+              '</svg>' +
+              '<span>' + formatDuration(dur) + '</span>' +
+            '</div>' +
             '<div class="stat-pill">' +
               '<svg viewBox="0 0 24 24">' +
                 '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>' +
@@ -528,7 +528,6 @@
 
       toast(newState ? '✅ آزمون فعال شد' : '⏸ آزمون غیرفعال شد', 'success');
       await loadExams();
-
     } catch (e) {
       console.warn('[toggle fatal]', e);
       toast('خطای غیرمنتظره', 'error');
@@ -546,7 +545,6 @@
     }
 
     try {
-      /* ۱) فایل رو از Storage پاک کن */
       try {
         var examResult = await state.supabase
           .from('exams')
@@ -563,7 +561,6 @@
         console.warn('[delete] storage remove failed:', e);
       }
 
-      /* ۲) رکورد رو حذف کن */
       var del = await state.supabase.from('exams').delete().eq('id', examId);
 
       if (del.error) {
@@ -575,11 +572,45 @@
       toast('✅ آزمون حذف شد', 'success');
       await loadExams();
       await loadStats();
-
     } catch (e) {
       console.warn('[delete fatal]', e);
       toast('خطای غیرمنتظره', 'error');
     }
+  }
+
+  /* ============================================================
+   * DURATION PRESETS
+   * ============================================================ */
+  function bindDurationPresets() {
+    if (!el.durationPresets) return;
+
+    el.durationPresets.addEventListener('click', function (e) {
+      var btn = e.target.closest('.duration-preset');
+      if (!btn) return;
+
+      var min = parseInt(btn.getAttribute('data-min'), 10);
+      if (!min || min < MIN_DURATION) return;
+
+      if (el.modalDuration) {
+        el.modalDuration.value = min;
+      }
+
+      el.durationPresets.querySelectorAll('.duration-preset').forEach(function (b) {
+        b.classList.toggle('active', b === btn);
+      });
+    });
+  }
+
+  function updateDurationPresetActive() {
+    if (!el.durationPresets || !el.modalDuration) return;
+
+    var current = parseInt(el.modalDuration.value, 10);
+    if (!current) current = DEFAULT_DURATION;
+
+    el.durationPresets.querySelectorAll('.duration-preset').forEach(function (b) {
+      var min = parseInt(b.getAttribute('data-min'), 10);
+      b.classList.toggle('active', min === current);
+    });
   }
 
   /* ============================================================
@@ -612,11 +643,14 @@
 
     if (el.modalTitle) el.modalTitle.value = '';
     if (el.modalDesc) el.modalDesc.value = '';
+    if (el.modalDuration) el.modalDuration.value = DEFAULT_DURATION;
     if (el.fileInput) el.fileInput.value = '';
     if (el.filePreview) el.filePreview.innerHTML = '';
     if (el.progressBar) el.progressBar.style.display = 'none';
     if (el.progressFill) el.progressFill.style.width = '0%';
     if (el.progressText) el.progressText.textContent = '';
+
+    updateDurationPresetActive();
 
     if (el.uploadBtn) {
       el.uploadBtn.disabled = true;
@@ -680,8 +714,11 @@
   function updateUploadBtn() {
     if (!el.uploadBtn) return;
     var title = el.modalTitle ? el.modalTitle.value.trim() : '';
+    var duration = el.modalDuration ? parseInt(el.modalDuration.value, 10) : 0;
     var hasFile = !!state.selectedFile;
-    el.uploadBtn.disabled = !(hasFile && title.length >= 2);
+    var validDuration = duration >= MIN_DURATION && duration <= MAX_DURATION;
+
+    el.uploadBtn.disabled = !(hasFile && title.length >= 2 && validDuration);
   }
 
   function bindUploadEvents() {
@@ -740,9 +777,29 @@
       el.modalTitle.addEventListener('input', updateUploadBtn);
     }
 
+    if (el.modalDuration) {
+      el.modalDuration.addEventListener('input', function () {
+        var v = parseInt(el.modalDuration.value, 10);
+        if (v > MAX_DURATION) el.modalDuration.value = MAX_DURATION;
+        if (v < MIN_DURATION && el.modalDuration.value !== '') el.modalDuration.value = MIN_DURATION;
+        updateDurationPresetActive();
+        updateUploadBtn();
+      });
+
+      el.modalDuration.addEventListener('blur', function () {
+        var v = parseInt(el.modalDuration.value, 10);
+        if (!v || v < MIN_DURATION) el.modalDuration.value = DEFAULT_DURATION;
+        if (v > MAX_DURATION) el.modalDuration.value = MAX_DURATION;
+        updateDurationPresetActive();
+        updateUploadBtn();
+      });
+    }
+
     if (el.uploadBtn) {
       el.uploadBtn.addEventListener('click', doUpload);
     }
+
+    bindDurationPresets();
   }
 
   /* ============================================================
@@ -763,6 +820,15 @@
       return;
     }
 
+    /* مدت زمان */
+    var durationMinutes = parseInt(el.modalDuration ? el.modalDuration.value : '', 10);
+    if (!durationMinutes || durationMinutes < MIN_DURATION) {
+      durationMinutes = DEFAULT_DURATION;
+    }
+    if (durationMinutes > MAX_DURATION) {
+      durationMinutes = MAX_DURATION;
+    }
+
     state.isUploading = true;
     if (el.uploadBtn) {
       el.uploadBtn.disabled = true;
@@ -775,14 +841,12 @@
     var sb = state.supabase;
 
     try {
-      /* ۱) ساخت مسیر یکتا */
       var ext = fileExt(state.selectedFile.name) || '.html';
       var path = state.user.id + '/' + Date.now() + ext;
 
       if (el.progressFill) el.progressFill.style.width = '20%';
       if (el.progressText) el.progressText.textContent = 'در حال آپلود فایل...';
 
-      /* ۲) آپلود به Storage */
       var uploadResult = await sb.storage
         .from(BUCKET)
         .upload(path, state.selectedFile, {
@@ -799,7 +863,6 @@
       if (el.progressFill) el.progressFill.style.width = '70%';
       if (el.progressText) el.progressText.textContent = 'در حال ذخیره در دیتابیس...';
 
-      /* ۳) ساخت رکورد در exams */
       var dbResult = await sb
         .from('exams')
         .insert({
@@ -807,6 +870,7 @@
           description: description || null,
           file_path: path,
           file_size: state.selectedFile.size,
+          duration_minutes: durationMinutes,
           created_by: state.user.id,
           is_active: true
         })
@@ -814,7 +878,6 @@
         .single();
 
       if (dbResult.error) {
-        /* rollback */
         try { await sb.storage.from(BUCKET).remove([path]); } catch (e) {}
         console.warn('[insert]', dbResult.error);
 
@@ -841,7 +904,7 @@
       if (el.uploadBtn) {
         el.uploadBtn.disabled = false;
         el.uploadBtn.innerHTML =
-          '<svg viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>' +
+          '<svg viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/><polyline points="16 16 12 12 8 16"/></svg>' +
           '<span>آپلود و ساخت آزمون</span>';
       }
       if (el.progressBar) el.progressBar.style.display = 'none';
@@ -867,7 +930,6 @@
     bindLogout();
     bindUploadEvents();
 
-    /* Auth */
     var auth = await requireTeacher();
     if (!auth) return;
 
@@ -876,7 +938,6 @@
 
     fillHeader();
 
-    /* Load */
     await Promise.all([
       loadStats(),
       loadExams()
