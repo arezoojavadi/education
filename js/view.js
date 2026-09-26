@@ -4,20 +4,11 @@
  * پنل مشاهده و نمره‌دهی پاسخ‌های دانش‌آموزان
  * طراحی: فاطمه جوادی
  *
- * قابلیت‌ها:
- *   • لیست دانش‌آموزانی که آزمون رو حل کردن
- *   • کلیک روی هر اسم → مشاهده‌ی پاسخ‌ها
- *   • نمره‌دهی (۰ تا ۲۰) + یادداشت برای هر دانش‌آموز
- *   • نمایش نمره در لیست (با رنگ‌بندی)
- *   • جستجو در نام و کد
- *   • مرتب‌سازی (جدیدترین / قدیمی‌ترین / الفبا / تصحیح‌نشده‌ها اول)
- *   • شمارش (کل / تصحیح‌شده / در انتظار)
- *   • خروجی CSV
- *   • Realtime — پاسخ جدید زنده میاد
- *   • تاریخ و ساعت کامل ثبت
- *   • حالت شب/روز + ریسپانسیو
- *
- * وابستگی: @supabase/supabase-js از CDN
+ * 🆕 تغییرات این نسخه:
+ *   • خواندن پروفایل‌ها با RPC امن (دور زدن RLS)
+ *   • Fallback به SELECT اگه RPC نبود
+ *   • سرچ بهتر (کار می‌کنه حتی با اعداد فارسی)
+ *   • نمایش پیام واضح‌تر
  * ============================================================ */
 
 (function () {
@@ -32,7 +23,6 @@
   var SUPABASE_KEY = 'sb_publishable_Qf3R9hPgjApwe2c-qQMoJA_jitobazq';
 
   var MAX_SCORE = 20;
-
   var DEBUG = true;
 
   /* ============================================================
@@ -40,16 +30,16 @@
    * ============================================================ */
   function log() {
     if (!DEBUG) return;
-    var args = Array.prototype.slice.call(arguments);
-    try { console.log.apply(console, args); } catch (e) {}
+    var a = Array.prototype.slice.call(arguments);
+    try { console.log.apply(console, a); } catch (e) {}
   }
   function logError() {
-    var args = Array.prototype.slice.call(arguments);
-    try { console.error.apply(console, args); } catch (e) {}
+    var a = Array.prototype.slice.call(arguments);
+    try { console.error.apply(console, a); } catch (e) {}
   }
   function logWarn() {
-    var args = Array.prototype.slice.call(arguments);
-    try { console.warn.apply(console, args); } catch (e) {}
+    var a = Array.prototype.slice.call(arguments);
+    try { console.warn.apply(console, a); } catch (e) {}
   }
 
   /* ============================================================
@@ -57,15 +47,12 @@
    * ============================================================ */
   function getSupabase() {
     if (window.supabaseClient) return window.supabaseClient;
-
     if (!window.supabase || typeof window.supabase.createClient !== 'function') {
       throw new Error('Supabase SDK بارگذاری نشده');
     }
-
     window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
       auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
     });
-
     return window.supabaseClient;
   }
 
@@ -121,14 +108,12 @@
 
       submissionsList: document.getElementById('submissionsList'),
 
-      /* Detail */
       detailAvatar:  document.getElementById('detailAvatar'),
       detailName:    document.getElementById('detailName'),
       detailCode:    document.getElementById('detailCode'),
       detailTime:    document.getElementById('detailTime'),
       answersList:   document.getElementById('answersList'),
 
-      /* Grading */
       gradeInput:    document.getElementById('gradeInput'),
       gradeNote:     document.getElementById('gradeNote'),
       saveGradeBtn:  document.getElementById('saveGradeBtn'),
@@ -147,11 +132,11 @@
   /* ============================================================
    * HELPERS
    * ============================================================ */
-  var FA = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+  var FA_DIGITS = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
 
   function toFa(n) {
     return String(n === null || n === undefined ? 0 : n)
-      .replace(/\d/g, function (d) { return FA[+d]; });
+      .replace(/\d/g, function (d) { return FA_DIGITS[+d]; });
   }
 
   function pad(n) { return n < 10 ? '0' + n : String(n); }
@@ -169,6 +154,27 @@
     if (!parts.length) return '؟';
     if (parts.length === 1) return parts[0][0] || '؟';
     return (parts[0][0] || '') + (parts[parts.length - 1][0] || '');
+  }
+
+  /* تبدیل اعداد فارسی به انگلیسی برای سرچ */
+  function normalizeDigits(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/[۰-۹]/g, function (d) { return String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)); })
+      .replace(/[٠-٩]/g, function (d) { return String('٠١٢٣٤٥٦٧٨٩'.indexOf(d)); });
+  }
+
+  /* نرمال‌سازی برای سرچ */
+  function normalizeForSearch(str) {
+    if (!str) return '';
+    return normalizeDigits(String(str))
+      .toLowerCase()
+      .replace(/[يى]/g, 'ی')
+      .replace(/[كک]/g, 'ک')
+      .replace(/[أإآا]/g, 'ا')
+      .replace(/\u200c/g, ' ')     /* نیم‌فاصله */
+      .replace(/\s+/g, ' ')
+      .trim();
   }
 
   /* ─── Date & Time ─── */
@@ -276,35 +282,27 @@
     log('%c🔐 [Auth] شروع...', 'color: #6C5CE7; font-weight: bold;');
 
     var sessionResult;
-    try {
-      sessionResult = await sb.auth.getSession();
-    } catch (e) {
-      logError('❌ [Auth] session:', e);
+    try { sessionResult = await sb.auth.getSession(); }
+    catch (e) {
       showError('خطا در بررسی نشست. اینترنت را بررسی کن.');
       return null;
     }
 
     var session = sessionResult && sessionResult.data && sessionResult.data.session;
     if (!session) {
-      log('➡️ [Auth] نشست نیست → index.html');
       window.location.replace('index.html');
       return null;
     }
 
     var userResult;
-    try {
-      userResult = await sb.auth.getUser();
-    } catch (e) {
-      logError('❌ [Auth] user:', e);
+    try { userResult = await sb.auth.getUser(); }
+    catch (e) {
       showError('خطا در دریافت کاربر');
       return null;
     }
 
     var user = userResult && userResult.data && userResult.data.user;
-    if (!user) {
-      window.location.replace('index.html');
-      return null;
-    }
+    if (!user) { window.location.replace('index.html'); return null; }
 
     var profile = null;
 
@@ -417,6 +415,76 @@
   }
 
   /* ============================================================
+   * 🆕 LOAD PROFILES با RPC (روش مطمئن)
+   * ============================================================ */
+  async function fetchProfiles(userIds) {
+    if (!userIds || !userIds.length) return {};
+
+    var sb = state.supabase;
+    var map = {};
+
+    /* ─── تلاش ۱: RPC امن ─── */
+    try {
+      log('🔍 [Profiles] تلاش با RPC get_students_profiles...');
+      var rpc = await sb.rpc('get_students_profiles', {
+        p_user_ids: userIds
+      });
+
+      if (!rpc.error && Array.isArray(rpc.data)) {
+        rpc.data.forEach(function (p) {
+          if (p && p.id) map[p.id] = p;
+        });
+        log('✅ [Profiles] RPC موفق — ' + Object.keys(map).length + ' پروفایل');
+        if (Object.keys(map).length > 0) return map;
+      } else if (rpc.error) {
+        logWarn('⚠️ [Profiles] RPC error:', rpc.error);
+      }
+    } catch (e) {
+      logWarn('⚠️ [Profiles] RPC exception:', e);
+    }
+
+    /* ─── تلاش ۲: SELECT مستقیم ─── */
+    try {
+      log('🔍 [Profiles] تلاش با SELECT مستقیم...');
+      var sel = await sb
+        .from('profiles')
+        .select('id, code, full_name')
+        .in('id', userIds);
+
+      if (!sel.error && Array.isArray(sel.data)) {
+        sel.data.forEach(function (p) {
+          if (p && p.id) map[p.id] = p;
+        });
+        log('✅ [Profiles] SELECT موفق — ' + Object.keys(map).length + ' پروفایل');
+        if (Object.keys(map).length > 0) return map;
+      } else if (sel.error) {
+        logWarn('⚠️ [Profiles] SELECT error:', sel.error);
+      }
+    } catch (e) {
+      logWarn('⚠️ [Profiles] SELECT exception:', e);
+    }
+
+    /* ─── تلاش ۳: یکی یکی ─── */
+    log('🔍 [Profiles] تلاش تک‌تک...');
+    for (var i = 0; i < userIds.length && i < 50; i++) {
+      try {
+        var one = await sb
+          .from('profiles')
+          .select('id, code, full_name')
+          .eq('id', userIds[i])
+          .maybeSingle();
+
+        if (!one.error && one.data && one.data.id) {
+          map[one.data.id] = one.data;
+        }
+      } catch (e) {}
+    }
+
+    log('📋 [Profiles] نهایی: ' + Object.keys(map).length + ' از ' + userIds.length);
+    return map;
+  }
+
+  /* ============================================================
    * LOAD SUBMISSIONS
    * ============================================================ */
   async function loadSubmissions() {
@@ -439,7 +507,7 @@
 
       var subs = r.data || [];
 
-      /* پروفایل‌ها */
+      /* جمع‌آوری user ids */
       var userIds = [];
       subs.forEach(function (s) {
         if (s.student_id && userIds.indexOf(s.student_id) === -1) {
@@ -447,22 +515,10 @@
         }
       });
 
-      var profilesMap = {};
-      if (userIds.length) {
-        try {
-          var pr = await state.supabase
-            .from('profiles')
-            .select('id, code, full_name')
-            .in('id', userIds);
+      /* گرفتن پروفایل‌ها با RPC */
+      var profilesMap = await fetchProfiles(userIds);
 
-          (pr.data || []).forEach(function (p) {
-            profilesMap[p.id] = p;
-          });
-        } catch (e) {
-          logWarn('⚠️ [Load] profiles:', e);
-        }
-      }
-
+      /* ادغام */
       subs.forEach(function (s) {
         s.profiles = profilesMap[s.student_id] || null;
       });
@@ -493,20 +549,35 @@
   }
 
   /* ============================================================
-   * FILTER + SORT
+   * 🆕 FILTER + SORT (با سرچ بهتر)
    * ============================================================ */
   function applyFilter() {
     var list = state.submissions.slice();
 
+    /* سرچ */
     if (state.query) {
-      var q = state.query.toLowerCase();
-      list = list.filter(function (s) {
-        var name = (s.profiles && s.profiles.full_name) || '';
-        var code = (s.profiles && s.profiles.code) || '';
-        return name.toLowerCase().indexOf(q) !== -1 || code.indexOf(q) !== -1;
-      });
+      var q = normalizeForSearch(state.query);
+      log('🔍 [Search] query:', q);
+
+      if (q.length > 0) {
+        list = list.filter(function (s) {
+          var profile = s.profiles || {};
+          var name = normalizeForSearch(profile.full_name || '');
+          var code = normalizeForSearch(profile.code || '');
+
+          /* چک نام */
+          if (name.indexOf(q) !== -1) return true;
+          /* چک کد */
+          if (code.indexOf(q) !== -1) return true;
+
+          return false;
+        });
+
+        log('🔍 [Search] نتیجه:', list.length);
+      }
     }
 
+    /* مرتب‌سازی */
     if (state.sort === 'date-desc') {
       list.sort(function (a, b) {
         return new Date(b.submitted_at) - new Date(a.submitted_at);
@@ -567,6 +638,7 @@
             '</svg>' +
           '</div>' +
           '<div class="empty-title">نتیجه‌ای پیدا نشد</div>' +
+          '<div class="empty-text">عبارت جستجو رو تغییر بده.</div>' +
         '</div>';
       return;
     }
@@ -574,7 +646,7 @@
     var html = '';
     state.filtered.forEach(function (s, i) {
       var profile = s.profiles || {};
-      var name = profile.full_name || 'دانش‌آموز';
+      var name = (profile.full_name && profile.full_name.trim()) || 'بدون نام';
       var code = profile.code || '—';
       var initials = getInitials(name);
       var delay = (i * 0.03).toFixed(2) + 's';
@@ -658,7 +730,7 @@
     if (el.detailView) el.detailView.style.display = 'block';
 
     var profile = sub.profiles || {};
-    var name = profile.full_name || 'دانش‌آموز';
+    var name = (profile.full_name && profile.full_name.trim()) || 'بدون نام';
 
     if (el.detailAvatar) el.detailAvatar.textContent = getInitials(name);
     if (el.detailName) el.detailName.textContent = name;
@@ -820,8 +892,6 @@
       btn.innerHTML = '<span class="spinner-sm"></span><span>در حال ذخیره...</span>';
     }
 
-    log('💾 [Grade] ذخیره: ' + score + ' برای ' + state.currentId);
-
     try {
       var r = await state.supabase
         .from('submissions')
@@ -831,8 +901,7 @@
           graded_at: new Date().toISOString(),
           graded_by: state.user.id
         })
-        .eq('id', state.currentId)
-        .select('id, score, teacher_note, graded_at, graded_by');
+        .eq('id', state.currentId);
 
       if (r.error) {
         logError('❌ [Grade]', r.error);
@@ -840,7 +909,6 @@
         return;
       }
 
-      /* آپدیت state */
       for (var i = 0; i < state.submissions.length; i++) {
         if (state.submissions[i].id === state.currentId) {
           state.submissions[i].score = score;
@@ -880,8 +948,6 @@
     if (!state.currentId) return;
     if (!confirm('مطمئنی می‌خوای نمره رو پاک کنی؟')) return;
 
-    log('🗑 [Grade] پاک کردن نمره: ' + state.currentId);
-
     try {
       var r = await state.supabase
         .from('submissions')
@@ -894,7 +960,6 @@
         .eq('id', state.currentId);
 
       if (r.error) {
-        logError('❌ [Grade]', r.error);
         toast('خطا: ' + (r.error.message || ''), 'error');
         return;
       }
@@ -1058,14 +1123,10 @@
           filter: 'exam_id=eq.' + state.exam.id
         }, async function (payload) {
           try {
-            var pr = await state.supabase
-              .from('profiles')
-              .select('id, code, full_name')
-              .eq('id', payload.new.student_id)
-              .maybeSingle();
+            var profilesMap = await fetchProfiles([payload.new.student_id]);
 
             var full = Object.assign({}, payload.new, {
-              profiles: pr.data || null
+              profiles: profilesMap[payload.new.student_id] || null
             });
 
             state.submissions.unshift(full);
@@ -1073,9 +1134,8 @@
             renderCounts();
             if (state.view === 'list') renderList();
 
-            toast('📬 پاسخ جدید از ' +
-              (pr.data && pr.data.full_name || 'دانش‌آموز'),
-              'success', 4000);
+            var name = (profilesMap[payload.new.student_id] && profilesMap[payload.new.student_id].full_name) || 'دانش‌آموز';
+            toast('📬 پاسخ جدید از ' + name, 'success', 4000);
           } catch (e) {
             logWarn('⚠️ [Realtime]', e);
           }
@@ -1113,6 +1173,7 @@
    * BIND EVENTS
    * ============================================================ */
   function bindEvents() {
+    /* سرچ با debounce */
     if (el.searchInput) {
       var t = null;
       el.searchInput.addEventListener('input', function (e) {
@@ -1120,9 +1181,20 @@
         var val = e.target.value;
         t = setTimeout(function () {
           state.query = (val || '').trim();
+          log('🔍 [Search] شروع جستجو برای:', state.query);
           applyFilter();
           renderList();
         }, 250);
+      });
+
+      /* پاک کردن با Escape */
+      el.searchInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          el.searchInput.value = '';
+          state.query = '';
+          applyFilter();
+          renderList();
+        }
       });
     }
 
@@ -1159,6 +1231,12 @@
     }
 
     document.addEventListener('keydown', function (e) {
+      /* Ctrl+K → سرچ */
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault();
+        if (el.searchInput) el.searchInput.focus();
+      }
+
       if (state.view === 'detail') {
         if (e.key === 'Escape') backToList();
         else if (e.key === 'ArrowLeft') {
@@ -1179,7 +1257,7 @@
    * ============================================================ */
   async function init() {
     log(
-      '%c📋 پنل نمره‌دهی — سامانه آزمون\n%cطراحی: فاطمه جوادی',
+      '%c📋 پنل نمره‌دهی\n%cطراحی: فاطمه جوادی',
       'color: #6C5CE7; font-size: 16px; font-weight: bold;',
       'color: #00CEC9; font-size: 12px;'
     );
@@ -1187,7 +1265,7 @@
     try {
       state.supabase = getSupabase();
     } catch (e) {
-      logError('❌ [Init] Supabase:', e);
+      logError('❌ [Init]', e);
       showError('خطا در بارگذاری سیستم');
       return;
     }
@@ -1228,7 +1306,7 @@
       setTimeout(function () { showDetail(subId); }, 200);
     }
 
-    log('%c✅ [Init] پنل نمره‌دهی آماده', 'color: #00B894; font-weight: bold;');
+    log('%c✅ [Init] آماده', 'color: #00B894; font-weight: bold;');
   }
 
   /* ============================================================
