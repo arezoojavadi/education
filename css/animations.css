@@ -1,198 +1,848 @@
-/* ============================================
-   Micro-interactions
-============================================ */
+/* ============================================================
+ * css/animations.css
+ * ------------------------------------------------------------
+ * انیمیشن‌های سراسری — بهینه و سریع
+ * طراحی: فاطمه جوادی
+ *
+ * اصول:
+ *   • فقط transform + opacity (GPU-friendly)
+ *   • بدون filter: blur سنگین
+ *   • بدون mix-blend-mode
+ *   • بدون will-change پراکنده
+ *   • احترام به prefers-reduced-motion
+ *
+ * پیش‌نیاز: css/style.css (برای CSS Variables)
+ * ============================================================ */
 
-/* Fade-in با جهت */
+
+/* ============================================================
+ * 1) KEYFRAMES — پایه
+ * ============================================================ */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(24px); }
+  from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes slideIn {
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
   from { opacity: 0; transform: translateX(24px); }
   to   { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(.94); }
+  from { opacity: 0; transform: scale(0.92); }
   to   { opacity: 1; transform: scale(1); }
 }
 
-@keyframes bounceIn {
-  0%   { opacity: 0; transform: scale(.9); }
-  50%  { opacity: 1; transform: scale(1.02); }
+@keyframes scaleOut {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.92); }
+}
+
+@keyframes popIn {
+  0%   { opacity: 0; transform: scale(0.5); }
+  70%  { opacity: 1; transform: scale(1.08); }
   100% { opacity: 1; transform: scale(1); }
 }
 
-/* اعمال به کارت‌ها */
-.card { animation: slideUp .35s ease both; }
-.card:nth-child(1) { animation-delay: 0s; }
-.card:nth-child(2) { animation-delay: .06s; }
-.card:nth-child(3) { animation-delay: .12s; }
-.card:nth-child(4) { animation-delay: .18s; }
-.card:nth-child(5) { animation-delay: .24s; }
-.card:nth-child(6) { animation-delay: .30s; }
-
-/* Hover ملایم روی دکمه‌ها */
-.btn { position: relative; overflow: hidden; }
-
-.btn::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at center, rgba(255,255,255,.3), transparent 70%);
-  opacity: 0;
-  transition: opacity .3s;
+@keyframes popOut {
+  0%   { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.5); }
 }
 
-.btn:hover::after { opacity: 1; }
-
-/* آیکون‌های header */
-.btn-icon {
-  transition: transform .2s, background .2s;
+@keyframes rotate {
+  to { transform: rotate(360deg); }
 }
 
-.btn-icon:hover {
-  transform: rotate(-8deg) scale(1.08);
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
-/* کاربر آواتار */
-.user-avatar {
-  transition: transform .3s, box-shadow .3s;
-  box-shadow: 0 4px 12px rgba(108,92,231,.25);
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.6; transform: scale(0.95); }
 }
 
-.user-avatar:hover {
-  transform: scale(1.1) rotate(4deg);
-  box-shadow: 0 8px 24px rgba(108,92,231,.4);
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.2); }
 }
 
-/* بج‌ها */
-.badge {
-  transition: transform .2s;
+@keyframes wave {
+  0%, 100% { transform: rotate(0); }
+  25%      { transform: rotate(-8deg); }
+  75%      { transform: rotate(8deg); }
 }
 
-.badge:hover { transform: scale(1.05); }
-
-/* ورودی‌ها */
-.form-input, .code-input, .text-input {
-  transition: border-color .2s, background .2s, transform .2s;
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%      { transform: translateX(-8px); }
+  40%      { transform: translateX(8px); }
+  60%      { transform: translateX(-5px); }
+  80%      { transform: translateX(5px); }
 }
 
-.form-input:focus, .code-input:focus, .text-input:focus {
-  transform: scale(1.01);
+@keyframes shimmer {
+  to { background-position: 200% 0; }
 }
 
-/* Card hover با سایه عمیق‌تر */
-.card-hover {
-  transition: transform .25s cubic-bezier(.4,0,.2,1), 
-              box-shadow .25s cubic-bezier(.4,0,.2,1);
+@keyframes glow {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50%      { opacity: 0.65; transform: scale(1.08); }
 }
 
-/* جدول - row hover */
-.table tr {
-  transition: background .15s;
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
 }
 
-/* Toast ورود و خروج */
-@keyframes toastSlideIn {
-  from { opacity: 0; transform: translateX(-100%); }
-  to   { opacity: 1; transform: translateX(0); }
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-6px) rotate(3deg); }
 }
 
-@keyframes toastSlideOut {
-  from { opacity: 1; transform: translateX(0); max-height: 200px; }
-  to   { opacity: 0; transform: translateX(-100%); max-height: 0; }
+@keyframes progressShine {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
 }
 
-.toast { animation: toastSlideIn .4s cubic-bezier(.4,0,.2,1) both; }
-.toast.removing { animation: toastSlideOut .3s cubic-bezier(.4,0,.2,1) both; }
+@keyframes skeletonLoad {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
 
-/* Modal */
+@keyframes sparkle {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  50%      { transform: scale(1.25) rotate(20deg); opacity: 0.75; }
+}
+
+@keyframes badgePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.6; transform: scale(0.85); }
+}
+
+@keyframes slideUpAndFade {
+  0%   { opacity: 0; transform: translateY(24px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes toastIn {
+  0%   { opacity: 0; transform: translateX(-30px) scale(0.95); }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes toastOut {
+  to { opacity: 0; transform: translateX(-30px) scale(0.95); }
+}
+
+@keyframes modalIn {
+  0%   { opacity: 0; transform: translateY(30px) scale(0.94); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 @keyframes backdropIn {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
 
-.modal-overlay.show {
-  animation: backdropIn .2s ease;
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.modal-overlay.show .modal {
-  animation: bounceIn .35s cubic-bezier(.4,0,.2,1);
+@keyframes heroFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-8px) rotate(5deg); }
 }
 
-/* Progress bar */
-.progress-fill {
-  position: relative;
-  overflow: hidden;
+@keyframes slowRotate {
+  to { transform: rotate(360deg); }
 }
 
-.progress-fill::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255,255,255,.4),
-    transparent
-  );
-  animation: shimmer 1.6s linear infinite;
+@keyframes avatarPop {
+  0%   { opacity: 0; transform: scale(0.4) rotate(-15deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
 }
 
-@keyframes shimmer {
-  from { transform: translateX(-100%); }
-  to   { transform: translateX(100%); }
+@keyframes logoPop {
+  0%   { opacity: 0; transform: scale(0.4); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
-/* Success checkmark */
 @keyframes checkPop {
   0%   { transform: scale(0) rotate(-45deg); opacity: 0; }
   50%  { transform: scale(1.2) rotate(0); opacity: 1; }
   100% { transform: scale(1) rotate(0); }
 }
 
-.check-pop { animation: checkPop .4s cubic-bezier(.34,1.56,.64,1); }
-
-/* Timer pulse */
-@keyframes timerPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(255,107,107,.5); }
-  50%      { box-shadow: 0 0 0 8px rgba(255,107,107,0); }
+@keyframes ripple {
+  0%   { transform: scale(0); opacity: 0.5; }
+  100% { transform: scale(4); opacity: 0; }
 }
 
-.timer.warning {
-  animation: timerPulse 1.5s ease-in-out infinite;
+@keyframes dotPulse {
+  0%, 60%, 100% { transform: scale(0.6); opacity: 0.4; }
+  30%           { transform: scale(1); opacity: 1; }
 }
 
-/* درخشش روی آیکون اصلی */
-@keyframes glow {
-  0%, 100% { filter: drop-shadow(0 0 8px rgba(108,92,231,.3)); }
-  50%      { filter: drop-shadow(0 0 20px rgba(108,92,231,.6)); }
+
+/* ============================================================
+ * 2) ANIMATION CLASSES — ورود
+ * ============================================================ */
+
+.anim-fade-in      { animation: fadeIn 0.4s var(--ease, cubic-bezier(0.4, 0, 0.2, 1)) both; }
+.anim-slide-up     { animation: slideUp 0.5s var(--ease, cubic-bezier(0.4, 0, 0.2, 1)) both; }
+.anim-slide-down   { animation: slideDown 0.5s var(--ease, cubic-bezier(0.4, 0, 0.2, 1)) both; }
+.anim-slide-left   { animation: slideInLeft 0.5s var(--ease, cubic-bezier(0.4, 0, 0.2, 1)) both; }
+.anim-slide-right  { animation: slideInRight 0.5s var(--ease, cubic-bezier(0.4, 0, 0.2, 1)) both; }
+.anim-scale-in     { animation: scaleIn 0.4s var(--ease, cubic-bezier(0.4, 0, 0.2, 1)) both; }
+.anim-pop-in       { animation: popIn 0.5s var(--bounce, cubic-bezier(0.34, 1.56, 0.64, 1)) both; }
+.anim-card-in      { animation: cardIn 0.5s var(--ease, cubic-bezier(0.4, 0, 0.2, 1)) both; }
+.anim-avatar-pop   { animation: avatarPop 0.6s var(--bounce, cubic-bezier(0.34, 1.56, 0.64, 1)) both; }
+.anim-logo-pop     { animation: logoPop 0.6s var(--bounce, cubic-bezier(0.34, 1.56, 0.64, 1)) both; }
+
+
+/* ============================================================
+ * 3) ANIMATION CLASSES — تکرارشونده
+ * ============================================================ */
+
+.anim-spin         { animation: spin 1s linear infinite; }
+.anim-rotate       { animation: rotate 2s linear infinite; }
+.anim-rotate-slow  { animation: slowRotate 30s linear infinite; }
+.anim-pulse        { animation: pulse 2s ease-in-out infinite; }
+.anim-heartbeat    { animation: heartbeat 1.8s ease-in-out infinite; }
+.anim-wave         { animation: wave 2s ease-in-out infinite; }
+.anim-glow         { animation: glow 3s ease-in-out infinite; }
+.anim-bounce       { animation: bounce 2s ease-in-out infinite; }
+.anim-float        { animation: float 4s ease-in-out infinite; }
+.anim-sparkle      { animation: sparkle 2.5s ease-in-out infinite; }
+.anim-badge-pulse  { animation: badgePulse 2s ease-in-out infinite; }
+.anim-hero-float   { animation: heroFloat 4s ease-in-out infinite; }
+
+
+/* ============================================================
+ * 4) ANIMATION CLASSES — توجه
+ * ============================================================ */
+
+.anim-shake {
+  animation: shake 0.4s var(--ease, cubic-bezier(0.4, 0, 0.2, 1));
 }
 
-.logo { animation: wave 3s ease-in-out infinite, glow 2s ease-in-out infinite; }
-
-/* اسکرول‌بار ملایم */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+.anim-pop-in-quick {
+  animation: popIn 0.3s var(--bounce, cubic-bezier(0.34, 1.56, 0.64, 1)) both;
 }
 
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 10px;
-  transition: background .2s;
+.anim-check {
+  animation: checkPop 0.5s var(--bounce, cubic-bezier(0.34, 1.56, 0.64, 1)) both;
 }
 
-::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
-/* احترام به prefers-reduced-motion */
+/* ============================================================
+ * 5) DELAY UTILITIES
+ * ============================================================ */
+
+.delay-1 { animation-delay: 0.05s; }
+.delay-2 { animation-delay: 0.10s; }
+.delay-3 { animation-delay: 0.15s; }
+.delay-4 { animation-delay: 0.20s; }
+.delay-5 { animation-delay: 0.25s; }
+.delay-6 { animation-delay: 0.30s; }
+.delay-7 { animation-delay: 0.35s; }
+.delay-8 { animation-delay: 0.40s; }
+.delay-9 { animation-delay: 0.45s; }
+.delay-10 { animation-delay: 0.50s; }
+
+
+/* ============================================================
+ * 6) DURATION UTILITIES
+ * ============================================================ */
+
+.duration-fast   { animation-duration: 0.2s; }
+.duration-normal { animation-duration: 0.4s; }
+.duration-slow   { animation-duration: 0.7s; }
+.duration-slower { animation-duration: 1s; }
+.duration-slowest { animation-duration: 1.5s; }
+
+
+/* ============================================================
+ * 7) MICRO-INTERACTIONS — Hover
+ * ============================================================ */
+
+.hover-lift {
+  transition: transform 0.2s var(--ease, cubic-bezier(0.4, 0, 0.2, 1)),
+              box-shadow 0.2s var(--ease, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.hover-lift:hover {
+  transform: translateY(-3px);
+}
+
+.hover-scale {
+  transition: transform 0.2s var(--ease, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.hover-scale:hover {
+  transform: scale(1.04);
+}
+
+.hover-rotate {
+  transition: transform 0.3s var(--ease, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.hover-rotate:hover {
+  transform: rotate(-6deg) scale(1.05);
+}
+
+.hover-glow {
+  transition: box-shadow 0.3s var(--ease, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.hover-glow:hover {
+  box-shadow: 0 10px 30px rgba(108, 92, 231, 0.28);
+}
+
+html.dark .hover-glow:hover {
+  box-shadow: 0 10px 30px rgba(162, 155, 254, 0.35);
+}
+
+
+/* ============================================================
+ * 8) MICRO-INTERACTIONS — Active
+ * ============================================================ */
+
+.press:active {
+  transform: scale(0.97);
+  transition: transform 0.1s var(--ease, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.press-strong:active {
+  transform: scale(0.94);
+}
+
+
+/* ============================================================
+ * 9) BUTTON RIPPLE (بدون JS)
+ * ============================================================ */
+
+.btn-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-ripple::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.btn-ripple:active::after {
+  animation: ripple 0.6s var(--ease, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+
+/* ============================================================
+ * 10) CARD HOVER (کارت‌های آزمون)
+ * ============================================================ */
+
+.card-anim {
+  transition: transform 0.25s var(--ease, cubic-bezier(0.4, 0, 0.2, 1)),
+              box-shadow 0.25s var(--ease, cubic-bezier(0.4, 0, 0.2, 1)),
+              border-color 0.25s var(--ease, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.card-anim:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(108, 92, 231, 0.15);
+  border-color: rgba(108, 92, 231, 0.25);
+}
+
+html.dark .card-anim:hover {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  border-color: rgba(162, 155, 254, 0.25);
+}
+
+/* نوار رنگی بالای کارت — فقط روی hover */
+.card-anim::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #6C5CE7, #00CEC9);
+  opacity: 0;
+  transition: opacity 0.3s var(--ease, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.card-anim:hover::before {
+  opacity: 1;
+}
+
+
+/* ============================================================
+ * 11) PROGRESS BAR SHINE
+ * ============================================================ */
+
+.progress-anim {
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-anim::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  animation: progressShine 1.8s linear infinite;
+}
+
+/* در حالت reduced-motion، خاموش */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: .01ms !important;
+  .progress-anim::after { display: none; }
+}
+
+
+/* ============================================================
+ * 12) SKELETON SHIMMER
+ * ============================================================ */
+
+.skeleton-anim {
+  background: linear-gradient(
+    90deg,
+    var(--input-bg, #F8F7FF) 25%,
+    var(--input-border, #E5E0FF) 50%,
+    var(--input-bg, #F8F7FF) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeletonLoad 1.5s ease-in-out infinite;
+}
+
+
+/* ============================================================
+ * 13) LOADING DOTS
+ * ============================================================ */
+
+.loading-dots-anim {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.loading-dots-anim span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: dotPulse 1.4s ease-in-out infinite;
+}
+
+.loading-dots-anim span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots-anim span:nth-child(3) { animation-delay: 0.4s; }
+
+
+/* ============================================================
+ * 14) TOAST ANIMATIONS
+ * ============================================================ */
+
+.toast-anim-in {
+  animation: toastIn 0.35s var(--bounce, cubic-bezier(0.34, 1.56, 0.64, 1)) both;
+}
+
+.toast-anim-out {
+  animation: toastOut 0.25s var(--ease, cubic-bezier(0.4, 0, 0.2, 1)) forwards;
+}
+
+
+/* ============================================================
+ * 15) MODAL ANIMATIONS
+ * ============================================================ */
+
+.modal-anim-in {
+  animation: modalIn 0.35s var(--bounce, cubic-bezier(0.34, 1.56, 0.64, 1)) both;
+}
+
+.modal-backdrop-in {
+  animation: backdropIn 0.2s var(--ease, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+
+/* ============================================================
+ * 16) TRANSITION UTILITIES
+ * ============================================================ */
+
+.transition-all {
+  transition: all 0.2s var(--ease, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.transition-colors {
+  transition: color 0.2s var(--ease, cubic-bezier(0.4, 0, 0.2, 1)),
+              background-color 0.2s var(--ease, cubic-bezier(0.4, 0, 0.2, 1)),
+              border-color 0.2s var(--ease, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.transition-transform {
+  transition: transform 0.2s var(--ease, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.transition-opacity {
+  transition: opacity 0.3s var(--ease, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.transition-shadow {
+  transition: box-shadow 0.3s var(--ease, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+
+/* ============================================================
+ * 17) SPECIAL — Top Bar / Nav
+ * ============================================================ */
+
+.top-bar-anim {
+  animation: slideDown 0.5s var(--ease, cubic-bezier(0.4, 0, 0.2, 1)) both;
+}
+
+.section-anim {
+  animation: slideUp 0.6s var(--ease, cubic-bezier(0.4, 0, 0.2, 1)) both;
+}
+
+
+/* ============================================================
+ * 18) SPECIAL — Hero
+ * ============================================================ */
+
+.hero-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-shine::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #6C5CE7, #00CEC9, #FD79A8, #6C5CE7);
+  background-size: 200% 100%;
+  animation: shimmer 8s linear infinite;
+}
+
+.hero-gradient-text {
+  background: linear-gradient(135deg, #6C5CE7 0%, #00CEC9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+html.dark .hero-gradient-text {
+  background: linear-gradient(135deg, #A29BFE 0%, #00CEC9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+
+/* ============================================================
+ * 19) SPECIAL — Icon Buttons
+ * ============================================================ */
+
+.icon-btn-anim {
+  transition: transform 0.2s var(--ease, cubic-bezier(0.4, 0, 0.2, 1)),
+              box-shadow 0.2s var(--ease, cubic-bezier(0.4, 0, 0.2, 1)),
+              border-color 0.2s var(--ease, cubic-bezier(0.4, 0, 0.2, 1)),
+              color 0.2s var(--ease, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.icon-btn-anim:hover {
+  transform: translateY(-2px);
+}
+
+.icon-btn-anim:active {
+  transform: scale(0.94);
+}
+
+
+/* ============================================================
+ * 20) SPECIAL — Avatar
+ * ============================================================ */
+
+.avatar-anim {
+  transition: background 0.4s var(--ease, cubic-bezier(0.4, 0, 0.2, 1)),
+              transform 0.3s var(--bounce, cubic-bezier(0.34, 1.56, 0.64, 1)),
+              box-shadow 0.3s var(--ease, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.avatar-anim:hover {
+  transform: scale(1.08) rotate(3deg);
+}
+
+.avatar-ring {
+  position: relative;
+}
+
+.avatar-ring::after {
+  content: '';
+  position: absolute;
+  inset: -10px;
+  border-radius: inherit;
+  border: 1.5px dashed rgba(108, 92, 231, 0.25);
+  animation: slowRotate 30s linear infinite;
+  pointer-events: none;
+}
+
+html.dark .avatar-ring::after {
+  border-color: rgba(162, 155, 254, 0.3);
+}
+
+.avatar-glow {
+  position: relative;
+}
+
+.avatar-glow::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #6C5CE7, #00CEC9, #FD79A8);
+  opacity: 0.4;
+  z-index: -1;
+  animation: glow 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+
+/* ============================================================
+ * 21) SPECIAL — Logo
+ * ============================================================ */
+
+.logo-anim {
+  animation: logoPop 0.6s var(--bounce, cubic-bezier(0.34, 1.56, 0.64, 1)) both;
+}
+
+.logo-icon-anim {
+  animation: bounce 3s ease-in-out infinite;
+}
+
+
+/* ============================================================
+ * 22) SPECIAL — Badge Dot
+ * ============================================================ */
+
+.badge-dot-anim {
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+
+/* ============================================================
+ * 23) SPECIAL — Suggestion Chips
+ * ============================================================ */
+
+.chip-anim {
+  transition: transform 0.2s var(--ease, cubic-bezier(0.4, 0, 0.2, 1)),
+              border-color 0.2s var(--ease, cubic-bezier(0.4, 0, 0.2, 1)),
+              color 0.2s var(--ease, cubic-bezier(0.4, 0, 0.2, 1)),
+              box-shadow 0.2s var(--ease, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.chip-anim:hover {
+  transform: translateY(-2px);
+}
+
+.chip-anim:active {
+  transform: scale(0.95);
+}
+
+
+/* ============================================================
+ * 24) SPECIAL — Number Counters
+ * ============================================================ */
+
+.number-anim {
+  font-variant-numeric: tabular-nums;
+  transition: color 0.3s var(--ease, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+
+/* ============================================================
+ * 25) SPECIAL — Progress in Cards
+ * ============================================================ */
+
+.progress-fill-anim {
+  transition: width 0.4s var(--ease, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+
+/* ============================================================
+ * 26) PAGE LOADER
+ * ============================================================ */
+
+.page-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--bg-1, #EEF0FF);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.4s var(--ease, cubic-bezier(0.4, 0, 0.2, 1)),
+              visibility 0.4s var(--ease, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+html.dark .page-loader {
+  background: #0F0C24;
+}
+
+.page-loader.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.page-loader-spinner {
+  width: 44px;
+  height: 44px;
+  border: 3.5px solid var(--input-border, #E5E0FF);
+  border-top-color: var(--brand-1, #6C5CE7);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+
+/* ============================================================
+ * 27) TRANSITION HELPERS
+ * ============================================================ */
+
+.fade-enter {
+  opacity: 0;
+  transition: opacity 0.3s var(--ease, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.fade-enter.active {
+  opacity: 1;
+}
+
+
+/* ============================================================
+ * 28) REDUCED MOTION — خاموش کردن همه
+ * ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: .01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* حذف انیمیشن‌های تزئینی */
+  .anim-spin,
+  .anim-rotate,
+  .anim-rotate-slow,
+  .anim-pulse,
+  .anim-heartbeat,
+  .anim-wave,
+  .anim-glow,
+  .anim-bounce,
+  .anim-float,
+  .anim-sparkle,
+  .anim-badge-pulse,
+  .anim-hero-float,
+  .hero-shine::before,
+  .avatar-ring::after,
+  .avatar-glow::before,
+  .page-loader-spinner {
+    animation: none !important;
+  }
+
+  /* فقط skeleton و spinner بمونن (لودینگ ضروریه) */
+  .skeleton-anim {
+    animation: skeletonLoad 2s ease-in-out infinite !important;
+  }
+
+  .loading-dots-anim span {
+    animation: dotPulse 2s ease-in-out infinite !important;
   }
 }
+
+
+/* ============================================================
+ * 29) HTML.reduced-motion (از a11y.js)
+ * ============================================================ */
+
+html.reduced-motion *,
+html.reduced-motion *::before,
+html.reduced-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+html.reduced-motion .anim-spin,
+html.reduced-motion .anim-pulse,
+html.reduced-motion .anim-bounce,
+html.reduced-motion .anim-float,
+html.reduced-motion .anim-glow {
+  animation: none !important;
+}
+
+
+/* ============================================================
+ * 30) PRINT — خاموش کردن همه
+ * ============================================================ */
+
+@media print {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .page-loader,
+  .toast-container,
+  .modal-overlay {
+    display: none !important;
+  }
+}
+
+
+/* ============================================================
+ * پایان — طراحی: فاطمه جوادی
+ * ============================================================ */
