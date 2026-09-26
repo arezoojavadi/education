@@ -1,97 +1,1429 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="مشاهده پاسخ‌ها — سامانه آزمون فاطمه جوادی">
+<meta name="author" content="فاطمه جوادی">
+<meta name="theme-color" content="#6C5CE7" id="themeMeta">
+<meta name="color-scheme" content="light dark">
+
+<title>مشاهده پاسخ‌ها | سامانه آزمون فاطمه جوادی</title>
+
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#6C5CE7">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="آزمون">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/components.css">
-<link rel="stylesheet" href="css/animations.css">
-<link rel="stylesheet" href="css/skeletons.css">
-<link rel="stylesheet" href="css/print.css" media="print">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#6C5CE7">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="آزمون">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>مشاهده پاسخ‌ها</title>
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/components.css">
+<style>
+/* ============================================================
+   RESET
+============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ============================================================
+   TOKENS — LIGHT
+============================================================ */
+:root {
+  --brand-1: #6C5CE7;
+  --brand-2: #8E7CFF;
+  --brand-3: #00CEC9;
+  --brand-4: #FD79A8;
+  --brand-5: #FDCB6E;
+  --success: #00B894;
+  --danger:  #FF6B6B;
+
+  --bg-1: #EEF0FF;
+  --bg-2: #F5F0FF;
+  --bg-3: #FFF0F8;
+
+  --card-bg: #FFFFFF;
+  --card-border: rgba(108, 92, 231, 0.08);
+
+  --text-1: #1E1B3A;
+  --text-2: #6B6789;
+  --text-3: #A5A0C0;
+
+  --input-bg: #F8F7FF;
+  --input-border: #E5E0FF;
+
+  --shadow-sm: 0 2px 8px rgba(108, 92, 231, 0.06);
+  --shadow-md: 0 6px 24px rgba(108, 92, 231, 0.10);
+  --shadow-lg: 0 12px 40px rgba(108, 92, 231, 0.15);
+  --shadow-btn: 0 6px 18px rgba(108, 92, 231, 0.28);
+
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+}
+
+/* ============================================================
+   TOKENS — DARK
+============================================================ */
+html.dark {
+  --bg-1: #0F0C24;
+  --bg-2: #14102E;
+  --bg-3: #1A1030;
+
+  --card-bg: #1A1638;
+  --card-border: rgba(162, 155, 254, 0.12);
+
+  --text-1: #F2F0FF;
+  --text-2: #A5A0C0;
+  --text-3: #6B6789;
+
+  --input-bg: #14102E;
+  --input-border: #2A2456;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.5);
+  --shadow-btn: 0 6px 18px rgba(108, 92, 231, 0.4);
+}
+
+/* ============================================================
+   BASE
+============================================================ */
+html, body {
+  min-height: 100%;
+}
+
+body {
+  font-family: 'Vazirmatn', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 50%, var(--bg-3) 100%);
+  background-attachment: fixed;
+  color: var(--text-1);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background 0.4s var(--ease), color 0.4s var(--ease);
+}
+
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+input, select { font-family: inherit; }
+
+/* ============================================================
+   BACKGROUND DECOR
+============================================================ */
+.bg-decor {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bg-decor::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='2' cy='2' r='1' fill='%236C5CE7' opacity='0.35'/></svg>");
+  background-size: 32px 32px;
+  opacity: 0.3;
+  mask-image: radial-gradient(ellipse at top, #000 10%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse at top, #000 10%, transparent 70%);
+}
+
+html.dark .bg-decor::before {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='2' cy='2' r='1' fill='%23A29BFE' opacity='0.5'/></svg>");
+  opacity: 0.45;
+}
+
+.bg-decor::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(108, 92, 231, 0.1) 0%, transparent 35%),
+    radial-gradient(circle at 85% 85%, rgba(0, 206, 201, 0.08) 0%, transparent 35%);
+}
+
+html.dark .bg-decor::after {
+  background:
+    radial-gradient(circle at 15% 15%, rgba(162, 155, 254, 0.13) 0%, transparent 35%),
+    radial-gradient(circle at 85% 85%, rgba(0, 206, 201, 0.1) 0%, transparent 35%);
+}
+
+/* ============================================================
+   TOP BAR
+============================================================ */
+.top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--card-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-sm);
+}
+
+.top-bar-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 14px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.top-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.back-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-1);
+  transition: all 0.2s var(--ease);
+  flex-shrink: 0;
+}
+
+.back-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--brand-1);
+  color: var(--brand-1);
+}
+
+html.dark .back-btn:hover {
+  border-color: var(--brand-2);
+  color: var(--brand-2);
+}
+
+.back-btn:active { transform: scale(0.94); }
+
+.back-btn svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  line-height: 1.2;
+  min-width: 0;
+}
+
+.brand-title {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--text-1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 220px;
+}
+
+.brand-sub {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-3);
+  letter-spacing: 0.3px;
+}
+
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px 6px 6px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-lg);
+  transition: all 0.2s var(--ease);
+}
+
+.user-chip:hover { border-color: var(--brand-1); }
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  line-height: 1.2;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-1);
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-role {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--brand-1);
+}
+
+html.dark .user-role { color: var(--brand-2); }
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6C5CE7 0%, #8E7CFF 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(108, 92, 231, 0.25);
+  user-select: none;
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-1);
+  transition: all 0.2s var(--ease);
+  flex-shrink: 0;
+}
+
+.icon-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--brand-1);
+  color: var(--brand-1);
+}
+
+html.dark .icon-btn:hover {
+  border-color: var(--brand-2);
+  color: var(--brand-2);
+}
+
+.icon-btn:active { transform: scale(0.94); }
+
+.icon-btn svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.icon-wrap {
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+
+.icon-wrap svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.25s, transform 0.35s var(--ease);
+}
+
+.icon-sun  { opacity: 1; transform: rotate(0) scale(1); }
+.icon-moon { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+
+html.dark .icon-sun  { opacity: 0; transform: rotate(90deg) scale(0.5); }
+html.dark .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
+
+/* ============================================================
+   MAIN
+============================================================ */
+.main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+}
+
+/* ============================================================
+   EXAM HEADER
+============================================================ */
+.exam-header {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-xl);
+  padding: 24px 26px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.exam-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #6C5CE7, #00CEC9, #FD79A8, #6C5CE7);
+  background-size: 200% 100%;
+  animation: shimmer 8s linear infinite;
+}
+
+@keyframes shimmer { to { background-position: 200% 0; } }
+
+.exam-header-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.exam-header-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #6C5CE7, #8E7CFF);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 8px 20px rgba(108, 92, 231, 0.28);
+}
+
+.exam-header-icon svg {
+  width: 26px;
+  height: 26px;
+  stroke: #fff;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.exam-header-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.exam-header-title {
+  font-size: 19px;
+  font-weight: 900;
+  color: var(--text-1);
+  line-height: 1.3;
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+
+.exam-header-meta {
+  font-size: 12.5px;
+  color: var(--text-2);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* ============================================================
+   TOOLBAR
+============================================================ */
+.toolbar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.search-wrap {
+  flex: 1;
+  min-width: 200px;
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  stroke: var(--text-3);
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 44px 12px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--card-bg);
+  border: 2px solid var(--input-border);
+  border-radius: var(--radius-md);
+  color: var(--text-1);
+  outline: none;
+  transition: all 0.2s var(--ease);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.search-input::placeholder {
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+.search-input:focus {
+  border-color: var(--brand-1);
+  box-shadow: 0 6px 16px rgba(108, 92, 231, 0.15);
+}
+
+html.dark .search-input:focus {
+  border-color: var(--brand-2);
+  box-shadow: 0 6px 16px rgba(162, 155, 254, 0.25);
+}
+
+.select-wrap {
+  position: relative;
+  min-width: 160px;
+}
+
+.sort-select {
+  width: 100%;
+  padding: 12px 40px 12px 16px;
+  font-size: 13.5px;
+  font-weight: 700;
+  background: var(--card-bg);
+  border: 2px solid var(--input-border);
+  border-radius: var(--radius-md);
+  color: var(--text-1);
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.sort-select:focus {
+  border-color: var(--brand-1);
+  box-shadow: 0 6px 16px rgba(108, 92, 231, 0.15);
+}
+
+html.dark .sort-select:focus {
+  border-color: var(--brand-2);
+}
+
+.select-wrap::after {
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B6789' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+html.dark .select-wrap::after {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A5A0C0' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+}
+
+.btn-export {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, #00B894 0%, #55EFC4 100%);
+  border-radius: var(--radius-md);
+  box-shadow: 0 6px 18px rgba(0, 184, 148, 0.28);
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+  min-height: 46px;
+}
+
+.btn-export:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(0, 184, 148, 0.42);
+}
+
+.btn-export:active { transform: translateY(0) scale(0.97); }
+
+.btn-export svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ============================================================
+   INFO STRIP
+============================================================ */
+.info-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  margin-bottom: 16px;
+  font-size: 12.5px;
+  color: var(--text-2);
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+}
+
+.info-strip svg {
+  width: 16px;
+  height: 16px;
+  stroke: var(--brand-1);
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+html.dark .info-strip svg { stroke: var(--brand-2); }
+
+.info-strip b {
+  color: var(--text-1);
+  font-weight: 900;
+  margin: 0 4px;
+}
+
+/* ============================================================
+   SUBMISSIONS LIST
+============================================================ */
+.submissions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.submission-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease), border-color 0.2s var(--ease);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+  animation: cardIn 0.4s var(--ease) both;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.submission-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, #6C5CE7, #00CEC9);
+  opacity: 0;
+  transition: opacity 0.3s var(--ease);
+}
+
+.submission-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(108, 92, 231, 0.25);
+}
+
+.submission-card:hover::before { opacity: 1; }
+
+.submission-card:active { transform: translateY(-1px) scale(0.99); }
+
+.submission-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #6C5CE7, #8E7CFF);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 17px;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+  box-shadow: 0 6px 16px rgba(108, 92, 231, 0.28);
+  user-select: none;
+}
+
+.submission-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.submission-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-1);
+  line-height: 1.4;
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.submission-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--text-2);
+  font-weight: 600;
+}
+
+.submission-code {
+  font-family: 'Vazirmatn', monospace;
+  letter-spacing: 1.5px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  color: var(--brand-1);
+}
+
+html.dark .submission-code { color: var(--brand-2); }
+
+.meta-dot {
+  color: var(--text-3);
+  font-weight: 900;
+}
+
+.submission-stats {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.submission-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.submission-stat svg {
+  width: 11px;
+  height: 11px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.submission-arrow {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--input-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s var(--ease);
+}
+
+.submission-card:hover .submission-arrow {
+  background: var(--brand-1);
+  color: #fff;
+}
+
+.submission-arrow svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ============================================================
+   DETAIL VIEW
+============================================================ */
+.detail-header {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow-sm);
+  animation: cardIn 0.4s var(--ease) both;
+}
+
+.detail-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #6C5CE7, #8E7CFF);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 24px;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+  box-shadow: 0 8px 20px rgba(108, 92, 231, 0.32);
+  user-select: none;
+}
+
+.detail-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.detail-name {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--text-1);
+  line-height: 1.3;
+  margin-bottom: 6px;
+  word-break: break-word;
+}
+
+.detail-meta {
+  font-size: 12.5px;
+  color: var(--text-2);
+  font-weight: 600;
+  line-height: 1.7;
+}
+
+/* ============================================================
+   ANSWERS LIST
+============================================================ */
+.answers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.answer-item {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+  animation: cardIn 0.4s var(--ease) both;
+  transition: box-shadow 0.2s var(--ease);
+}
+
+.answer-item:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.answer-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.answer-number {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #6C5CE7, #8E7CFF);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 13px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(108, 92, 231, 0.28);
+  user-select: none;
+}
+
+.answer-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.answer-label-text {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-1);
+  line-height: 1.5;
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+
+.answer-type {
+  display: inline-flex;
+  padding: 3px 9px;
+  background: rgba(108, 92, 231, 0.1);
+  border: 1px solid rgba(108, 92, 231, 0.2);
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 800;
+  color: var(--brand-1);
+}
+
+html.dark .answer-type {
+  background: rgba(162, 155, 254, 0.15);
+  border-color: rgba(162, 155, 254, 0.25);
+  color: var(--brand-2);
+}
+
+.answer-value {
+  padding: 12px 14px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text-1);
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-weight: 500;
+}
+
+.answer-value.empty {
+  color: var(--text-3);
+  font-style: italic;
+  font-weight: 600;
+}
+
+/* ============================================================
+   NAVIGATION (Prev / Next)
+============================================================ */
+.detail-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-1);
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-md);
+  transition: all 0.2s var(--ease);
+  min-height: 42px;
+}
+
+.nav-btn:hover:not(:disabled) {
+  border-color: var(--brand-1);
+  color: var(--brand-1);
+  transform: translateY(-1px);
+}
+
+html.dark .nav-btn:hover:not(:disabled) {
+  border-color: var(--brand-2);
+  color: var(--brand-2);
+}
+
+.nav-btn:active:not(:disabled) { transform: scale(0.97); }
+
+.nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.nav-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.position-text {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-2);
+  padding: 0 12px;
+  text-align: center;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   EMPTY / LOADING
+============================================================ */
+.empty-state {
+  text-align: center;
+  padding: 56px 20px;
+  color: var(--text-2);
+  background: var(--card-bg);
+  border: 1px dashed var(--input-border);
+  border-radius: var(--radius-lg);
+}
+
+.empty-icon {
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 18px;
+  border-radius: var(--radius-xl);
+  background: var(--input-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-icon svg {
+  width: 36px;
+  height: 36px;
+  stroke: var(--brand-1);
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+html.dark .empty-icon svg { stroke: var(--brand-2); }
+
+.empty-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-1);
+  margin-bottom: 6px;
+}
+
+.empty-text {
+  font-size: 13px;
+  color: var(--text-2);
+  max-width: 340px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 80px 20px;
+  color: var(--text-2);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3.5px solid var(--input-border);
+  border-top-color: var(--brand-1);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============================================================
+   FOOTER
+============================================================ */
+.footer {
+  text-align: center;
+  padding: 24px 20px;
+  font-size: 11.5px;
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+.footer .heart {
+  display: inline-block;
+  color: #FD79A8;
+  animation: heartbeat 1.8s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+/* ============================================================
+   TOAST
+============================================================ */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 9000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+  max-width: 360px;
+}
+
+.toast {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  padding: 13px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-1);
+  box-shadow: var(--shadow-lg);
+  border-right: 4px solid var(--brand-1);
+  animation: toastIn 0.35s var(--bounce) both;
+  pointer-events: auto;
+  line-height: 1.5;
+}
+
+.toast.success { border-right-color: var(--success); }
+.toast.error   { border-right-color: var(--danger); }
+.toast.removing { animation: toastOut 0.25s var(--ease) forwards; }
+
+@keyframes toastIn {
+  0% { opacity: 0; transform: translateX(-30px) scale(0.95); }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes toastOut {
+  to { opacity: 0; transform: translateX(-30px) scale(0.95); }
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 720px) {
+  .top-bar-inner { padding: 12px 16px; }
+  .main { padding: 20px 16px 48px; }
+  .exam-header { padding: 20px 22px; }
+  .brand-title { max-width: 160px; }
+}
+
+@media (max-width: 600px) {
+  .user-info { display: none; }
+  .user-chip { padding: 4px; }
+  .brand-title { max-width: 130px; }
+
+  .exam-header-content { gap: 12px; }
+  .exam-header-icon { width: 44px; height: 44px; border-radius: 14px; }
+  .exam-header-icon svg { width: 22px; height: 22px; }
+  .exam-header-title { font-size: 16px; }
+
+  .toolbar { gap: 8px; }
+  .select-wrap { min-width: 100%; }
+  .btn-export { width: 100%; justify-content: center; }
+
+  .submission-card { padding: 16px; gap: 12px; flex-wrap: wrap; }
+  .submission-avatar { width: 42px; height: 42px; font-size: 15px; border-radius: 12px; }
+  .submission-name { font-size: 14px; }
+  .submission-stats { width: 100%; padding-top: 4px; }
+  .submission-arrow { display: none; }
+
+  .detail-header { padding: 18px; gap: 12px; }
+  .detail-avatar { width: 54px; height: 54px; font-size: 20px; border-radius: 16px; }
+  .detail-name { font-size: 17px; }
+
+  .answer-item { padding: 16px; }
+  .answer-label-text { font-size: 13px; }
+  .answer-value { font-size: 13px; }
+
+  .detail-nav { padding: 12px; }
+  .nav-btn { padding: 9px 12px; font-size: 12px; }
+  .position-text { font-size: 12px; padding: 0 6px; }
+}
+
+@media (max-width: 400px) {
+  .brand-title { display: none; }
+  .brand-sub { font-size: 10px; }
+
+  .nav-btn span { display: none; }
+  .nav-btn { padding: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .exam-header::before { animation: none; }
+}
+</style>
 </head>
 <body>
 
-  <header class="app-header">
-    <div style="display:flex; align-items:center; gap:12px;">
-      <a href="teacher.html" class="btn-icon" title="بازگشت">←</a>
-      <h2 id="pageTitle">مشاهده پاسخ‌ها</h2>
-    </div>
-    <div class="user-info">
-      <button class="btn-icon" onclick="toggleTheme()" title="تغییر تم">
-        <span id="themeIcon">🌙</span>
+<div class="bg-decor" aria-hidden="true"></div>
+
+<!-- ============ TOP BAR ============ -->
+<header class="top-bar">
+  <div class="top-bar-inner">
+
+    <div class="top-bar-left">
+      <button class="back-btn" id="backToList" type="button" title="بازگشت به پنل" aria-label="بازگشت">
+        <svg viewBox="0 0 24 24">
+          <line x1="19" y1="12" x2="5" y2="12"/>
+          <polyline points="12 19 5 12 12 5"/>
+        </svg>
       </button>
-      <button class="btn-icon" onclick="logout()" title="خروج">🚪</button>
-    </div>
-  </header>
 
-  <main class="container">
-
-    <div id="loading" class="loading">
-      <div class="spinner"></div>
-      در حال بارگذاری...
-    </div>
-
-    <!-- لیست دانش‌آموزان -->
-    <div id="studentsList" style="display:none;">
-      <h3 class="section-title" id="examTitle">—</h3>
-      <input type="text" class="form-input" id="searchInput" 
-             placeholder="🔍 جستجوی نام دانش‌آموز..." 
-             style="margin-bottom:20px;">
-      <div id="submissionsList"></div>
-    </div>
-
-    <!-- پاسخ‌های یک دانش‌آموز -->
-    <div id="detailView" style="display:none;">
-      <div class="card" style="margin-bottom:20px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-          <div>
-            <h3 id="studentName" style="margin-bottom:6px;">—</h3>
-            <div style="color:var(--text-muted); font-size:13px;" id="submitMeta">—</div>
-          </div>
-          <button class="btn btn-secondary btn-sm" onclick="backToList()">
-            ← بازگشت به لیست
-          </button>
+      <div class="brand">
+        <div class="brand-text">
+          <span class="brand-title" id="pageTitle">مشاهده پاسخ‌ها</span>
+          <span class="brand-sub">سامانه آزمون — فاطمه جوادی</span>
         </div>
       </div>
-
-      <div id="answersContainer"></div>
     </div>
 
-  </main>
+    <div class="top-actions">
+      <button class="icon-btn" id="themeBtn" type="button" title="تغییر حالت" aria-label="تغییر تم">
+        <span class="icon-wrap">
+          <svg class="icon-sun" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+          </svg>
+          <svg class="icon-moon" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </span>
+      </button>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/utils.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/view.js"></script>
-</body>
+      <div class="user-chip">
+        <div class="user-info">
+          <span class="user-name" id="userName">—</span>
+          <span class="user-role">معلم</span>
+        </div>
+        <div class="user-avatar" id="userAvatar">؟</div>
+      </div>
+
+      <button class="icon-btn" id="logoutBtn" type="button" title="خروج" aria-label="خروج">
+        <svg viewBox="0 0 24 24">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
+    </div>
+
+  </div>
+</header>
+
+<!-- ============ MAIN ============ -->
+<main class="main">
+
+  <!-- Loading -->
+  <div id="loading" class="loading-state">
+    <div class="loading-spinner"></div>
+    <span>در حال بارگذاری...</span>
+  </div>
+
+  <!-- ============ STUDENTS VIEW ============ -->
+  <div id="studentsView" style="display:none;">
+
+    <!-- Exam Header -->
+    <div class="exam-header">
+      <div class="exam-header-content">
+        <div class="exam-header-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <path d="M14 2v6h6"/>
+            <path d="M9 15l2 2 4-4"/>
+          </svg>
+        </div>
+        <div class="exam-header-text">
+          <h1 class="exam-header-title" id="examTitle">—</h1>
+          <div class="exam-header-meta" id="examMeta">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info Strip -->
+    <div class="info-strip">
+      <svg viewBox="0 0 24 24">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      <span>مجموع <b id="totalCount">۰</b> دانش‌آموز شرکت کرده‌اند</span>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input
+          type="text"
+          class="search-input"
+          id="searchInput"
+          placeholder="جستجوی نام یا کد دانش‌آموز..."
+          autocomplete="off"
+        >
+      </div>
+
+      <div class="select-wrap">
+        <select class="sort-select" id="sortSelect">
+          <option value="date-desc">جدیدترین</option>
+          <option value="date-asc">قدیمی‌ترین</option>
+          <option value="name">نام (الفبا)</option>
+          <option value="duration-desc">طولانی‌ترین مدت</option>
+        </select>
+      </div>
+
+      <button class="btn-export" id="exportBtn" type="button">
+        <svg viewBox="0 0 24 24">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        <span>خروجی CSV</span>
+      </button>
+    </div>
+
+    <!-- Submissions List -->
+    <div class="submissions-list" id="submissionsList">
+      <!-- JS fills -->
+    </div>
+
+  </div>
+
+  <!-- ============ DETAIL VIEW ============ -->
+  <div id="detailView" style="display:none;">
+
+    <!-- Detail Header -->
+    <div class="detail-header">
+      <div class="detail-avatar" id="detailAvatar">؟</div>
+      <div class="detail-info">
+        <h2 class="detail-name" id="detailName">—</h2>
+        <div class="detail-meta" id="detailMeta">—</div>
+      </div>
+    </div>
+
+    <!-- Answers -->
+    <div class="answers-list" id="answersList">
+      <!-- JS fills -->
+    </div>
+
+    <!-- Navigation -->
+    <div class="detail-nav">
+      <button class="nav-btn" id="nextBtn" type="button">
+        <svg viewBox="0 0 24 24">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        <span>بعدی</span>
+      </button>
+
+      <span class="position-text" id="positionText">—</span>
+
+      <button class="nav-btn" id="prevBtn" type="button">
+        <svg viewBox="0 0 24 24">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+        <span>قبلی</span>
+      </button>
+    </div>
+
+  </div>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  ساخته شده با <span class="heart">♥</span> برای یادگیری بهتر — طراحی: فاطمه جوادی
+</footer>
+
+<!-- ============ TOASTS ============ -->
+<div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+<!-- ============ SCRIPTS ============ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/utils.js"></script>
-<script src="js/errors.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/a11y.js"></script>
-<!-- اسکریپت مخصوص صفحه -->
+<script src="js/view.js"></script>
+</body>
 </html>
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<button class="btn btn-secondary" onclick="exportAll()">
-  ⬇ خروجی CSV
-</button>
-<script src="js/a11y.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', initAccessibility);
-</script>
