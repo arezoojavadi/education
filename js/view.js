@@ -1298,7 +1298,18 @@
     }
 
     if (el.exportBtn) el.exportBtn.addEventListener('click', exportCSV);
-    if (el.backToList) el.backToList.addEventListener('click', backToList);
+        /* 🆕 دکمه‌ی برگشت — هوشمند */
+    if (el.backToList) {
+      el.backToList.addEventListener('click', function () {
+        if (state.view === 'detail') {
+          /* توی جزئیات هستیم → برگرد به لیست */
+          backToList();
+        } else {
+          /* توی لیست هستیم → برگرد به پنل معلم */
+          window.location.replace('teacher.html');
+        }
+      });
+    }
     if (el.prevBtn) el.prevBtn.addEventListener('click', goPrev);
     if (el.nextBtn) el.nextBtn.addEventListener('click', goNext);
     if (el.saveGradeBtn) el.saveGradeBtn.addEventListener('click', saveGrade);
