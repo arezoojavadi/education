@@ -1,12 +1,20 @@
 /* ============================================================
  * js/take.js
  * ------------------------------------------------------------
- * منطق انجام آزمون — بدون تایمر
+ * منطق انجام آزمون توسط دانش‌آموز
  * طراحی: فاطمه جوادی
  *
- * 🆕 تغییر این نسخه:
- *   • فیلتر inputهای اضافی (مخفی، غیرقابل‌مشاهده، نوار جستجو)
- *   • فقط inputهای واقعی سؤال capture می‌شن
+ * 🎯 قابلیت‌های این نسخه:
+ *   • فیلتر هوشمند inputهای اضافی (نام، کد، جستجو، ...)
+ *   • capture کامل — همه‌ی سؤال‌ها حتی خالی‌ها
+ *   • بدون تایمر — دانش‌آموز هر چقدر بخواد وقت داره
+ *   • ذخیره‌ی خودکار پیش‌نویس (Auto-save)
+ *   • بازیابی پیش‌نویس
+ *   • هشدار قبل از بستن صفحه
+ *   • تأیید قبل از ثبت با آمار
+ *   • کلیدهای میان‌بر (Ctrl+S / Ctrl+Enter)
+ *   • حالت شب/روز + Toast + ریسپانسیو
+ *   • مقاوم در برابر خطاهای شبکه
  * ============================================================ */
 
 (function () {
@@ -14,6 +22,9 @@
 
   if (window.TakePanel && window.TakePanel.__loaded) return;
 
+  /* ============================================================
+   * CONFIG
+   * ============================================================ */
   var SUPABASE_URL = 'https://cfkwvzbqgapguuaqibmq.supabase.co';
   var SUPABASE_KEY = 'sb_publishable_Qf3R9hPgjApwe2c-qQMoJA_jitobazq';
 
@@ -23,6 +34,9 @@
 
   var DEBUG = true;
 
+  /* ============================================================
+   * LOGGER
+   * ============================================================ */
   function log() {
     if (!DEBUG) return;
     var a = Array.prototype.slice.call(arguments);
@@ -376,10 +390,10 @@
   }
 
   /* ============================================================
-   * 🆕 CAPTURE ANSWERS — با فیلتر هوشمند
+   * 🎯 CAPTURE ANSWERS — نسخه‌ی نهایی با فیلتر هوشمند
    * ============================================================ */
   function captureAnswers() {
-    if (!el.iframe) return { inputs: [] };
+    if (!el.iframe) return { inputs: [], metadata: { total_inputs: 0, answered_count: 0 } };
 
     var iframeWin = null;
     var doc = null;
@@ -389,22 +403,91 @@
       doc = el.iframe.contentDocument || (iframeWin && iframeWin.document);
     } catch (e) {
       logWarn('⚠️ [capture] iframe access failed:', e);
-      return { inputs: [] };
+      return { inputs: [], metadata: { total_inputs: 0, answered_count: 0 } };
     }
 
-    if (!doc) return { inputs: [] };
+    if (!doc) return { inputs: [], metadata: { total_inputs: 0, answered_count: 0 } };
 
-    /* ─── ابزار: بررسی قابل‌مشاهده بودن ─── */
+    /* ═══════════════════════════════════════════════════════════
+       🚫 کلمات ممنوعه (انگلیسی + فارسی)
+       اگه name/id/class/label شامل اینا بود → input رد می‌شه
+       ═══════════════════════════════════════════════════════════ */
+    var EXCLUDE_KEYWORDS = [
+      /* اطلاعات شخصی */
+      'name', 'username', 'studentname', 'student_name', 'fullname', 'full_name',
+      'firstname', 'first_name', 'lastname', 'last_name', 'nickname',
+      'national', 'nationalid', 'national_id', 'melli', 'melli_code',
+      'studentid', 'student_id', 'studentcode', 'student_code',
+      'usercode', 'user_code', 'userid', 'user_id',
+      'phone', 'mobile', 'telephone', 'cellphone',
+      'email', 'mail', 'e-mail',
+
+      /* امنیت */
+      'captcha', 'token', 'csrf', 'auth', 'password', 'passwd',
+
+      /* دکمه‌ها */
+      'submit', 'reset', 'button', 'cancel', 'confirm',
+
+      /* جستجو */
+      'search', 'find', 'filter', 'query', 'keyword', 'lookup',
+
+      /* متادیتا */
+      'timestamp', 'date_created', 'created_at',
+
+      /* فارسی */
+      'نام', 'فامیل', 'فامیلی', 'خانوادگی',
+      'شماره', 'کد', 'ملی', 'ملیت',
+      'جستجو', 'جست‌وجو', 'پیدا', 'فیلتر',
+      'موبایل', 'تلفن', 'همراه',
+      'ایمیل', 'رایانامه', 'پست الکترونیک',
+      'کاربر', 'رمز', 'گذرواژه', 'رمز عبور',
+      'ثبت', 'ارسال', 'تأیید', 'لغو'
+    ];
+
+    /* ═══════════════════════════════════════════════════════════
+       🚫 کلمات ممنوعه Parent
+       ═══════════════════════════════════════════════════════════ */
+    var EXCLUDE_PARENT_KEYWORDS = [
+      'search', 'navbar', 'nav-bar', 'toolbar', 'tool-bar',
+      'sidebar', 'side-bar', 'filter', 'filters',
+      'header', 'footer', 'nav', 'menu',
+      'banner', 'top-bar', 'topbar',
+      'user-info', 'student-info', 'profile-box', 'profile-info',
+      'user-details', 'student-details'
+    ];
+
+    /* ═══════════════════════════════════════════════════════════
+       ابزار: چک کلمه ممنوعه
+       ═══════════════════════════════════════════════════════════ */
+    function hasExcludedKeyword(text) {
+      if (!text) return false;
+      var lower = String(text).toLowerCase();
+
+      for (var i = 0; i < EXCLUDE_KEYWORDS.length; i++) {
+        var kw = EXCLUDE_KEYWORDS[i].toLowerCase();
+
+        /* برای کلمات کوتاه، فقط اگه دقیقاً به عنوان کلمه جدا باشه */
+        if (kw.length <= 4) {
+          /* با word boundary */
+          var re = new RegExp('(^|[^a-z0-9])' + kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '([^a-z0-9]|$)', 'i');
+          if (re.test(lower)) return true;
+        } else {
+          /* کلمات بلندتر رو substring چک کن */
+          if (lower.indexOf(kw) !== -1) return true;
+        }
+      }
+      return false;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       ابزار: چک قابل مشاهده بودن
+       ═══════════════════════════════════════════════════════════ */
     function isVisible(node) {
       if (!node) return false;
-
-      /* نوع hidden */
       if (node.type === 'hidden') return false;
-
-      /* غیرفعال */
       if (node.disabled) return false;
+      if (node.readOnly && node.tabIndex === -1) return false;
 
-      /* استایل */
       var style = null;
       try {
         style = iframeWin ? iframeWin.getComputedStyle(node) : null;
@@ -415,16 +498,14 @@
         if (style.visibility === 'hidden') return false;
         if (style.visibility === 'collapse') return false;
         if (parseFloat(style.opacity) === 0) return false;
+        if (style.pointerEvents === 'none' && style.display === 'none') return false;
       }
 
-      /* offsetParent (برای مخفی‌ها null می‌شه) */
       if (node.offsetParent === null) {
-        /* استثنا: position: fixed */
         if (style && style.position === 'fixed') return true;
         return false;
       }
 
-      /* ابعاد */
       var rect = null;
       try { rect = node.getBoundingClientRect(); } catch (e) {}
       if (rect && rect.width === 0 && rect.height === 0) return false;
@@ -432,52 +513,9 @@
       return true;
     }
 
-    /* ─── ابزار: بررسی داخل نوار جستجو / منو ─── */
-    function isInSearchOrNav(node) {
-      var p = node.parentElement;
-      var depth = 0;
-
-      while (p && depth < 6) {
-        var tag = (p.tagName || '').toLowerCase();
-        var role = (p.getAttribute && p.getAttribute('role')) || '';
-        var cls = (p.className && String(p.className)) || '';
-        var pid = p.id || '';
-
-        if (tag === 'nav' || tag === 'header' || tag === 'footer') return true;
-        if (role === 'search' || role === 'navigation' || role === 'banner' || role === 'toolbar') return true;
-
-        var combined = (cls + ' ' + pid).toLowerCase();
-        if (combined.indexOf('search') !== -1) return true;
-        if (combined.indexOf('navbar') !== -1) return true;
-        if (combined.indexOf('toolbar') !== -1) return true;
-        if (combined.indexOf('sidebar') !== -1) return true;
-        if (combined.indexOf('filter') !== -1 && tag !== 'form') return true;
-
-        p = p.parentElement;
-        depth++;
-      }
-      return false;
-    }
-
-    /* ─── ابزار: بررسی نوع search ─── */
-    function isSearchInput(node) {
-      return node.type === 'search';
-    }
-
-    /* ─── ابزار: فیلتر اصلی ─── */
-    function shouldCapture(node) {
-      if (!node) return false;
-      if (!isVisible(node)) return false;
-      if (isInSearchOrNav(node)) return false;
-      if (isSearchInput(node)) return false;
-      return true;
-    }
-
-    var inputs = [];
-    var idx = 0;
-    var skipped = { hidden: 0, invisible: 0, searchNav: 0, searchType: 0 };
-
-    /* ─── پیدا کردن label ─── */
+    /* ═══════════════════════════════════════════════════════════
+       ابزار: پیدا کردن label
+       ═══════════════════════════════════════════════════════════ */
     function findLabel(node) {
       if (!node) return null;
 
@@ -504,15 +542,115 @@
       return null;
     }
 
-    /* ─── RADIO ─── */
+    /* ═══════════════════════════════════════════════════════════
+       ابزار: چک Parent ممنوعه
+       ═══════════════════════════════════════════════════════════ */
+    function hasExcludedParent(node) {
+      var p = node.parentElement;
+      var depth = 0;
+
+      while (p && depth < 6) {
+        var tag = (p.tagName || '').toLowerCase();
+
+        if (tag === 'nav' || tag === 'header' || tag === 'footer') return true;
+
+        var role = (p.getAttribute && p.getAttribute('role')) || '';
+        if (role === 'search' || role === 'navigation' ||
+            role === 'banner' || role === 'toolbar') return true;
+
+        var combined = ((p.className && String(p.className)) || '') + ' ' + (p.id || '');
+        var lower = combined.toLowerCase().trim();
+
+        if (lower) {
+          for (var i = 0; i < EXCLUDE_PARENT_KEYWORDS.length; i++) {
+            if (lower.indexOf(EXCLUDE_PARENT_KEYWORDS[i]) !== -1) return true;
+          }
+        }
+
+        p = p.parentElement;
+        depth++;
+      }
+      return false;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       🎯 فیلتر اصلی
+       ═══════════════════════════════════════════════════════════ */
+    var excludeLog = [];
+
+    function shouldCapture(node) {
+      if (!node) return false;
+
+      /* ۱) نامرئی */
+      if (!isVisible(node)) {
+        excludeLog.push({
+          reason: 'invisible',
+          name: node.name || node.id || 'unnamed'
+        });
+        return false;
+      }
+
+      /* ۲) type=search */
+      if (node.type === 'search') {
+        excludeLog.push({
+          reason: 'type-search',
+          name: node.name || node.id || 'unnamed'
+        });
+        return false;
+      }
+
+      /* ۳) کلمه ممنوعه توی name/id/class */
+      var searchable = [
+        node.name || '',
+        node.id || '',
+        node.className || ''
+      ].join(' ');
+
+      if (hasExcludedKeyword(searchable)) {
+        excludeLog.push({
+          reason: 'keyword-name',
+          name: node.name || node.id || 'unnamed',
+          matched: searchable.slice(0, 60)
+        });
+        return false;
+      }
+
+      /* ۴) کلمه ممنوعه توی label/placeholder/aria */
+      var label = findLabel(node);
+      if (label && hasExcludedKeyword(label)) {
+        excludeLog.push({
+          reason: 'keyword-label',
+          name: node.name || node.id || 'unnamed',
+          label: label.slice(0, 60)
+        });
+        return false;
+      }
+
+      /* ۵) parent ممنوعه */
+      if (hasExcludedParent(node)) {
+        excludeLog.push({
+          reason: 'excluded-parent',
+          name: node.name || node.id || 'unnamed'
+        });
+        return false;
+      }
+
+      return true;
+    }
+
+    var inputs = [];
+    var idx = 0;
+
+    /* ─────────────────────────────────────────────────────────
+       ۱) RADIO — تک‌انتخابی
+       ───────────────────────────────────────────────────────── */
     try {
       var radioNames = [];
+
       doc.querySelectorAll('input[type=radio]').forEach(function (r) {
         if (!r.name) return;
-        if (!shouldCapture(r)) { skipped.invisible++; return; }
-        if (radioNames.indexOf(r.name) === -1) {
-          radioNames.push(r.name);
-        }
+        if (!shouldCapture(r)) return;
+        if (radioNames.indexOf(r.name) === -1) radioNames.push(r.name);
       });
 
       radioNames.forEach(function (name) {
@@ -541,13 +679,16 @@
       logWarn('⚠️ [capture] radio:', e);
     }
 
-    /* ─── CHECKBOX ─── */
+    /* ─────────────────────────────────────────────────────────
+       ۲) CHECKBOX — چندگزینه‌ای
+       ───────────────────────────────────────────────────────── */
     try {
       var checkboxGroups = {};
+
       doc.querySelectorAll('input[type=checkbox]').forEach(function (cb) {
         var key = cb.name || cb.id;
         if (!key) return;
-        if (!shouldCapture(cb)) { skipped.invisible++; return; }
+        if (!shouldCapture(cb)) return;
 
         if (!checkboxGroups[key]) checkboxGroups[key] = { values: [], first: cb };
         if (cb.checked) checkboxGroups[key].values.push(String(cb.value || 'true'));
@@ -570,18 +711,17 @@
       logWarn('⚠️ [capture] checkbox:', e);
     }
 
-    /* ─── TEXT / NUMBER / EMAIL / TEL / URL — با فیلتر ─── */
+    /* ─────────────────────────────────────────────────────────
+       ۳) TEXT / NUMBER / EMAIL / TEL / URL
+       ───────────────────────────────────────────────────────── */
     try {
       doc.querySelectorAll(
         'input[type=text], input[type=number], input[type=email], input[type=tel], input[type=url]'
       ).forEach(function (inp) {
-        if (!shouldCapture(inp)) {
-          if (inp.type === 'hidden') skipped.hidden++;
-          else skipped.invisible++;
-          return;
-        }
+        if (!shouldCapture(inp)) return;
 
         var val = (inp.value || '').trim();
+
         idx++;
         inputs.push({
           index: idx,
@@ -595,12 +735,15 @@
       logWarn('⚠️ [capture] text:', e);
     }
 
-    /* ─── TEXTAREA — با فیلتر ─── */
+    /* ─────────────────────────────────────────────────────────
+       ۴) TEXTAREA — تشریحی
+       ───────────────────────────────────────────────────────── */
     try {
       doc.querySelectorAll('textarea').forEach(function (ta) {
-        if (!shouldCapture(ta)) { skipped.invisible++; return; }
+        if (!shouldCapture(ta)) return;
 
         var val = (ta.value || '').trim();
+
         idx++;
         inputs.push({
           index: idx,
@@ -614,10 +757,12 @@
       logWarn('⚠️ [capture] textarea:', e);
     }
 
-    /* ─── SELECT — با فیلتر ─── */
+    /* ─────────────────────────────────────────────────────────
+       ۵) SELECT — انتخابی
+       ───────────────────────────────────────────────────────── */
     try {
       doc.querySelectorAll('select').forEach(function (sel) {
-        if (!shouldCapture(sel)) { skipped.invisible++; return; }
+        if (!shouldCapture(sel)) return;
 
         var opt = sel.options[sel.selectedIndex];
         var text = opt ? (opt.textContent || '').trim() : (sel.value || '');
@@ -635,13 +780,26 @@
       logWarn('⚠️ [capture] select:', e);
     }
 
+    /* ─────────────────────────────────────────────────────────
+       آمار
+       ───────────────────────────────────────────────────────── */
     var duration = state.startedAt ? Math.floor((Date.now() - state.startedAt) / 1000) : 0;
+
     var answered = inputs.filter(function (i) {
       return i.value !== null && i.value !== undefined && String(i.value).trim() !== '';
     }).length;
 
     log('📋 [capture] ' + inputs.length + ' سؤال معتبر، ' + answered + ' پاسخ');
-    log('🚫 [capture] رد شده:', skipped);
+
+    if (excludeLog.length) {
+      log('🚫 [capture] ' + excludeLog.length + ' input رد شد:');
+      excludeLog.forEach(function (x, i) {
+        log('   ' + (i + 1) + '. ' + x.reason +
+            ' → ' + (x.name || 'unnamed') +
+            (x.label ? ' | label: "' + x.label + '"' : '') +
+            (x.matched ? ' | matched: "' + x.matched + '"' : ''));
+      });
+    }
 
     return {
       inputs: inputs,
@@ -650,13 +808,14 @@
         duration_seconds: duration,
         total_inputs: inputs.length,
         answered_count: answered,
+        excluded_count: excludeLog.length,
         user_agent: (navigator.userAgent || '').slice(0, 200)
       }
     };
   }
 
   /* ============================================================
-   * DRAFT
+   * DRAFT — ذخیره و بازیابی
    * ============================================================ */
   function saveDraft() {
     if (state.isSubmitted || !state.examId) return;
@@ -685,6 +844,7 @@
     if (!parsed || !parsed.answers || !parsed.answers.inputs) return;
     if (!parsed.answers.inputs.length) return;
 
+    /* چک کن حداقل یه پاسخ پر شده باشه */
     var hasAnyValue = parsed.answers.inputs.some(function (i) {
       return i.value !== null && i.value !== undefined && String(i.value).trim() !== '';
     });
@@ -750,7 +910,7 @@
             }
           }
 
-        } else if (['text','number','email','tel','url'].indexOf(item.type) !== -1) {
+        } else if (['text', 'number', 'email', 'tel', 'url'].indexOf(item.type) !== -1) {
           var inp = doc.querySelector('input[name="' + item.name.replace(/"/g, '\\"') + '"]') ||
                     (item.name ? doc.getElementById(item.name) : null);
           if (inp && item.value) inp.value = item.value;
@@ -811,7 +971,11 @@
       var answers = captureAnswers();
       var duration = state.startedAt ? Math.floor((Date.now() - state.startedAt) / 1000) : 0;
 
-      log('📤 [Submit] ارسال...', { exam_id: state.examId, duration: duration, count: answers.inputs.length });
+      log('📤 [Submit] ارسال...', {
+        exam_id: state.examId,
+        duration: duration,
+        count: answers.inputs.length
+      });
 
       var insertResult = await state.supabase
         .from('submissions')
@@ -904,11 +1068,13 @@
     });
 
     document.addEventListener('keydown', function (e) {
+      /* Ctrl+S → ذخیره دستی */
       if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
         e.preventDefault();
         saveDraft();
         toast('💾 پیش‌نویس ذخیره شد', 'success', 1500);
       }
+      /* Ctrl+Enter → ثبت */
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         e.preventDefault();
         doSubmit();
