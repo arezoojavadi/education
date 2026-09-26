@@ -1,136 +1,1681 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="پنل معلم — سامانه آزمون فاطمه جوادی">
+<meta name="author" content="فاطمه جوادی">
+<meta name="theme-color" content="#6C5CE7" id="themeMeta">
+<meta name="color-scheme" content="light dark">
+
+<title>پنل معلم | سامانه آزمون فاطمه جوادی</title>
+
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#6C5CE7">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="آزمون">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/components.css">
-<link rel="stylesheet" href="css/animations.css">
-<link rel="stylesheet" href="css/skeletons.css">
-<link rel="stylesheet" href="css/print.css" media="print">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#6C5CE7">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="آزمون">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>پنل معلم</title>
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/components.css">
+<style>
+/* ============================================================
+   RESET
+============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ============================================================
+   DESIGN TOKENS — LIGHT
+============================================================ */
+:root {
+  --brand-1: #6C5CE7;
+  --brand-2: #8E7CFF;
+  --brand-3: #00CEC9;
+  --brand-4: #FD79A8;
+  --brand-5: #FDCB6E;
+  --success: #00B894;
+  --danger:  #FF6B6B;
+
+  --bg-1: #EEF0FF;
+  --bg-2: #F5F0FF;
+  --bg-3: #FFF0F8;
+
+  --card-bg: #FFFFFF;
+  --card-border: rgba(108, 92, 231, 0.08);
+
+  --text-1: #1E1B3A;
+  --text-2: #6B6789;
+  --text-3: #A5A0C0;
+
+  --input-bg: #F8F7FF;
+  --input-border: #E5E0FF;
+
+  --shadow-sm: 0 2px 8px rgba(108, 92, 231, 0.06);
+  --shadow-md: 0 6px 24px rgba(108, 92, 231, 0.10);
+  --shadow-lg: 0 12px 40px rgba(108, 92, 231, 0.15);
+  --shadow-btn: 0 6px 18px rgba(108, 92, 231, 0.28);
+
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+}
+
+/* ============================================================
+   DESIGN TOKENS — DARK
+============================================================ */
+html.dark {
+  --bg-1: #0F0C24;
+  --bg-2: #14102E;
+  --bg-3: #1A1030;
+
+  --card-bg: #1A1638;
+  --card-border: rgba(162, 155, 254, 0.12);
+
+  --text-1: #F2F0FF;
+  --text-2: #A5A0C0;
+  --text-3: #6B6789;
+
+  --input-bg: #14102E;
+  --input-border: #2A2456;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.5);
+  --shadow-btn: 0 6px 18px rgba(108, 92, 231, 0.4);
+}
+
+/* ============================================================
+   BASE
+============================================================ */
+html, body {
+  min-height: 100%;
+}
+
+body {
+  font-family: 'Vazirmatn', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 50%, var(--bg-3) 100%);
+  background-attachment: fixed;
+  color: var(--text-1);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background 0.4s var(--ease), color 0.4s var(--ease);
+}
+
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+input, textarea { font-family: inherit; }
+
+/* ============================================================
+   BACKGROUND DECORATION
+============================================================ */
+.bg-decor {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bg-decor::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='2' cy='2' r='1' fill='%236C5CE7' opacity='0.35'/></svg>");
+  background-size: 32px 32px;
+  opacity: 0.3;
+  mask-image: radial-gradient(ellipse at top, #000 10%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse at top, #000 10%, transparent 70%);
+}
+
+html.dark .bg-decor::before {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='2' cy='2' r='1' fill='%23A29BFE' opacity='0.5'/></svg>");
+  opacity: 0.45;
+}
+
+.bg-decor::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(108, 92, 231, 0.1) 0%, transparent 35%),
+    radial-gradient(circle at 85% 85%, rgba(0, 206, 201, 0.08) 0%, transparent 35%);
+}
+
+html.dark .bg-decor::after {
+  background:
+    radial-gradient(circle at 15% 15%, rgba(162, 155, 254, 0.13) 0%, transparent 35%),
+    radial-gradient(circle at 85% 85%, rgba(0, 206, 201, 0.1) 0%, transparent 35%);
+}
+
+/* ============================================================
+   TOP BAR
+============================================================ */
+.top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--card-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-sm);
+}
+
+.top-bar-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 14px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--text-1);
+}
+
+.brand-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6C5CE7 0%, #8E7CFF 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(108, 92, 231, 0.25);
+  flex-shrink: 0;
+}
+
+.brand-logo svg {
+  width: 20px;
+  height: 20px;
+  stroke: #fff;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  line-height: 1.2;
+}
+
+.brand-title {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--text-1);
+}
+
+.brand-sub {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-3);
+  letter-spacing: 0.3px;
+}
+
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px 6px 6px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-lg);
+  transition: all 0.2s var(--ease);
+}
+
+.user-chip:hover { border-color: var(--brand-1); }
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  line-height: 1.2;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-1);
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-role {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--brand-1);
+}
+
+html.dark .user-role { color: var(--brand-2); }
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6C5CE7 0%, #8E7CFF 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(108, 92, 231, 0.25);
+  user-select: none;
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-1);
+  transition: all 0.2s var(--ease);
+  flex-shrink: 0;
+}
+
+.icon-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--brand-1);
+  color: var(--brand-1);
+}
+
+html.dark .icon-btn:hover {
+  border-color: var(--brand-2);
+  color: var(--brand-2);
+}
+
+.icon-btn:active { transform: scale(0.94); }
+
+.icon-btn svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.icon-wrap {
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+
+.icon-wrap svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.25s, transform 0.35s var(--ease);
+}
+
+.icon-sun  { opacity: 1; transform: rotate(0) scale(1); }
+.icon-moon { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+
+html.dark .icon-sun  { opacity: 0; transform: rotate(90deg) scale(0.5); }
+html.dark .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
+
+/* ============================================================
+   MAIN
+============================================================ */
+.main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+}
+
+/* ============================================================
+   STATS
+============================================================ */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: 20px 18px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.stat-icon {
+  width: 46px;
+  height: 46px;
+  margin: 0 auto 10px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke: #fff;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.stat-icon.brand {
+  background: linear-gradient(135deg, #6C5CE7, #8E7CFF);
+  box-shadow: 0 6px 16px rgba(108, 92, 231, 0.3);
+}
+
+.stat-icon.success {
+  background: linear-gradient(135deg, #00B894, #55EFC4);
+  box-shadow: 0 6px 16px rgba(0, 184, 148, 0.3);
+}
+
+.stat-icon.pink {
+  background: linear-gradient(135deg, #FD79A8, #FF9EC4);
+  box-shadow: 0 6px 16px rgba(253, 121, 168, 0.3);
+}
+
+.stat-value {
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--text-1);
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-2);
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+/* ============================================================
+   SECTION HEADER
+============================================================ */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 17px;
+  font-weight: 900;
+  color: var(--text-1);
+}
+
+.section-title-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #6C5CE7, #8E7CFF);
+}
+
+.section-title-icon svg {
+  width: 17px;
+  height: 17px;
+  stroke: #fff;
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.section-count {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--text-2);
+  font-size: 11.5px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+/* ============================================================
+   NEW EXAM BUTTON
+============================================================ */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, #6C5CE7 0%, #8E7CFF 100%);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-btn);
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+  position: relative;
+  overflow: hidden;
+  min-height: 46px;
+  cursor: pointer;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transition: left 0.6s var(--ease);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(108, 92, 231, 0.42);
+}
+
+.btn-primary:hover:not(:disabled)::before { left: 120%; }
+
+.btn-primary:active:not(:disabled) { transform: translateY(0) scale(0.98); }
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-primary svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  position: relative;
+  z-index: 1;
+}
+
+.btn-primary span { position: relative; z-index: 1; }
+
+/* ============================================================
+   EXAM GRID
+============================================================ */
+.exam-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.exam-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), border-color 0.25s var(--ease);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: cardIn 0.5s var(--ease) both;
+}
+
+.exam-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: rgba(108, 92, 231, 0.25);
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.exam-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #6C5CE7, #00CEC9);
+  opacity: 0;
+  transition: opacity 0.3s var(--ease);
+}
+
+.exam-card:hover::before { opacity: 1; }
+
+.exam-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.exam-card-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #6C5CE7, #8E7CFF);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 6px 16px rgba(108, 92, 231, 0.28);
+}
+
+.exam-card-icon.inactive {
+  background: linear-gradient(135deg, #A5A0C0, #C9C5DD);
+  box-shadow: 0 6px 16px rgba(165, 160, 192, 0.3);
+}
+
+.exam-card-icon svg {
+  width: 24px;
+  height: 24px;
+  stroke: #fff;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.exam-card-title-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.exam-card-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-1);
+  line-height: 1.4;
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+
+.exam-card-desc {
+  font-size: 12.5px;
+  color: var(--text-2);
+  line-height: 1.65;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.badge-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 800;
+  white-space: nowrap;
+  flex-shrink: 0;
+  border: 1px solid transparent;
+}
+
+.badge-status.active {
+  background: rgba(0, 184, 148, 0.1);
+  border-color: rgba(0, 184, 148, 0.25);
+  color: var(--success);
+}
+
+.badge-status.inactive {
+  background: rgba(165, 160, 192, 0.12);
+  border-color: rgba(165, 160, 192, 0.25);
+  color: var(--text-2);
+}
+
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.85); }
+}
+
+/* Stats inside exam card */
+.exam-card-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.stat-pill svg {
+  width: 12px;
+  height: 12px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+/* Exam card footer */
+.exam-card-footer {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--input-border);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 14px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-1);
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-md);
+  transition: all 0.2s var(--ease);
+  text-decoration: none;
+  cursor: pointer;
+  flex: 1;
+  justify-content: center;
+  min-width: 0;
+}
+
+.btn-ghost:hover {
+  border-color: var(--brand-1);
+  color: var(--brand-1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--shadow-sm);
+}
+
+html.dark .btn-ghost:hover {
+  border-color: var(--brand-2);
+  color: var(--brand-2);
+}
+
+.btn-ghost:active { transform: scale(0.97); }
+
+.btn-ghost.danger:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+  background: rgba(255, 107, 107, 0.08);
+}
+
+.btn-ghost svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+.btn-ghost span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   EMPTY STATE
+============================================================ */
+.empty-state {
+  text-align: center;
+  padding: 56px 20px;
+  color: var(--text-2);
+  background: var(--card-bg);
+  border: 1px dashed var(--input-border);
+  border-radius: var(--radius-lg);
+  grid-column: 1/-1;
+}
+
+.empty-icon {
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 18px;
+  border-radius: var(--radius-xl);
+  background: var(--input-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-icon svg {
+  width: 36px;
+  height: 36px;
+  stroke: var(--brand-1);
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+html.dark .empty-icon svg { stroke: var(--brand-2); }
+
+.empty-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-1);
+  margin-bottom: 6px;
+}
+
+.empty-text {
+  font-size: 13px;
+  color: var(--text-2);
+  max-width: 340px;
+  margin: 0 auto 12px;
+  line-height: 1.7;
+}
+
+/* ============================================================
+   MODAL
+============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 8000;
+  background: rgba(15, 12, 36, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s var(--ease);
+  overflow-y: auto;
+}
+
+.modal-overlay.show { display: flex; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.modal {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-xl);
+  padding: 32px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 92vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  animation: modalIn 0.35s var(--bounce);
+  position: relative;
+}
+
+@keyframes modalIn {
+  0% { opacity: 0; transform: translateY(30px) scale(0.94); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.modal-title {
+  font-size: 19px;
+  font-weight: 900;
+  color: var(--text-1);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  line-height: 1.3;
+}
+
+.modal-title-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6C5CE7, #8E7CFF);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 6px 16px rgba(108, 92, 231, 0.28);
+}
+
+.modal-title-icon svg {
+  width: 18px;
+  height: 18px;
+  stroke: #fff;
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.modal-close {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--input-bg);
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s var(--ease);
+  flex-shrink: 0;
+  border: none;
+  cursor: pointer;
+}
+
+.modal-close:hover {
+  background: rgba(255, 107, 107, 0.1);
+  color: var(--danger);
+}
+
+.modal-close svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Form */
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-2);
+  margin-bottom: 8px;
+}
+
+.form-label .req {
+  color: var(--danger);
+  margin-right: 2px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 15px;
+  font-weight: 600;
+  background: var(--input-bg);
+  border: 2px solid var(--input-border);
+  border-radius: var(--radius-md);
+  color: var(--text-1);
+  outline: none;
+  transition: border-color 0.2s var(--ease), background 0.2s var(--ease), box-shadow 0.2s var(--ease);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.form-input::placeholder { color: var(--text-3); font-weight: 500; }
+
+.form-input:focus {
+  border-color: var(--brand-1);
+  background: var(--card-bg);
+  box-shadow: 0 6px 16px rgba(108, 92, 231, 0.15);
+}
+
+html.dark .form-input:focus {
+  border-color: var(--brand-2);
+  box-shadow: 0 6px 16px rgba(162, 155, 254, 0.25);
+}
+
+/* Upload Zone */
+.upload-zone {
+  border: 2px dashed var(--input-border);
+  border-radius: var(--radius-lg);
+  padding: 32px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+  background: var(--input-bg);
+  position: relative;
+}
+
+.upload-zone:hover,
+.upload-zone.dragover {
+  border-color: var(--brand-1);
+  background: rgba(108, 92, 231, 0.05);
+}
+
+html.dark .upload-zone:hover,
+html.dark .upload-zone.dragover {
+  border-color: var(--brand-2);
+  background: rgba(162, 155, 254, 0.08);
+}
+
+.upload-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 12px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #6C5CE7, #8E7CFF);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(108, 92, 231, 0.28);
+}
+
+.upload-icon svg {
+  width: 26px;
+  height: 26px;
+  stroke: #fff;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.upload-text {
+  font-size: 13.5px;
+  color: var(--text-2);
+  font-weight: 600;
+  line-height: 1.7;
+}
+
+.upload-text b {
+  color: var(--brand-1);
+  font-weight: 800;
+}
+
+html.dark .upload-text b { color: var(--brand-2); }
+
+.upload-hint {
+  font-size: 11px;
+  color: var(--text-3);
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+/* File Preview */
+.file-preview-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-md);
+  margin-top: 12px;
+  animation: slideUp 0.3s var(--ease);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.file-preview-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6C5CE7, #8E7CFF);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(108, 92, 231, 0.25);
+}
+
+.file-preview-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke: #fff;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.file-preview-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-preview-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-1);
+  word-break: break-all;
+  margin-bottom: 2px;
+}
+
+.file-preview-size {
+  font-size: 11.5px;
+  color: var(--text-2);
+  font-weight: 600;
+}
+
+.file-preview-remove {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s var(--ease);
+  flex-shrink: 0;
+  border: none;
+  cursor: pointer;
+}
+
+.file-preview-remove:hover {
+  background: rgba(255, 107, 107, 0.12);
+  color: var(--danger);
+}
+
+.file-preview-remove svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Progress */
+.progress-wrap {
+  margin-top: 16px;
+  display: none;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--input-bg);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #6C5CE7, #8E7CFF, #00CEC9);
+  background-size: 200% 100%;
+  border-radius: 999px;
+  transition: width 0.4s var(--ease);
+  position: relative;
+  overflow: hidden;
+  animation: progressShine 2s linear infinite;
+}
+
+@keyframes progressShine {
+  from { background-position: 0% 0; }
+  to   { background-position: 200% 0; }
+}
+
+.progress-text {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-2);
+  margin-top: 8px;
+}
+
+/* Modal Footer */
+.modal-footer {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--input-border);
+  flex-wrap: wrap;
+}
+
+.btn-cancel {
+  flex: 1;
+  min-width: 100px;
+  padding: 13px 20px;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-1);
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+  min-height: 48px;
+  font-family: inherit;
+}
+
+.btn-cancel:hover {
+  border-color: var(--brand-1);
+  color: var(--brand-1);
+}
+
+.btn-cancel:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-submit {
+  flex: 2;
+  min-width: 160px;
+  padding: 13px 20px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, #6C5CE7 0%, #8E7CFF 100%);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  box-shadow: var(--shadow-btn);
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  font-family: inherit;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(108, 92, 231, 0.42);
+}
+
+.btn-submit:active:not(:disabled) { transform: translateY(0) scale(0.98); }
+
+.btn-submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-submit svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.spinner-sm {
+  width: 16px;
+  height: 16px;
+  border: 2.5px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============================================================
+   FOOTER
+============================================================ */
+.footer {
+  text-align: center;
+  padding: 24px 20px;
+  font-size: 11.5px;
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+.footer .heart {
+  display: inline-block;
+  color: #FD79A8;
+  animation: heartbeat 1.8s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+/* ============================================================
+   TOAST
+============================================================ */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 9000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+  max-width: 360px;
+}
+
+.toast {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  padding: 13px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-1);
+  box-shadow: var(--shadow-lg);
+  border-right: 4px solid var(--brand-1);
+  animation: toastIn 0.35s var(--bounce) both;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.5;
+}
+
+.toast.success { border-right-color: var(--success); }
+.toast.error   { border-right-color: var(--danger); }
+.toast.removing { animation: toastOut 0.25s var(--ease) forwards; }
+
+@keyframes toastIn {
+  0% { opacity: 0; transform: translateX(-30px) scale(0.95); }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes toastOut {
+  to { opacity: 0; transform: translateX(-30px) scale(0.95); }
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 720px) {
+  .top-bar-inner { padding: 12px 16px; }
+  .main { padding: 24px 16px 48px; }
+  .brand-text { display: none; }
+  .exam-grid { grid-template-columns: 1fr; }
+  .stats { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+}
+
+@media (max-width: 480px) {
+  .top-bar-inner { padding: 10px 12px; gap: 8px; }
+  .user-name { max-width: 90px; font-size: 12px; }
+  .user-role { font-size: 10px; }
+  .user-avatar { width: 32px; height: 32px; font-size: 13px; }
+  .user-chip { padding: 5px 12px 5px 5px; gap: 8px; }
+  .icon-btn { width: 36px; height: 36px; }
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  .main { padding: 18px 12px 40px; }
+
+  .stats { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stat-card { padding: 16px 12px; }
+  .stat-icon { width: 40px; height: 40px; }
+  .stat-icon svg { width: 20px; height: 20px; }
+  .stat-value { font-size: 22px; }
+  .stat-label { font-size: 11px; }
+
+  .section-title { font-size: 15px; }
+
+  .btn-primary { padding: 10px 16px; font-size: 13px; min-height: 42px; }
+
+  .exam-card { padding: 18px; }
+  .exam-card-icon { width: 42px; height: 42px; border-radius: 12px; }
+  .exam-card-icon svg { width: 22px; height: 22px; }
+  .exam-card-title { font-size: 15px; }
+
+  .btn-ghost {
+    padding: 8px 10px;
+    font-size: 11.5px;
+    gap: 4px;
+  }
+
+  .modal { padding: 24px 20px; border-radius: var(--radius-lg); }
+  .modal-title { font-size: 16px; }
+  .modal-title-icon { width: 32px; height: 32px; }
+
+  .upload-zone { padding: 24px 16px; }
+  .upload-icon { width: 48px; height: 48px; }
+  .upload-icon svg { width: 22px; height: 22px; }
+  .upload-text { font-size: 12.5px; }
+
+  .modal-footer { flex-direction: column-reverse; }
+  .btn-cancel, .btn-submit { width: 100%; flex: none; }
+}
+
+@media (max-width: 360px) {
+  .stats { grid-template-columns: 1fr 1fr; }
+  .stat-value { font-size: 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .progress-fill, .badge-dot { animation: none; }
+}
+</style>
 </head>
 <body>
 
-  <header class="app-header">
-    <h2>👨‍🏫 پنل معلم</h2>
-    <div class="user-info">
-      <span class="user-name" id="userName">—</span>
-      <div class="user-avatar" id="userAvatar">؟</div>
-      <button class="btn-icon" onclick="toggleTheme()" title="تغییر تم">
-        <span id="themeIcon">🌙</span>
+<div class="bg-decor" aria-hidden="true"></div>
+
+<!-- ============ TOP BAR ============ -->
+<header class="top-bar">
+  <div class="top-bar-inner">
+
+    <div class="brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-title">پنل معلم</span>
+        <span class="brand-sub">سامانه آزمون — فاطمه جوادی</span>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <button class="icon-btn" id="themeBtn" type="button" title="تغییر حالت" aria-label="تغییر تم">
+        <span class="icon-wrap">
+          <svg class="icon-sun" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+          </svg>
+          <svg class="icon-moon" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </span>
       </button>
-      <button class="btn-icon" onclick="logout()" title="خروج">🚪</button>
-    </div>
-  </header>
 
-  <main class="container">
+      <div class="user-chip">
+        <div class="user-info">
+          <span class="user-name" id="userName">—</span>
+          <span class="user-role">معلم</span>
+        </div>
+        <div class="user-avatar" id="userAvatar">؟</div>
+      </div>
 
-    <!-- آمار -->
-    <div class="stats-grid" id="statsGrid">
-      <div class="stat-card">
-        <div class="stat-value" id="statExams">—</div>
-        <div class="stat-label">آزمون‌ها</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="statSubmissions">—</div>
-        <div class="stat-label">پاسخ‌ها</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="statStudents">—</div>
-        <div class="stat-label">دانش‌آموزان</div>
-      </div>
-    </div>
-
-    <!-- آزمون‌ها -->
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-      <h3 class="section-title" style="margin:0;">📝 آزمون‌ها</h3>
-      <button class="btn btn-primary" onclick="openUploadModal()">
-        + آزمون جدید
+      <button class="icon-btn" id="logoutBtn" type="button" title="خروج" aria-label="خروج">
+        <svg viewBox="0 0 24 24">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
       </button>
     </div>
 
-    <div id="examsList">
-      <div class="loading"><div class="spinner"></div>در حال بارگذاری...</div>
+  </div>
+</header>
+
+<!-- ============ MAIN ============ -->
+<main class="main">
+
+  <!-- Stats -->
+  <section class="stats">
+    <div class="stat-card">
+      <div class="stat-icon brand">
+        <svg viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <path d="M14 2v6h6"/>
+        </svg>
+      </div>
+      <div class="stat-value" id="statExams">۰</div>
+      <div class="stat-label">آزمون‌ها</div>
     </div>
 
-  </main>
-
-  <!-- Modal آپلود -->
-  <div class="modal-overlay" id="uploadModal">
-    <div class="modal">
-      <h3>📄 آپلود آزمون جدید</h3>
-
-      <div class="form-group">
-        <label>عنوان آزمون</label>
-        <input type="text" id="examTitle" class="form-input" 
-               placeholder="مثلاً: ریاضی فصل ۳" maxlength="100">
+    <div class="stat-card">
+      <div class="stat-icon success">
+        <svg viewBox="0 0 24 24">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
       </div>
+      <div class="stat-value" id="statSubmissions">۰</div>
+      <div class="stat-label">پاسخ‌های دریافت‌شده</div>
+    </div>
 
-      <div class="form-group">
-        <label>توضیح (اختیاری)</label>
-        <input type="text" id="examDesc" class="form-input" 
-               placeholder="توضیح کوتاه" maxlength="200">
+    <div class="stat-card">
+      <div class="stat-icon pink">
+        <svg viewBox="0 0 24 24">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
       </div>
+      <div class="stat-value" id="statStudents">۰</div>
+      <div class="stat-label">دانش‌آموزان</div>
+    </div>
+  </section>
 
-      <div class="form-group">
-        <label>فایل HTML</label>
-        <div class="upload-zone" id="uploadZone">
-          <span class="upload-icon">📁</span>
-          <p class="upload-text">
-            فایل HTML رو انتخاب کن یا اینجا رها کن<br>
-            <b>حداکثر ۱۰ مگابایت</b>
-          </p>
-          <input type="file" id="fileInput" accept=".html,.htm" hidden>
-        </div>
-        <div id="filePreview"></div>
-        <div class="progress-bar" id="progressBar" style="display:none;">
-          <div class="progress-fill" id="progressFill"></div>
-        </div>
-      </div>
+  <!-- Section Header -->
+  <div class="section-header">
+    <h2 class="section-title">
+      <span class="section-title-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <path d="M14 2v6h6"/>
+          <path d="M9 15l2 2 4-4"/>
+        </svg>
+      </span>
+      آزمون‌های من
+      <span class="section-count" id="examsCount">۰</span>
+    </h2>
 
-      <div class="modal-footer">
-        <button class="btn btn-primary" id="uploadBtn" onclick="uploadExam()" disabled>
-          آپلود
-        </button>
-        <button class="btn btn-secondary" onclick="closeUploadModal()">
-          لغو
-        </button>
+    <button class="btn-primary" id="newExamBtn" type="button">
+      <svg viewBox="0 0 24 24">
+        <line x1="12" y1="5" x2="12" y2="19"/>
+        <line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      <span>آزمون جدید</span>
+    </button>
+  </div>
+
+  <!-- Exams List -->
+  <div class="exam-grid" id="examsList">
+    <div class="empty-state">
+      <div class="empty-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <path d="M14 2v6h6"/>
+        </svg>
       </div>
+      <div class="empty-title">در حال بارگذاری...</div>
+      <div class="empty-text">لطفاً صبر کن.</div>
     </div>
   </div>
 
-  <script src="js/errors.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/utils.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/upload.js"></script>
-  <script src="js/teacher.js"></script>
-</body>
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  ساخته شده با <span class="heart">♥</span> برای یادگیری بهتر — طراحی: فاطمه جوادی
+</footer>
+
+<!-- ============ UPLOAD MODAL ============ -->
+<div class="modal-overlay" id="uploadModal" role="dialog" aria-modal="true" aria-labelledby="modalTitleText">
+  <div class="modal">
+
+    <div class="modal-header">
+      <h3 class="modal-title" id="modalTitleText">
+        <span class="modal-title-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+        </span>
+        آپلود آزمون جدید
+      </h3>
+
+      <button class="modal-close" id="closeModal" type="button" aria-label="بستن">
+        <svg viewBox="0 0 24 24">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Title -->
+    <div class="form-group">
+      <label class="form-label" for="examTitle">
+        عنوان آزمون <span class="req">*</span>
+      </label>
+      <input
+        type="text"
+        id="examTitle"
+        class="form-input"
+        placeholder="مثلاً: ریاضی فصل ۳"
+        maxlength="100"
+        autocomplete="off"
+      >
+    </div>
+
+    <!-- Description -->
+    <div class="form-group">
+      <label class="form-label" for="examDesc">
+        توضیح کوتاه (اختیاری)
+      </label>
+      <input
+        type="text"
+        id="examDesc"
+        class="form-input"
+        placeholder="مثلاً: فصل سوم — معادلات درجه دوم"
+        maxlength="200"
+        autocomplete="off"
+      >
+    </div>
+
+    <!-- Upload Zone -->
+    <div class="form-group">
+      <label class="form-label">
+        فایل HTML آزمون <span class="req">*</span>
+      </label>
+
+      <div class="upload-zone" id="uploadZone" role="button" tabindex="0">
+        <div class="upload-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <path d="M14 2v6h6"/>
+          </svg>
+        </div>
+        <div class="upload-text">
+          فایل رو اینجا <b>رها کن</b> یا <b>کلیک کن</b>
+        </div>
+        <div class="upload-hint">
+          فقط فایل HTML — حداکثر ۱۰ مگابایت
+        </div>
+        <input type="file" id="fileInput" accept=".html,.htm" hidden>
+      </div>
+
+      <div id="filePreview"></div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-wrap" id="progressBar">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-text" id="progressText"></div>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button class="btn-cancel" id="cancelBtn" type="button">
+        لغو
+      </button>
+      <button class="btn-submit" id="uploadBtn" type="button" disabled>
+        <svg viewBox="0 0 24 24">
+          <polyline points="16 16 12 12 8 16"/>
+          <line x1="12" y1="12" x2="12" y2="21"/>
+          <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+          <polyline points="16 16 12 12 8 16"/>
+        </svg>
+        <span>آپلود و ساخت آزمون</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============ TOASTS ============ -->
+<div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+<!-- ============ SCRIPTS ============ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/utils.js"></script>
-<script src="js/errors.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/a11y.js"></script>
-<!-- اسکریپت مخصوص صفحه -->
+<script src="js/teacher.js"></script>
+</body>
 </html>
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<script src="js/a11y.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', initAccessibility);
-</script>
