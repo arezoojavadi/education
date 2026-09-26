@@ -6,7 +6,7 @@
   <title>سامانه آزمون | فاطمه جوادی</title>
 
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <meta name="theme-color" content="#6C5CE7">
+  <meta name="theme-color" content="#6C5CE7" id="themeMeta">
 
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 
@@ -14,11 +14,11 @@
     /* ============ Reset ============ */
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
+    /* ============ Light Theme ============ */
     :root {
       --primary: #6C5CE7;
       --primary-2: #A29BFE;
       --accent: #00CEC9;
-      --accent-2: #55EFC4;
       --pink: #FD79A8;
       --danger: #FF6B6B;
       --success: #00B894;
@@ -32,9 +32,11 @@
       --input-border: rgba(108, 92, 231, 0.15);
       --shadow: 0 20px 60px rgba(108, 92, 231, 0.18);
       --glow: rgba(108, 92, 231, 0.4);
+      --grid-color: rgba(108, 92, 231, 0.06);
     }
 
-    body.dark {
+    /* ============ Dark Theme — روی html ============ */
+    html.dark {
       --primary: #A29BFE;
       --primary-2: #6C5CE7;
       --accent: #00CEC9;
@@ -42,13 +44,14 @@
       --bg-1: #0A0820;
       --bg-2: #1A0F35;
       --card-bg: rgba(26, 22, 56, 0.7);
-      --card-border: rgba(162, 155, 254, 0.2);
+      --card-border: rgba(162, 155, 254, 0.25);
       --text: #F5F3FF;
       --text-muted: #A8A3C7;
       --input-bg: rgba(15, 12, 35, 0.6);
-      --input-border: rgba(162, 155, 254, 0.25);
+      --input-border: rgba(162, 155, 254, 0.3);
       --shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
       --glow: rgba(162, 155, 254, 0.5);
+      --grid-color: rgba(162, 155, 254, 0.08);
     }
 
     html, body {
@@ -56,7 +59,8 @@
       font-family: 'Vazirmatn', Tahoma, sans-serif;
       color: var(--text);
       overflow-x: hidden;
-      transition: color 0.5s ease;
+      transition: color 0.5s ease, background 0.5s ease;
+      background: var(--bg-1);
     }
 
     /* ============ Background ============ */
@@ -68,23 +72,15 @@
       z-index: -3;
     }
 
-    /* گرید متحرک - شبیه کد */
     .bg-grid {
       position: fixed;
       inset: 0;
       background-image:
-        linear-gradient(rgba(108, 92, 231, 0.06) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(108, 92, 231, 0.06) 1px, transparent 1px);
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
       background-size: 40px 40px;
       z-index: -2;
-      animation: gridMove 20s linear infinite;
-      transition: opacity 0.5s;
-    }
-
-    body.dark .bg-grid {
-      background-image:
-        linear-gradient(rgba(162, 155, 254, 0.08) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(162, 155, 254, 0.08) 1px, transparent 1px);
+      animation: gridMove 25s linear infinite;
     }
 
     @keyframes gridMove {
@@ -92,7 +88,6 @@
       to { background-position: 40px 40px; }
     }
 
-    /* حباب‌های نوری */
     .blob {
       position: fixed;
       border-radius: 50%;
@@ -100,6 +95,7 @@
       opacity: 0.55;
       z-index: -1;
       transition: background 0.6s ease;
+      pointer-events: none;
     }
 
     .blob-1 {
@@ -127,19 +123,17 @@
       0%, 100% { transform: translate(0, 0) scale(1); }
       50% { transform: translate(-60px, 80px) scale(1.15); }
     }
-
     @keyframes float2 {
       0%, 100% { transform: translate(0, 0) scale(1); }
       50% { transform: translate(80px, -60px) scale(1.1); }
     }
-
     @keyframes float3 {
       0%, 100% { transform: translate(0, 0) scale(1); }
       33% { transform: translate(-50px, 50px) scale(0.9); }
       66% { transform: translate(50px, -30px) scale(1.1); }
     }
 
-    /* ============ آیکون‌های شناور تکنولوژی ============ */
+    /* ============ Floating Tech Icons ============ */
     .float-icons {
       position: fixed;
       inset: 0;
@@ -156,7 +150,7 @@
       transition: opacity 0.5s;
     }
 
-    body.dark .float-icon { opacity: 0.25; }
+    html.dark .float-icon { opacity: 0.28; }
 
     @keyframes floatAround {
       0%, 100% { transform: translateY(0) rotate(0deg); }
@@ -177,30 +171,63 @@
       position: fixed;
       top: 24px;
       left: 24px;
-      width: 52px;
-      height: 52px;
+      width: 54px;
+      height: 54px;
       border-radius: 18px;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       cursor: pointer;
-      font-size: 22px;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 8px 24px rgba(108, 92, 231, 0.15);
-      z-index: 100;
+      z-index: 999;
       overflow: hidden;
     }
 
     .theme-toggle:hover {
-      transform: translateY(-3px) rotate(-10deg);
+      transform: translateY(-3px) rotate(-10deg) scale(1.05);
       box-shadow: 0 12px 32px var(--glow);
     }
 
     .theme-toggle:active { transform: scale(0.92); }
+
+    .theme-icon {
+      position: relative;
+      width: 26px;
+      height: 26px;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .theme-icon svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      transition: opacity 0.4s, transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      color: var(--text);
+    }
+
+    .icon-sun {
+      opacity: 1;
+      transform: rotate(0) scale(1);
+    }
+    .icon-moon {
+      opacity: 0;
+      transform: rotate(-90deg) scale(0.5);
+    }
+
+    html.dark .icon-sun {
+      opacity: 0;
+      transform: rotate(90deg) scale(0.5);
+    }
+    html.dark .icon-moon {
+      opacity: 1;
+      transform: rotate(0) scale(1);
+    }
 
     /* ============ Card ============ */
     .login-wrap {
@@ -229,7 +256,6 @@
       overflow: hidden;
     }
 
-    /* خط رنگی بالای کارت */
     .login-card::before {
       content: '';
       position: absolute;
@@ -294,7 +320,6 @@
       100% { opacity: 1; transform: scale(1) rotate(0); }
     }
 
-    /* حلقه‌ی چرخان دور لوگو */
     .logo-circle::after {
       content: '';
       position: absolute;
@@ -304,8 +329,8 @@
       animation: rotate 20s linear infinite;
     }
 
-    body.dark .logo-circle::after {
-      border-color: rgba(162, 155, 254, 0.3);
+    html.dark .logo-circle::after {
+      border-color: rgba(162, 155, 254, 0.35);
     }
 
     @keyframes rotate {
@@ -350,13 +375,11 @@
       font-weight: 700;
       color: var(--primary);
       letter-spacing: 0.3px;
-      animation: fadeIn 1s ease 0.8s both;
     }
 
-    body.dark .designer-tag {
+    html.dark .designer-tag {
       background: linear-gradient(135deg, rgba(162, 155, 254, 0.15), rgba(0, 206, 201, 0.15));
       border-color: rgba(162, 155, 254, 0.3);
-      color: var(--primary-2);
     }
 
     .designer-tag .spark {
@@ -368,12 +391,7 @@
       50% { transform: scale(1.3) rotate(20deg); opacity: 0.7; }
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ============ OTP Label ============ */
+    /* ============ OTP Input ============ */
     .otp-label {
       text-align: center;
       font-size: 12.5px;
@@ -395,7 +413,6 @@
       background: linear-gradient(90deg, transparent, var(--input-border), transparent);
     }
 
-    /* ============ OTP Input ============ */
     .otp-input {
       display: flex;
       gap: 10px;
@@ -416,13 +433,15 @@
       border-radius: 16px;
       color: var(--text);
       outline: none;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: border-color 0.25s, background 0.25s, transform 0.15s, box-shadow 0.25s;
       caret-color: var(--primary);
-      position: relative;
+      -moz-appearance: textfield;
     }
 
-    .otp-input input:hover {
-      border-color: var(--primary-2);
+    .otp-input input::-webkit-outer-spin-button,
+    .otp-input input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
     }
 
     .otp-input input:focus {
@@ -435,13 +454,10 @@
     .otp-input input.filled {
       border-color: var(--primary);
       background: linear-gradient(135deg, rgba(108, 92, 231, 0.12), rgba(0, 206, 201, 0.12));
-      animation: digitIn 0.3s cubic-bezier(0.4, 1.5, 0.6, 1);
     }
 
-    @keyframes digitIn {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.15); }
-      100% { transform: scale(1); }
+    html.dark .otp-input input.filled {
+      background: linear-gradient(135deg, rgba(162, 155, 254, 0.15), rgba(0, 206, 201, 0.15));
     }
 
     .otp-input input.error {
@@ -532,7 +548,7 @@
       font-size: 13.5px;
       font-weight: 700;
       min-height: 20px;
-      padding: 12px 18px;
+      padding: 0 18px;
       border-radius: 14px;
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       opacity: 0;
@@ -545,6 +561,7 @@
       opacity: 1;
       transform: translateY(0);
       max-height: 100px;
+      padding: 12px 18px;
     }
 
     .msg.error {
@@ -582,25 +599,14 @@
 
     /* ============ Responsive ============ */
     @media (max-width: 480px) {
-      .login-card {
-        padding: 36px 22px 26px;
-        border-radius: 28px;
-      }
-
+      .login-card { padding: 36px 22px 26px; border-radius: 28px; }
       .logo-circle { width: 72px; height: 72px; font-size: 34px; border-radius: 22px; }
       .title { font-size: 24px; }
       .subtitle { font-size: 12.5px; }
-
       .otp-input { gap: 6px; }
-      .otp-input input {
-        width: 46px;
-        height: 56px;
-        font-size: 24px;
-        border-radius: 13px;
-      }
-
+      .otp-input input { width: 46px; height: 56px; font-size: 24px; border-radius: 13px; }
       .btn-login { padding: 16px; font-size: 15.5px; }
-      .theme-toggle { top: 16px; left: 16px; width: 46px; height: 46px; font-size: 20px; }
+      .theme-toggle { top: 16px; left: 16px; width: 48px; height: 48px; }
     }
 
     @media (max-width: 360px) {
@@ -639,7 +645,15 @@
 
   <!-- Theme Toggle -->
   <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="تغییر حالت" aria-label="تغییر تم">
-    <span id="themeIcon">🌙</span>
+    <span class="theme-icon">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="4"></circle>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+      </svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+    </span>
   </button>
 
   <!-- Login Card -->
@@ -658,12 +672,12 @@
       <div class="otp-label">کد ۶ رقمی</div>
 
       <div class="otp-input" id="otpInput" dir="ltr">
-        <input type="text" inputmode="numeric" maxlength="1" data-index="0" autocomplete="off" aria-label="رقم ۱">
-        <input type="text" inputmode="numeric" maxlength="1" data-index="1" autocomplete="off" aria-label="رقم ۲">
-        <input type="text" inputmode="numeric" maxlength="1" data-index="2" autocomplete="off" aria-label="رقم ۳">
-        <input type="text" inputmode="numeric" maxlength="1" data-index="3" autocomplete="off" aria-label="رقم ۴">
-        <input type="text" inputmode="numeric" maxlength="1" data-index="4" autocomplete="off" aria-label="رقم ۵">
-        <input type="text" inputmode="numeric" maxlength="1" data-index="5" autocomplete="off" aria-label="رقم ۶">
+        <input type="text" inputmode="numeric" maxlength="1" data-index="0" autocomplete="off" aria-label="رقم ۱" spellcheck="false">
+        <input type="text" inputmode="numeric" maxlength="1" data-index="1" autocomplete="off" aria-label="رقم ۲" spellcheck="false">
+        <input type="text" inputmode="numeric" maxlength="1" data-index="2" autocomplete="off" aria-label="رقم ۳" spellcheck="false">
+        <input type="text" inputmode="numeric" maxlength="1" data-index="3" autocomplete="off" aria-label="رقم ۴" spellcheck="false">
+        <input type="text" inputmode="numeric" maxlength="1" data-index="4" autocomplete="off" aria-label="رقم ۵" spellcheck="false">
+        <input type="text" inputmode="numeric" maxlength="1" data-index="5" autocomplete="off" aria-label="رقم ۶" spellcheck="false">
       </div>
 
       <button class="btn-login" id="loginBtn" onclick="login()">
@@ -690,15 +704,15 @@
     // ============================================
     // Elements
     // ============================================
-    const inputs = document.querySelectorAll('#otpInput input');
+    const inputs = Array.from(document.querySelectorAll('#otpInput input'));
     const msg = document.getElementById('msg');
     const btn = document.getElementById('loginBtn');
 
     // ============================================
-    // OTP Logic
+    // Helpers
     // ============================================
     function getCode() {
-      return Array.from(inputs).map(i => i.value).join('');
+      return inputs.map(i => i.value).join('');
     }
 
     function clearError() {
@@ -706,58 +720,108 @@
       msg.classList.remove('show');
     }
 
-    inputs.forEach((input, idx) => {
-      // تایپ → برو بعدی
-      input.addEventListener('input', e => {
-        const val = e.target.value.replace(/\D/g, '');
-        e.target.value = val.slice(-1);
-        clearError();
+    function fillDigit(idx, digit) {
+      inputs[idx].value = digit;
+      inputs[idx].classList.add('filled');
+      clearError();
+    }
 
-        if (e.target.value) {
-          e.target.classList.add('filled');
-          // انیمیشن + برو بعدی
-          if (idx < inputs.length - 1) {
-            inputs[idx + 1].focus();
-          } else {
-            // آخرین خانه
-            input.blur();
-            if (getCode().length === 6) {
-              setTimeout(() => login(), 200);
-            }
-          }
-        } else {
-          e.target.classList.remove('filled');
+    function goNext(idx) {
+      if (idx < inputs.length - 1) {
+        inputs[idx + 1].focus();
+      } else {
+        // آخرین خانه → چک کن کد کامل شد
+        if (getCode().length === 6) {
+          inputs[idx].blur();
+          setTimeout(login, 200);
         }
-      });
+      }
+    }
 
-      // کیبورد
+    function goPrev(idx) {
+      if (idx > 0) {
+        inputs[idx - 1].value = '';
+        inputs[idx - 1].classList.remove('filled');
+        inputs[idx - 1].focus();
+      }
+    }
+
+    // ============================================
+    // OTP — keydown based (روان و بدون گیر)
+    // ============================================
+    inputs.forEach((input, idx) => {
+
       input.addEventListener('keydown', e => {
+        // Modifier keys — بذار رد شن
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+        // عدد
+        if (/^[0-9]$/.test(e.key)) {
+          e.preventDefault();
+          fillDigit(idx, e.key);
+          goNext(idx);
+          return;
+        }
+
+        // Backspace
         if (e.key === 'Backspace') {
-          if (!e.target.value) {
-            // خالی → برو عقب و پاک کن
-            if (idx > 0) {
-              e.preventDefault();
-              inputs[idx - 1].focus();
-              inputs[idx - 1].value = '';
-              inputs[idx - 1].classList.remove('filled');
-              clearError();
-            }
+          e.preventDefault();
+          if (input.value) {
+            input.value = '';
+            input.classList.remove('filled');
+            clearError();
           } else {
-            // پر → فقط پاک کن
-            e.target.value = '';
-            e.target.classList.remove('filled');
+            goPrev(idx);
             clearError();
           }
-        } else if (e.key === 'ArrowLeft') {
-          if (idx > 0) { e.preventDefault(); inputs[idx - 1].focus(); }
-        } else if (e.key === 'ArrowRight') {
-          if (idx < inputs.length - 1) { e.preventDefault(); inputs[idx + 1].focus(); }
-        } else if (e.key === 'Enter') {
+          return;
+        }
+
+        // Delete
+        if (e.key === 'Delete') {
+          e.preventDefault();
+          input.value = '';
+          input.classList.remove('filled');
+          return;
+        }
+
+        // Arrow Keys
+        if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          if (idx > 0) inputs[idx - 1].focus();
+          return;
+        }
+        if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          if (idx < inputs.length - 1) inputs[idx + 1].focus();
+          return;
+        }
+
+        // Home / End
+        if (e.key === 'Home') {
+          e.preventDefault();
+          inputs[0].focus();
+          return;
+        }
+        if (e.key === 'End') {
+          e.preventDefault();
+          inputs[inputs.length - 1].focus();
+          return;
+        }
+
+        // Enter
+        if (e.key === 'Enter') {
           e.preventDefault();
           login();
-        } else if (e.key === 'Delete') {
-          e.target.value = '';
-          e.target.classList.remove('filled');
+          return;
+        }
+
+        // Tab — عادی رد شو
+        if (e.key === 'Tab') return;
+
+        // هر چیز دیگه — بلاک کن
+        if (e.key.length === 1) {
+          e.preventDefault();
         }
       });
 
@@ -780,20 +844,26 @@
         });
 
         clearError();
+
         if (digits.length === 6) {
           inputs[5].blur();
-          setTimeout(() => login(), 200);
+          setTimeout(login, 200);
         } else {
           inputs[Math.min(digits.length, 5)].focus();
         }
       });
 
-      // فوکوس
-      input.addEventListener('focus', e => e.target.select());
+      // Focus — انتخاب خودکار محتوا
+      input.addEventListener('focus', () => {
+        setTimeout(() => input.select(), 0);
+      });
+
+      // جلوگیری از drag
+      input.addEventListener('dragstart', e => e.preventDefault());
     });
 
     // فوکوس اولیه
-    setTimeout(() => inputs[0].focus(), 300);
+    setTimeout(() => inputs[0].focus(), 400);
 
     // ============================================
     // ورود
@@ -834,13 +904,11 @@
           return;
         }
 
-        // اگه اسم تأیید نشده
         if (!profile.name_confirmed) {
           window.location.href = 'choose-name.html';
           return;
         }
 
-        // موفق
         msg.textContent = '✅ خوش آمدی! در حال انتقال...';
         msg.className = 'msg success show';
         btn.innerHTML = '<span>✅ موفق</span>';
@@ -856,7 +924,7 @@
     }
 
     // ============================================
-    // پیام خطا
+    // خطا
     // ============================================
     function showError(text) {
       inputs.forEach(i => i.classList.add('error'));
@@ -876,28 +944,34 @@
     }
 
     // ============================================
-    // تم — با کلاس روی <html> که مطمئن‌تره
+    // تم — روی html (قطعی)
     // ============================================
-    function toggleTheme() {
-      const isDark = document.documentElement.classList.toggle('dark');
-      document.body.classList.toggle('dark', isDark);
-      document.getElementById('themeIcon').textContent = isDark ? '☀️' : '🌙';
+    function applyTheme(isDark) {
+      document.documentElement.classList.toggle('dark', isDark);
       localStorage.setItem('theme', isDark ? 'dark' : 'light');
-
-      // آپدیت meta theme-color
-      const meta = document.querySelector('meta[name="theme-color"]');
+      const meta = document.getElementById('themeMeta');
       if (meta) meta.content = isDark ? '#0A0820' : '#6C5CE7';
     }
 
-    // بازیابی تم
+    function toggleTheme() {
+      const isDark = !document.documentElement.classList.contains('dark');
+      applyTheme(isDark);
+    }
+
+    // بازیابی تم — قبل از رندر
     (function initTheme() {
       const saved = localStorage.getItem('theme');
-      if (saved === 'dark') {
-        document.documentElement.classList.add('dark');
-        document.body.classList.add('dark');
-        document.getElementById('themeIcon').textContent = '☀️';
-      }
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const isDark = saved === 'dark' || (!saved && prefersDark);
+      if (isDark) applyTheme(true);
     })();
+
+    // گوش دادن به تغییر تم سیستم
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        if (!localStorage.getItem('theme')) applyTheme(e.matches);
+      });
+    }
   </script>
 </body>
 </html>
