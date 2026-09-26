@@ -1,66 +1,848 @@
-/* ============================================
-   Skeleton Loading
-============================================ */
+/* ============================================================
+ * css/skeletons.css
+ * ------------------------------------------------------------
+ * Skeleton Loading Components
+ * طراحی: فاطمه جوادی
+ *
+ * شامل:
+ *   • Skeleton پایه (line, block, circle, avatar)
+ *   • Skeleton تخصصی (card, table-row, list-item, badge, chart)
+ *   • انیمیشن Shimmer بهینه (GPU-friendly)
+ *   • پشتیبانی از Light + Dark
+ *   • احترام به prefers-reduced-motion
+ *
+ * پیش‌نیاز: css/style.css (برای CSS Variables)
+ * ============================================================ */
+
+
+/* ============================================================
+ * 1) SKELETON — پایه
+ * ============================================================ */
+
 .skeleton {
-  background: linear-gradient(
-    90deg,
-    var(--border) 25%,
-    var(--bg) 50%,
-    var(--border) 75%
-  );
-  background-size: 200% 100%;
-  animation: skeletonLoading 1.5s ease-in-out infinite;
-  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  background: var(--input-bg, #F8F7FF);
+  border-radius: var(--radius-sm, 10px);
+  /* جلوگیری از پرش چیدمان */
+  min-height: 12px;
+  /* جدا از محتوای اطراف */
+  isolation: isolate;
+  user-select: none;
+  pointer-events: none;
 }
 
-@keyframes skeletonLoading {
+/* لایه‌ی shimmer — فقط transform و opacity برای سرعت */
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.55) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: skeletonShimmer 1.6s ease-in-out infinite;
+  will-change: transform;
+  z-index: 1;
+}
+
+html.dark .skeleton::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(162, 155, 254, 0.12) 50%,
+    transparent 100%
+  );
+}
+
+@keyframes skeletonShimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+/* جلوگیری از انیمیشن مضاعف روی خود skeleton */
+.skeleton:empty::before {
+  content: '';
+  display: block;
+  height: 100%;
+}
+
+
+/* ============================================================
+ * 2) SKELETON — شکل‌ها
+ * ============================================================ */
+
+/* خط — ارتفاع پیش‌فرض ۱۲ */
+.skeleton-line {
+  height: 12px;
+  border-radius: var(--radius-xs, 8px);
+}
+
+/* خط‌های با ارتفاع متفاوت */
+.skeleton-line-xs { height: 8px; }
+.skeleton-line-sm { height: 10px; }
+.skeleton-line-md { height: 14px; }
+.skeleton-line-lg { height: 18px; }
+.skeleton-line-xl { height: 24px; }
+
+/* عنوان — باریک‌تر و برجسته */
+.skeleton-title {
+  height: 20px;
+  width: 60%;
+  border-radius: var(--radius-sm, 10px);
+}
+
+/* زیرعنوان */
+.skeleton-subtitle {
+  height: 14px;
+  width: 40%;
+}
+
+/* متن — با عرض‌های متفاوت */
+.skeleton-text {
+  height: 12px;
+  border-radius: var(--radius-xs, 8px);
+}
+
+.skeleton-text.w-100 { width: 100%; }
+.skeleton-text.w-90  { width: 90%; }
+.skeleton-text.w-80  { width: 80%; }
+.skeleton-text.w-70  { width: 70%; }
+.skeleton-text.w-60  { width: 60%; }
+.skeleton-text.w-50  { width: 50%; }
+.skeleton-text.w-40  { width: 40%; }
+.skeleton-text.w-30  { width: 30%; }
+.skeleton-text.w-25  { width: 25%; }
+.skeleton-text.w-20  { width: 20%; }
+.skeleton-text.w-15  { width: 15%; }
+
+/* بلوک — مستطیل بزرگ */
+.skeleton-block {
+  height: 100px;
+  border-radius: var(--radius-md, 14px);
+}
+
+.skeleton-block-sm { height: 60px; }
+.skeleton-block-md { height: 100px; }
+.skeleton-block-lg { height: 160px; }
+.skeleton-block-xl { height: 220px; }
+
+/* دایره */
+.skeleton-circle {
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.skeleton-circle-sm { width: 24px; height: 24px; }
+.skeleton-circle-md { width: 40px; height: 40px; }
+.skeleton-circle-lg { width: 56px; height: 56px; }
+.skeleton-circle-xl { width: 80px; height: 80px; }
+
+/* آواتار — با شعاع متوسط (نه کامل) */
+.skeleton-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md, 14px);
+  flex-shrink: 0;
+}
+
+.skeleton-avatar-sm { width: 32px; height: 32px; border-radius: var(--radius-sm, 10px); }
+.skeleton-avatar-lg { width: 64px; height: 64px; border-radius: var(--radius-lg, 22px); }
+.skeleton-avatar-xl { width: 88px; height: 88px; border-radius: var(--radius-xl, 28px); }
+
+/* آیکون */
+.skeleton-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md, 14px);
+  flex-shrink: 0;
+}
+
+.skeleton-icon-sm { width: 28px; height: 28px; border-radius: var(--radius-sm, 10px); }
+.skeleton-icon-lg { width: 52px; height: 52px; border-radius: var(--radius-lg, 22px); }
+
+/* بج / پیل */
+.skeleton-badge {
+  height: 20px;
+  width: 60px;
+  border-radius: 999px;
+}
+
+.skeleton-badge-sm { height: 16px; width: 44px; }
+.skeleton-badge-lg { height: 24px; width: 80px; }
+
+/* دکمه */
+.skeleton-btn {
+  height: 44px;
+  width: 100%;
+  border-radius: var(--radius-md, 14px);
+}
+
+.skeleton-btn-sm {
+  height: 34px;
+  width: 100px;
+  border-radius: var(--radius-sm, 10px);
+}
+
+.skeleton-btn-lg {
+  height: 54px;
+  border-radius: var(--radius-lg, 22px);
+}
+
+
+/* ============================================================
+ * 3) SKELETON — کامپوننت‌های ترکیبی
+ * ============================================================ */
+
+/* --- کارت ساده --- */
+.skeleton-card {
+  background: var(--card-bg, #FFFFFF);
+  border: 1px solid var(--card-border, rgba(108, 92, 231, 0.08));
+  border-radius: var(--radius-lg, 22px);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: var(--shadow-sm, 0 2px 8px rgba(108, 92, 231, 0.06));
+}
+
+/* --- کارت با آیکون در کنار عنوان --- */
+.skeleton-card-head {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.skeleton-card-head-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* --- کارت آزمون (شبیه exam-card) --- */
+.skeleton-exam-card {
+  background: var(--card-bg, #FFFFFF);
+  border: 1px solid var(--card-border, rgba(108, 92, 231, 0.08));
+  border-radius: var(--radius-lg, 22px);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: var(--shadow-sm, 0 2px 8px rgba(108, 92, 231, 0.06));
+}
+
+.skeleton-exam-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* --- کارت آمار --- */
+.skeleton-stat {
+  background: var(--card-bg, #FFFFFF);
+  border: 1px solid var(--card-border, rgba(108, 92, 231, 0.08));
+  border-radius: var(--radius-lg, 22px);
+  padding: 20px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  box-shadow: var(--shadow-sm, 0 2px 8px rgba(108, 92, 231, 0.06));
+}
+
+.skeleton-stat .skeleton-icon {
+  margin: 0;
+}
+
+.skeleton-stat .skeleton-value {
+  height: 26px;
+  width: 60%;
+  border-radius: var(--radius-sm, 10px);
+}
+
+.skeleton-stat .skeleton-label {
+  height: 12px;
+  width: 80%;
+  border-radius: var(--radius-xs, 8px);
+}
+
+/* --- آیتم لیست (آواتار + متن) --- */
+.skeleton-list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--input-border, #E5E0FF);
+}
+
+.skeleton-list-item:last-child {
+  border-bottom: none;
+}
+
+.skeleton-list-item-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.skeleton-list-item-action {
+  width: 80px;
+  height: 34px;
+  border-radius: var(--radius-sm, 10px);
+  flex-shrink: 0;
+}
+
+/* --- ردیف جدول --- */
+.skeleton-table {
+  background: var(--card-bg, #FFFFFF);
+  border: 1px solid var(--card-border, rgba(108, 92, 231, 0.08));
+  border-radius: var(--radius-lg, 22px);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm, 0 2px 8px rgba(108, 92, 231, 0.06));
+}
+
+.skeleton-table-head {
+  background: var(--input-bg, #F8F7FF);
+  padding: 14px 16px;
+  display: flex;
+  gap: 14px;
+  border-bottom: 1px solid var(--input-border, #E5E0FF);
+}
+
+.skeleton-table-head .skeleton {
+  height: 12px;
+  flex: 1;
+}
+
+.skeleton-table-row {
+  padding: 14px 16px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  border-bottom: 1px solid var(--input-border, #E5E0FF);
+}
+
+.skeleton-table-row:last-child {
+  border-bottom: none;
+}
+
+.skeleton-table-row .skeleton {
+  flex: 1;
+  height: 14px;
+}
+
+.skeleton-table-row .skeleton.skeleton-badge {
+  flex: 0 0 60px;
+  height: 22px;
+}
+
+.skeleton-table-row .skeleton.skeleton-avatar {
+  flex: 0 0 32px;
+  height: 32px;
+}
+
+.skeleton-table-row .skeleton.skeleton-btn-sm {
+  flex: 0 0 70px;
+  height: 30px;
+}
+
+/* --- پروفایل (آواتار بزرگ + نام + نقش) --- */
+.skeleton-profile {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+}
+
+.skeleton-profile-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* --- هدر (شبیه top-bar) --- */
+.skeleton-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+}
+
+.skeleton-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.skeleton-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* --- Hero --- */
+.skeleton-hero {
+  background: var(--card-bg, #FFFFFF);
+  border: 1px solid var(--card-border, rgba(108, 92, 231, 0.08));
+  border-radius: var(--radius-xl, 28px);
+  padding: 32px 28px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: var(--shadow-md, 0 6px 24px rgba(108, 92, 231, 0.1));
+}
+
+.skeleton-hero-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-hero .skeleton-emoji {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-lg, 22px);
+  flex-shrink: 0;
+}
+
+/* --- فرم --- */
+.skeleton-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.skeleton-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeleton-form-field .skeleton-label {
+  height: 12px;
+  width: 30%;
+}
+
+.skeleton-form-field .skeleton-input {
+  height: 48px;
+  width: 100%;
+  border-radius: var(--radius-md, 14px);
+}
+
+/* --- نمودار --- */
+.skeleton-chart {
+  background: var(--card-bg, #FFFFFF);
+  border: 1px solid var(--card-border, rgba(108, 92, 231, 0.08));
+  border-radius: var(--radius-lg, 22px);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: var(--shadow-sm, 0 2px 8px rgba(108, 92, 231, 0.06));
+}
+
+.skeleton-chart-bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  gap: 8px;
+  height: 140px;
+  padding: 12px 0;
+}
+
+.skeleton-chart-bar {
+  flex: 1;
+  background: var(--input-bg, #F8F7FF);
+  border-radius: var(--radius-xs, 8px) var(--radius-xs, 8px) 0 0;
+  position: relative;
+  overflow: hidden;
+  max-width: 32px;
+}
+
+.skeleton-chart-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.5) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: skeletonShimmer 1.6s ease-in-out infinite;
+}
+
+html.dark .skeleton-chart-bar::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(162, 155, 254, 0.12) 50%,
+    transparent 100%
+  );
+}
+
+.skeleton-chart-bar:nth-child(1) { height: 55%; animation-delay: 0s; }
+.skeleton-chart-bar:nth-child(2) { height: 78%; animation-delay: 0.1s; }
+.skeleton-chart-bar:nth-child(3) { height: 40%; animation-delay: 0.2s; }
+.skeleton-chart-bar:nth-child(4) { height: 90%; animation-delay: 0.3s; }
+.skeleton-chart-bar:nth-child(5) { height: 62%; animation-delay: 0.4s; }
+.skeleton-chart-bar:nth-child(6) { height: 85%; animation-delay: 0.5s; }
+.skeleton-chart-bar:nth-child(7) { height: 45%; animation-delay: 0.6s; }
+
+/* --- تصویر --- */
+.skeleton-image {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-lg, 22px);
+}
+
+.skeleton-image-square { aspect-ratio: 1; }
+.skeleton-image-portrait { aspect-ratio: 3 / 4; }
+.skeleton-image-wide { aspect-ratio: 21 / 9; }
+
+
+/* ============================================================
+ * 4) SKELETON — گروه‌بندی (Grid / Stack)
+ * ============================================================ */
+
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.skeleton-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.skeleton-grid-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+}
+
+.skeleton-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.skeleton-stack-sm { gap: 8px; }
+.skeleton-stack-lg { gap: 22px; }
+
+.skeleton-inline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+
+/* ============================================================
+ * 5) SKELETON — حالت‌های ویژه
+ * ============================================================ */
+
+/* پالس (اگه shimmer نمی‌خوای) */
+.skeleton-pulse {
+  animation: skeletonPulse 1.6s ease-in-out infinite;
+}
+
+.skeleton-pulse::after {
+  display: none;
+}
+
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+/* موج (برای بارگذاری‌های بزرگ) */
+.skeleton-wave {
+  animation: skeletonWaveBg 2s ease-in-out infinite;
+}
+
+@keyframes skeletonWaveBg {
+  0%, 100% { background: var(--input-bg, #F8F7FF); }
+  50% { background: var(--input-border, #E5E0FF); }
+}
+
+/* نقطه‌ای — برای آیتم‌های کوچک */
+.skeleton-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--input-bg, #F8F7FF);
+  animation: skeletonPulse 1.2s ease-in-out infinite;
+}
+
+.skeleton-dot:nth-child(2) { animation-delay: 0.15s; }
+.skeleton-dot:nth-child(3) { animation-delay: 0.30s; }
+
+/* سه نقطه در کنار هم */
+.skeleton-dots {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+
+/* ============================================================
+ * 6) SKELETON — انیمیشن‌های ورود
+ * ============================================================ */
+
+.skeleton-fade-in {
+  animation: skeletonFadeIn 0.4s var(--ease, cubic-bezier(0.4, 0, 0.2, 1)) both;
+}
+
+@keyframes skeletonFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* تأخیرهای متعدد برای ترتیب */
+.skeleton-delay-1 { animation-delay: 0.05s; }
+.skeleton-delay-2 { animation-delay: 0.10s; }
+.skeleton-delay-3 { animation-delay: 0.15s; }
+.skeleton-delay-4 { animation-delay: 0.20s; }
+.skeleton-delay-5 { animation-delay: 0.25s; }
+.skeleton-delay-6 { animation-delay: 0.30s; }
+
+
+/* ============================================================
+ * 7) LOADING STATE (به‌جای skeleton)
+ * ============================================================ */
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 60px 20px;
+  color: var(--text-2, #6B6789);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.loading-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--input-border, #E5E0FF);
+  border-top-color: var(--brand-1, #6C5CE7);
+  border-radius: 50%;
+  animation: skeletonSpin 0.8s linear infinite;
+}
+
+@keyframes skeletonSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* نقطه‌ای */
+.loading-dots {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.loading-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--brand-1, #6C5CE7);
+  animation: loadingDot 1.4s ease-in-out infinite;
+}
+
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes loadingDot {
+  0%, 60%, 100% { transform: scale(0.5); opacity: 0.4; }
+  30% { transform: scale(1); opacity: 1; }
+}
+
+
+/* ============================================================
+ * 8) SKELETON — ترکیب با کارت‌های موجود
+ * ============================================================ */
+
+/* روی کارت‌های اصلی، جایگزین محتوا */
+.card.is-loading {
+  pointer-events: none;
+}
+
+.card.is-loading .card-title,
+.card.is-loading .card-subtitle,
+.card.is-loading .card-body,
+.card.is-loading .card-footer {
+  visibility: hidden;
+}
+
+.card.is-loading::after {
+  content: '';
+  position: absolute;
+  inset: 22px;
+  background:
+    linear-gradient(
+      90deg,
+      var(--input-bg, #F8F7FF) 25%,
+      var(--input-border, #E5E0FF) 50%,
+      var(--input-bg, #F8F7FF) 75%
+    );
+  background-size: 200% 100%;
+  border-radius: var(--radius-md, 14px);
+  animation: skeletonShimmerBg 1.6s ease-in-out infinite;
+  z-index: 5;
+}
+
+@keyframes skeletonShimmerBg {
   from { background-position: 200% 0; }
   to   { background-position: -200% 0; }
 }
 
-.skeleton-card {
-  background: var(--surface);
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 4px 24px rgba(0,0,0,.04);
+
+/* ============================================================
+ * 9) RESPONSIVE
+ * ============================================================ */
+
+@media (max-width: 640px) {
+  .skeleton-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .skeleton-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .skeleton-grid-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .skeleton-card,
+  .skeleton-exam-card {
+    padding: 18px;
+  }
+
+  .skeleton-hero {
+    padding: 24px 20px;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .skeleton-hero-content {
+    align-items: center;
+  }
+
+  .skeleton-hero .skeleton-emoji {
+    width: 50px;
+    height: 50px;
+  }
+
+  .skeleton-table-head,
+  .skeleton-table-row {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .skeleton-chart {
+    padding: 18px;
+  }
+
+  .skeleton-chart-bars {
+    height: 100px;
+  }
 }
 
-.skeleton-line {
-  height: 16px;
-  margin-bottom: 12px;
+@media (max-width: 380px) {
+  .skeleton-grid-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .skeleton-stat {
+    padding: 16px 12px;
+  }
+
+  .skeleton-card {
+    padding: 14px;
+    gap: 12px;
+  }
 }
 
-.skeleton-line.title {
-  height: 24px;
-  width: 60%;
+
+/* ============================================================
+ * 10) REDUCED MOTION
+ * ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after,
+  .skeleton-chart-bar::after,
+  .skeleton-pulse,
+  .skeleton-wave,
+  .skeleton-dot,
+  .loading-spinner,
+  .loading-dots span {
+    animation: none !important;
+  }
+
+  .skeleton {
+    background: var(--input-bg, #F8F7FF);
+  }
+
+  .skeleton::after {
+    display: none;
+  }
+
+  /* جایگزین: پالس نرم */
+  .skeleton {
+    opacity: 0.75;
+  }
+
+  .card.is-loading::after {
+    animation: none;
+    background: var(--input-bg, #F8F7FF);
+  }
 }
 
-.skeleton-line.short { width: 40%; }
-.skeleton-line.tiny { height: 12px; width: 30%; }
-
-.skeleton-btn {
-  height: 36px;
-  width: 120px;
-  border-radius: 10px;
-  margin-top: 16px;
+/* احترام به کلاس دستی (از a11y.js) */
+html.reduced-motion .skeleton::after,
+html.reduced-motion .skeleton-chart-bar::after,
+html.reduced-motion .loading-spinner,
+html.reduced-motion .loading-dots span {
+  animation: none !important;
 }
 
-.skeleton-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 16px;
+html.reduced-motion .skeleton {
+  opacity: 0.75;
 }
 
-.skeleton-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+
+/* ============================================================
+ * 11) PRINT
+ * ============================================================ */
+
+@media print {
+  .skeleton,
+  .loading-state,
+  .loading-spinner,
+  .loading-dots {
+    display: none !important;
+  }
 }
 
-.skeleton-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px 0;
-  border-bottom: 1px solid var(--border);
-}
+
+/* ============================================================
+ * پایان — فاطمه جوادی
+ * ============================================================ */
