@@ -4,11 +4,12 @@
  * پنل مشاهده و نمره‌دهی پاسخ‌های دانش‌آموزان
  * طراحی: فاطمه جوادی
  *
- * 🆕 تغییرات این نسخه:
- *   • خواندن پروفایل‌ها با RPC امن (دور زدن RLS)
- *   • Fallback به SELECT اگه RPC نبود
- *   • سرچ بهتر (کار می‌کنه حتی با اعداد فارسی)
- *   • نمایش پیام واضح‌تر
+ * 🆕 نسخه‌ی جدید:
+ *   • نقشه‌ی سؤالات (نقشه‌ی بصری ۱ تا N)
+ *   • شمارش دقیق (X از Y)
+ *   • نوار پیشرفت
+ *   • هر سؤال با بج سبز/قرمز
+ *   • سؤالات خالی با پس‌زمینه‌ی متمایز
  * ============================================================ */
 
 (function () {
@@ -25,9 +26,6 @@
   var MAX_SCORE = 20;
   var DEBUG = true;
 
-  /* ============================================================
-   * LOGGER
-   * ============================================================ */
   function log() {
     if (!DEBUG) return;
     var a = Array.prototype.slice.call(arguments);
@@ -156,7 +154,6 @@
     return (parts[0][0] || '') + (parts[parts.length - 1][0] || '');
   }
 
-  /* تبدیل اعداد فارسی به انگلیسی برای سرچ */
   function normalizeDigits(str) {
     if (!str) return '';
     return String(str)
@@ -164,7 +161,6 @@
       .replace(/[٠-٩]/g, function (d) { return String('٠١٢٣٤٥٦٧٨٩'.indexOf(d)); });
   }
 
-  /* نرمال‌سازی برای سرچ */
   function normalizeForSearch(str) {
     if (!str) return '';
     return normalizeDigits(String(str))
@@ -172,12 +168,11 @@
       .replace(/[يى]/g, 'ی')
       .replace(/[كک]/g, 'ک')
       .replace(/[أإآا]/g, 'ا')
-      .replace(/\u200c/g, ' ')     /* نیم‌فاصله */
+      .replace(/\u200c/g, ' ')
       .replace(/\s+/g, ' ')
       .trim();
   }
 
-  /* ─── Date & Time ─── */
   function formatDate(iso) {
     if (!iso) return '—';
     try {
@@ -226,6 +221,12 @@
 
   function hasScore(sub) {
     return sub && sub.score !== null && sub.score !== undefined && sub.score !== '';
+  }
+
+  function isAnswered(item) {
+    if (!item) return false;
+    var v = item.value;
+    return v !== null && v !== undefined && String(v).trim() !== '';
   }
 
   /* ============================================================
@@ -415,7 +416,7 @@
   }
 
   /* ============================================================
-   * 🆕 LOAD PROFILES با RPC (روش مطمئن)
+   * LOAD PROFILES
    * ============================================================ */
   async function fetchProfiles(userIds) {
     if (!userIds || !userIds.length) return {};
@@ -423,9 +424,7 @@
     var sb = state.supabase;
     var map = {};
 
-    /* ─── تلاش ۱: RPC امن ─── */
     try {
-      log('🔍 [Profiles] تلاش با RPC get_students_profiles...');
       var rpc = await sb.rpc('get_students_profiles', {
         p_user_ids: userIds
       });
@@ -434,18 +433,11 @@
         rpc.data.forEach(function (p) {
           if (p && p.id) map[p.id] = p;
         });
-        log('✅ [Profiles] RPC موفق — ' + Object.keys(map).length + ' پروفایل');
         if (Object.keys(map).length > 0) return map;
-      } else if (rpc.error) {
-        logWarn('⚠️ [Profiles] RPC error:', rpc.error);
       }
-    } catch (e) {
-      logWarn('⚠️ [Profiles] RPC exception:', e);
-    }
+    } catch (e) {}
 
-    /* ─── تلاش ۲: SELECT مستقیم ─── */
     try {
-      log('🔍 [Profiles] تلاش با SELECT مستقیم...');
       var sel = await sb
         .from('profiles')
         .select('id, code, full_name')
@@ -455,32 +447,9 @@
         sel.data.forEach(function (p) {
           if (p && p.id) map[p.id] = p;
         });
-        log('✅ [Profiles] SELECT موفق — ' + Object.keys(map).length + ' پروفایل');
-        if (Object.keys(map).length > 0) return map;
-      } else if (sel.error) {
-        logWarn('⚠️ [Profiles] SELECT error:', sel.error);
       }
-    } catch (e) {
-      logWarn('⚠️ [Profiles] SELECT exception:', e);
-    }
+    } catch (e) {}
 
-    /* ─── تلاش ۳: یکی یکی ─── */
-    log('🔍 [Profiles] تلاش تک‌تک...');
-    for (var i = 0; i < userIds.length && i < 50; i++) {
-      try {
-        var one = await sb
-          .from('profiles')
-          .select('id, code, full_name')
-          .eq('id', userIds[i])
-          .maybeSingle();
-
-        if (!one.error && one.data && one.data.id) {
-          map[one.data.id] = one.data;
-        }
-      } catch (e) {}
-    }
-
-    log('📋 [Profiles] نهایی: ' + Object.keys(map).length + ' از ' + userIds.length);
     return map;
   }
 
@@ -507,7 +476,6 @@
 
       var subs = r.data || [];
 
-      /* جمع‌آوری user ids */
       var userIds = [];
       subs.forEach(function (s) {
         if (s.student_id && userIds.indexOf(s.student_id) === -1) {
@@ -515,10 +483,8 @@
         }
       });
 
-      /* گرفتن پروفایل‌ها با RPC */
       var profilesMap = await fetchProfiles(userIds);
 
-      /* ادغام */
       subs.forEach(function (s) {
         s.profiles = profilesMap[s.student_id] || null;
       });
@@ -549,35 +515,23 @@
   }
 
   /* ============================================================
-   * 🆕 FILTER + SORT (با سرچ بهتر)
+   * FILTER + SORT
    * ============================================================ */
   function applyFilter() {
     var list = state.submissions.slice();
 
-    /* سرچ */
     if (state.query) {
       var q = normalizeForSearch(state.query);
-      log('🔍 [Search] query:', q);
-
       if (q.length > 0) {
         list = list.filter(function (s) {
           var profile = s.profiles || {};
           var name = normalizeForSearch(profile.full_name || '');
           var code = normalizeForSearch(profile.code || '');
-
-          /* چک نام */
-          if (name.indexOf(q) !== -1) return true;
-          /* چک کد */
-          if (code.indexOf(q) !== -1) return true;
-
-          return false;
+          return name.indexOf(q) !== -1 || code.indexOf(q) !== -1;
         });
-
-        log('🔍 [Search] نتیجه:', list.length);
       }
     }
 
-    /* مرتب‌سازی */
     if (state.sort === 'date-desc') {
       list.sort(function (a, b) {
         return new Date(b.submitted_at) - new Date(a.submitted_at);
@@ -601,6 +555,25 @@
     }
 
     state.filtered = list;
+  }
+
+  /* ============================================================
+   * محاسبه آمار یک submission
+   * ============================================================ */
+  function getSubmissionStats(sub) {
+    var inputs = (sub && sub.answers && sub.answers.inputs) ? sub.answers.inputs : [];
+    var total = inputs.length;
+    var answered = 0;
+    inputs.forEach(function (item) {
+      if (isAnswered(item)) answered++;
+    });
+    var percent = total > 0 ? Math.round((answered / total) * 100) : 0;
+    return {
+      total: total,
+      answered: answered,
+      empty: total - answered,
+      percent: percent
+    };
   }
 
   /* ============================================================
@@ -654,12 +627,7 @@
       var graded = hasScore(s);
       var scoreDisplay = graded ? toFa(s.score) : '—';
 
-      var answerCount = 0;
-      if (s.answers && s.answers.inputs) {
-        answerCount = s.answers.inputs.filter(function (x) {
-          return x.value !== null && x.value !== undefined && String(x.value).trim() !== '';
-        }).length;
-      }
+      var stats = getSubmissionStats(s);
 
       html +=
         '<div class="student-row ' + (graded ? 'graded' : 'pending') + '" data-id="' + s.id + '" style="animation-delay:' + delay + ';">' +
@@ -677,7 +645,9 @@
           '</div>' +
 
           '<div class="student-extra">' +
-            '<div class="extra-answers">' + toFa(answerCount) + ' پاسخ</div>' +
+            '<div class="extra-answers">' +
+              '<b>' + toFa(stats.answered) + '</b> از ' + toFa(stats.total) +
+            '</div>' +
             '<div class="extra-duration">' + formatDuration(s.duration_seconds) + '</div>' +
           '</div>' +
 
@@ -760,7 +730,7 @@
   }
 
   /* ============================================================
-   * RENDER ANSWERS
+   * 🆕 RENDER ANSWERS — با نقشه‌ی سؤالات + شمارش دقیق
    * ============================================================ */
   function renderAnswers(answers) {
     if (!el.answersList) return;
@@ -776,7 +746,8 @@
               '<path d="M14 2v6h6"/>' +
             '</svg>' +
           '</div>' +
-          '<div class="empty-title">هیچ پاسخی ثبت نشده</div>' +
+          '<div class="empty-title">هیچ سؤالی ثبت نشده</div>' +
+          '<div class="empty-text">فایل آزمون سؤالی نداشت یا هنوز پاسخی ثبت نشده.</div>' +
         '</div>';
       return;
     }
@@ -795,31 +766,158 @@
       time: 'ساعت'
     };
 
-    var html = '';
+    /* شمارش */
+    var answeredCount = 0;
+    var emptyCount = 0;
+    inputs.forEach(function (it) {
+      if (isAnswered(it)) answeredCount++;
+      else emptyCount++;
+    });
+
+    var total = inputs.length;
+    var percent = total > 0 ? Math.round((answeredCount / total) * 100) : 0;
+
+    /* ══════════════════════════════════════════════════════
+       بخش ۱: خلاصه‌ی کلی (Counters + Progress)
+       ══════════════════════════════════════════════════════ */
+    var summaryHtml =
+      '<div class="answers-overview">' +
+
+        '<div class="overview-counters">' +
+          '<div class="ov-counter ok">' +
+            '<span class="ov-value">' + toFa(answeredCount) + '</span>' +
+            '<span class="ov-label">پاسخ داده</span>' +
+          '</div>' +
+          '<div class="ov-counter empty">' +
+            '<span class="ov-value">' + toFa(emptyCount) + '</span>' +
+            '<span class="ov-label">بدون پاسخ</span>' +
+          '</div>' +
+          '<div class="ov-counter total">' +
+            '<span class="ov-value">' + toFa(total) + '</span>' +
+            '<span class="ov-label">کل سؤالات</span>' +
+          '</div>' +
+        '</div>' +
+
+        '<div class="overview-progress">' +
+          '<div class="prog-label">' +
+            '<span>پیشرفت پاسخ‌دهی</span>' +
+            '<span class="prog-percent">' + toFa(percent) + '٪</span>' +
+          '</div>' +
+          '<div class="prog-bar">' +
+            '<div class="prog-fill" style="width:' + percent + '%"></div>' +
+          '</div>' +
+        '</div>' +
+
+      '</div>';
+
+    /* ══════════════════════════════════════════════════════
+       بخش ۲: نقشه‌ی سؤالات (Question Map)
+       ══════════════════════════════════════════════════════ */
+    var mapItemsHtml = '';
+    inputs.forEach(function (item, i) {
+      var idx = item.index || (i + 1);
+      var answered = isAnswered(item);
+      var label = item.label || item.name || 'سؤال ' + idx;
+
+      mapItemsHtml +=
+        '<div class="qmap-item ' + (answered ? 'ok' : 'empty') + '" ' +
+             'data-target="q-detail-' + idx + '" ' +
+             'title="' + escapeHtml(label.slice(0, 100)) + '">' +
+          '<span class="qmap-num">' + toFa(idx) + '</span>' +
+          (answered
+            ? '<svg class="qmap-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'
+            : '<svg class="qmap-icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
+          ) +
+        '</div>';
+    });
+
+    var mapHtml =
+      '<div class="qmap-card">' +
+        '<div class="qmap-header">' +
+          '<div class="qmap-title">' +
+            '<svg viewBox="0 0 24 24">' +
+              '<rect x="3" y="3" width="7" height="7" rx="1"/>' +
+              '<rect x="14" y="3" width="7" height="7" rx="1"/>' +
+              '<rect x="3" y="14" width="7" height="7" rx="1"/>' +
+              '<rect x="14" y="14" width="7" height="7" rx="1"/>' +
+            '</svg>' +
+            '<span>نقشه‌ی سؤالات</span>' +
+          '</div>' +
+          '<div class="qmap-legend">' +
+            '<span class="legend-item">' +
+              '<span class="legend-dot ok"></span>' +
+              '<span>پاسخ داده</span>' +
+            '</span>' +
+            '<span class="legend-item">' +
+              '<span class="legend-dot empty"></span>' +
+              '<span>بدون پاسخ</span>' +
+            '</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="qmap-grid">' + mapItemsHtml + '</div>' +
+      '</div>';
+
+    /* ══════════════════════════════════════════════════════
+       بخش ۳: لیست تفصیلی هر سؤال
+       ══════════════════════════════════════════════════════ */
+    var detailsHtml = '<div class="answers-details">';
+
     inputs.forEach(function (item, i) {
       var idx = item.index || (i + 1);
       var type = item.type || 'text';
       var value = item.value;
-      var hasValue = value !== null && value !== undefined && String(value).trim() !== '';
+      var answered = isAnswered(item);
       var label = item.label || item.name || 'سؤال ' + toFa(idx);
       var typeLabel = typeLabels[type] || type;
 
-      html +=
-        '<div class="answer-item ' + (hasValue ? 'ok' : 'empty') + '">' +
+      detailsHtml +=
+        '<div class="answer-item ' + (answered ? 'ok' : 'empty') + '" id="q-detail-' + idx + '" ' +
+             'style="animation-delay:' + (i * 0.015).toFixed(2) + 's;">' +
+
           '<div class="answer-head">' +
-            '<span class="answer-number">' + toFa(idx) + '</span>' +
+            '<span class="answer-number ' + (answered ? 'ok' : 'empty') + '">' + toFa(idx) + '</span>' +
             '<div class="answer-label">' +
               '<div class="answer-label-text">' + escapeHtml(label) + '</div>' +
               '<span class="answer-type">' + escapeHtml(typeLabel) + '</span>' +
             '</div>' +
+            (answered
+              ? '<span class="answer-badge ok">' +
+                  '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>' +
+                  'پاسخ داده' +
+                '</span>'
+              : '<span class="answer-badge empty">' +
+                  '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+                  'بدون پاسخ' +
+                '</span>'
+            ) +
           '</div>' +
-          '<div class="answer-value ' + (hasValue ? '' : 'empty') + '">' +
-            (hasValue ? escapeHtml(String(value)) : '— بدون پاسخ —') +
+
+          '<div class="answer-value ' + (answered ? 'has-content' : 'empty') + '">' +
+            (answered ? escapeHtml(String(value)) : 'این سؤال رو پاسخ نداده') +
           '</div>' +
+
         '</div>';
     });
 
-    el.answersList.innerHTML = html;
+    detailsHtml += '</div>';
+
+    /* ══════════════════════════════════════════════════════
+       ترکیب نهایی
+       ══════════════════════════════════════════════════════ */
+    el.answersList.innerHTML = summaryHtml + mapHtml + detailsHtml;
+
+    /* ─── کلیک روی نقشه → اسکرول به جزئیات ─── */
+    el.answersList.querySelectorAll('.qmap-item').forEach(function (node) {
+      node.addEventListener('click', function () {
+        var targetId = node.getAttribute('data-target');
+        var target = document.getElementById(targetId);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          target.classList.add('flash');
+          setTimeout(function () { target.classList.remove('flash'); }, 1200);
+        }
+      });
+    });
   }
 
   /* ============================================================
@@ -1043,18 +1141,12 @@
     }
 
     var rows = [
-      ['ردیف', 'نام دانش‌آموز', 'کد', 'تاریخ', 'ساعت', 'مدت (ثانیه)', 'تعداد پاسخ', 'نمره', 'یادداشت معلم']
+      ['ردیف', 'نام دانش‌آموز', 'کد', 'تاریخ', 'ساعت', 'مدت (ثانیه)', 'پاسخ داده', 'بدون پاسخ', 'کل', 'نمره', 'یادداشت معلم']
     ];
 
     state.submissions.forEach(function (s, i) {
       var profile = s.profiles || {};
-      var answerCount = 0;
-
-      if (s.answers && s.answers.inputs) {
-        answerCount = s.answers.inputs.filter(function (x) {
-          return x.value !== null && x.value !== undefined && String(x.value).trim() !== '';
-        }).length;
-      }
+      var stats = getSubmissionStats(s);
 
       rows.push([
         i + 1,
@@ -1063,7 +1155,9 @@
         formatDate(s.submitted_at),
         formatTime(s.submitted_at),
         s.duration_seconds || 0,
-        answerCount,
+        stats.answered,
+        stats.empty,
+        stats.total,
         hasScore(s) ? s.score : '—',
         s.teacher_note || '—'
       ]);
@@ -1173,7 +1267,6 @@
    * BIND EVENTS
    * ============================================================ */
   function bindEvents() {
-    /* سرچ با debounce */
     if (el.searchInput) {
       var t = null;
       el.searchInput.addEventListener('input', function (e) {
@@ -1181,13 +1274,11 @@
         var val = e.target.value;
         t = setTimeout(function () {
           state.query = (val || '').trim();
-          log('🔍 [Search] شروع جستجو برای:', state.query);
           applyFilter();
           renderList();
         }, 250);
       });
 
-      /* پاک کردن با Escape */
       el.searchInput.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
           el.searchInput.value = '';
@@ -1231,7 +1322,6 @@
     }
 
     document.addEventListener('keydown', function (e) {
-      /* Ctrl+K → سرچ */
       if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
         e.preventDefault();
         if (el.searchInput) el.searchInput.focus();
