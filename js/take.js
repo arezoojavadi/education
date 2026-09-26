@@ -4,10 +4,15 @@
  * منطق انجام آزمون توسط دانش‌آموز — بدون تایمر
  * طراحی: فاطمه جوادی
  *
- * 🆕 تغییرات این نسخه:
- *   • حذف کامل تایمر
+ * قابلیت‌ها:
+ *   • حذف کامل تایمر (دانش‌آموز هر چقدر بخواد وقت داره)
+ *   • capture کامل — همه‌ی inputها حتی خالی‌ها ذخیره می‌شن
  *   • بدون وابستگی به duration_minutes
  *   • استفاده از SELECT * (مقاوم در برابر تغییرات دیتابیس)
+ *   • ذخیره‌ی خودکار پیش‌نویس
+ *   • بازیابی پیش‌نویس
+ *   • هشدار قبل از خروج
+ *   • حالت شب/روز + Toast
  * ============================================================ */
 
 (function () {
@@ -25,13 +30,32 @@
   var DRAFT_PREFIX = 'exam_draft_';
   var AUTOSAVE_INTERVAL = 5000;
 
+  var DEBUG = true;
+
+  /* ============================================================
+   * LOGGER
+   * ============================================================ */
+  function log() {
+    if (!DEBUG) return;
+    var a = Array.prototype.slice.call(arguments);
+    try { console.log.apply(console, a); } catch (e) {}
+  }
+  function logError() {
+    var a = Array.prototype.slice.call(arguments);
+    try { console.error.apply(console, a); } catch (e) {}
+  }
+  function logWarn() {
+    var a = Array.prototype.slice.call(arguments);
+    try { console.warn.apply(console, a); } catch (e) {}
+  }
+
   /* ============================================================
    * SUPABASE
    * ============================================================ */
   function getSupabase() {
     if (window.supabaseClient) return window.supabaseClient;
     if (!window.supabase || typeof window.supabase.createClient !== 'function') {
-      throw new Error('Supabase SDK not loaded');
+      throw new Error('Supabase SDK بارگذاری نشده');
     }
     window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
       auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
@@ -135,13 +159,15 @@
    * TOAST
    * ============================================================ */
   function toast(message, type, duration) {
-    if (!el.toasts) { console.log('[' + (type || 'info') + ']', message); return; }
+    if (!el.toasts) { log('[' + (type || 'info') + '] ' + message); return; }
     type = type || 'info';
     duration = duration || 3000;
+
     var node = document.createElement('div');
     node.className = 'toast ' + type;
     node.textContent = message;
     el.toasts.appendChild(node);
+
     setTimeout(function () {
       node.classList.add('removing');
       setTimeout(function () { node.remove(); }, 300);
@@ -157,7 +183,7 @@
     var sessionResult;
     try { sessionResult = await sb.auth.getSession(); }
     catch (e) {
-      console.error('[take] session:', e);
+      logError('❌ [Auth] session:', e);
       window.location.replace('index.html');
       return null;
     }
@@ -170,7 +196,7 @@
     var userResult;
     try { userResult = await sb.auth.getUser(); }
     catch (e) {
-      console.error('[take] user:', e);
+      logError('❌ [Auth] user:', e);
       window.location.replace('index.html');
       return null;
     }
@@ -235,7 +261,7 @@
         .maybeSingle();
 
       if (r.error) {
-        console.error('[take] loadExam error:', r.error);
+        logError('❌ [loadExam]', r.error);
         showError('خطا در بارگذاری آزمون: ' + (r.error.message || 'نامشخص'));
         return null;
       }
@@ -252,11 +278,11 @@
         return null;
       }
 
-      console.log('[take] exam loaded:', state.exam.id, state.exam.title);
+      log('✅ [loadExam]', state.exam.id, state.exam.title);
       return state.exam;
 
     } catch (e) {
-      console.error('[take] loadExam fatal:', e);
+      logError('❌ [loadExam]', e);
       showError('خطا در بارگذاری آزمون');
       return null;
     }
@@ -284,7 +310,7 @@
 
       return true;
     } catch (e) {
-      console.warn('[take] checkNotSubmitted:', e);
+      logWarn('⚠️ [checkNotSubmitted]', e);
       return true;
     }
   }
@@ -299,14 +325,14 @@
     }
 
     try {
-      console.log('[take] downloading:', state.exam.file_path);
+      log('📥 [loadFile] دانلود:', state.exam.file_path);
 
       var r = await state.supabase.storage
         .from(BUCKET)
         .download(state.exam.file_path);
 
       if (r.error) {
-        console.error('[take] download error:', r.error);
+        logError('❌ [loadFile]', r.error);
         showError('خطا در دانلود فایل آزمون: ' + (r.error.message || 'دسترسی مجاز نیست'));
         return false;
       }
@@ -324,11 +350,11 @@
       }
 
       state.fileHtml = text;
-      console.log('[take] file loaded, size:', text.length);
+      log('✅ [loadFile] حجم:', text.length);
       return true;
 
     } catch (e) {
-      console.error('[take] loadFile fatal:', e);
+      logError('❌ [loadFile]', e);
       showError('خطا در بارگذاری فایل');
       return false;
     }
@@ -352,7 +378,7 @@
       restoreDraft();
     });
 
-    /* Timeout */
+    /* Timeout امن */
     setTimeout(function () {
       if (el.loading && el.loading.style.display !== 'none') {
         if (el.examContent) el.examContent.style.display = 'block';
@@ -363,7 +389,7 @@
   }
 
   /* ============================================================
-   * CAPTURE ANSWERS
+   * 🆕 CAPTURE ANSWERS — همه‌ی inputها حتی خالی‌ها
    * ============================================================ */
   function captureAnswers() {
     if (!el.iframe) return { inputs: [] };
@@ -372,7 +398,7 @@
     try {
       doc = el.iframe.contentDocument || el.iframe.contentWindow.document;
     } catch (e) {
-      console.warn('[take] iframe access failed:', e);
+      logWarn('⚠️ [capture] iframe access failed:', e);
       return { inputs: [] };
     }
 
@@ -381,6 +407,7 @@
     var inputs = [];
     var idx = 0;
 
+    /* ─── پیدا کردن label مرتبط ─── */
     function findLabel(node) {
       if (!node) return null;
 
@@ -407,14 +434,16 @@
       return null;
     }
 
-    /* RADIO */
+    /* ─── RADIO — همه‌ی گروه‌ها (حتی اگه هیچی انتخاب نشده) ─── */
     try {
-      var radioNames = {};
+      var radioNames = [];
       doc.querySelectorAll('input[type=radio]').forEach(function (r) {
-        if (r.name) radioNames[r.name] = true;
+        if (r.name && radioNames.indexOf(r.name) === -1) {
+          radioNames.push(r.name);
+        }
       });
 
-      Object.keys(radioNames).forEach(function (name) {
+      radioNames.forEach(function (name) {
         var checked = null;
         try {
           checked = doc.querySelector('input[type=radio][name="' + name.replace(/"/g, '\\"') + '"]:checked');
@@ -436,44 +465,43 @@
           label: label
         });
       });
-    } catch (e) {}
+    } catch (e) {
+      logWarn('⚠️ [capture] radio:', e);
+    }
 
-    /* CHECKBOX */
+    /* ─── CHECKBOX — همه‌ی گروه‌ها ─── */
     try {
       var checkboxGroups = {};
       doc.querySelectorAll('input[type=checkbox]').forEach(function (cb) {
         var key = cb.name || cb.id;
         if (!key) return;
-        if (!checkboxGroups[key]) checkboxGroups[key] = [];
-        if (cb.checked) checkboxGroups[key].push(String(cb.value || 'true'));
+        if (!checkboxGroups[key]) checkboxGroups[key] = { values: [], first: cb };
+        if (cb.checked) checkboxGroups[key].values.push(String(cb.value || 'true'));
       });
 
       Object.keys(checkboxGroups).forEach(function (name) {
-        var first = null;
-        try {
-          first = doc.querySelector('input[type=checkbox][name="' + name.replace(/"/g, '\\"') + '"]');
-        } catch (e) {}
-
-        var label = findLabel(first) || name;
+        var group = checkboxGroups[name];
+        var label = findLabel(group.first) || name;
 
         idx++;
         inputs.push({
           index: idx,
           name: name,
           type: 'checkbox',
-          value: checkboxGroups[name].join(' | '),
+          value: group.values.join(' | '),
           label: label
         });
       });
-    } catch (e) {}
+    } catch (e) {
+      logWarn('⚠️ [capture] checkbox:', e);
+    }
 
-    /* TEXT */
+    /* ─── TEXT / NUMBER / EMAIL / TEL / URL — 🆕 همه حتی خالی ─── */
     try {
       doc.querySelectorAll(
         'input[type=text], input[type=number], input[type=email], input[type=tel], input[type=url], input[type=search]'
       ).forEach(function (inp) {
         var val = (inp.value || '').trim();
-        if (!val) return;
         idx++;
         inputs.push({
           index: idx,
@@ -483,13 +511,14 @@
           label: findLabel(inp)
         });
       });
-    } catch (e) {}
+    } catch (e) {
+      logWarn('⚠️ [capture] text:', e);
+    }
 
-    /* TEXTAREA */
+    /* ─── TEXTAREA — 🆕 همه حتی خالی ─── */
     try {
       doc.querySelectorAll('textarea').forEach(function (ta) {
         var val = (ta.value || '').trim();
-        if (!val) return;
         idx++;
         inputs.push({
           index: idx,
@@ -499,26 +528,35 @@
           label: findLabel(ta)
         });
       });
-    } catch (e) {}
+    } catch (e) {
+      logWarn('⚠️ [capture] textarea:', e);
+    }
 
-    /* SELECT */
+    /* ─── SELECT — همه ─── */
     try {
       doc.querySelectorAll('select').forEach(function (sel) {
-        if (!sel.value) return;
         var opt = sel.options[sel.selectedIndex];
-        var text = opt ? (opt.textContent || '').trim() : sel.value;
+        var text = opt ? (opt.textContent || '').trim() : (sel.value || '');
+
         idx++;
         inputs.push({
           index: idx,
           name: sel.name || sel.id || ('select_' + idx),
           type: 'select',
-          value: String(text || sel.value).slice(0, 500),
+          value: String(text || sel.value || '').slice(0, 500),
           label: findLabel(sel)
         });
       });
-    } catch (e) {}
+    } catch (e) {
+      logWarn('⚠️ [capture] select:', e);
+    }
 
     var duration = state.startedAt ? Math.floor((Date.now() - state.startedAt) / 1000) : 0;
+    var answered = inputs.filter(function (i) {
+      return i.value !== null && i.value !== undefined && String(i.value).trim() !== '';
+    }).length;
+
+    log('📋 [capture] ' + inputs.length + ' سؤال، ' + answered + ' پاسخ');
 
     return {
       inputs: inputs,
@@ -526,6 +564,7 @@
         submitted_at: new Date().toISOString(),
         duration_seconds: duration,
         total_inputs: inputs.length,
+        answered_count: answered,
         user_agent: (navigator.userAgent || '').slice(0, 200)
       }
     };
@@ -560,6 +599,12 @@
     try { parsed = JSON.parse(raw); } catch (e) { return; }
     if (!parsed || !parsed.answers || !parsed.answers.inputs) return;
     if (!parsed.answers.inputs.length) return;
+
+    /* چک کن حداقل یه پاسخ پر شده باشه */
+    var hasAnyValue = parsed.answers.inputs.some(function (i) {
+      return i.value !== null && i.value !== undefined && String(i.value).trim() !== '';
+    });
+    if (!hasAnyValue) return;
 
     if (el.draftBanner) el.draftBanner.style.display = 'flex';
 
@@ -607,12 +652,12 @@
         } else if (item.type === 'textarea') {
           var ta = doc.querySelector('textarea[name="' + item.name.replace(/"/g, '\\"') + '"]') ||
                    (item.name ? doc.getElementById(item.name) : null);
-          if (ta) ta.value = item.value;
+          if (ta && item.value) ta.value = item.value;
 
         } else if (item.type === 'select') {
           var sel = doc.querySelector('select[name="' + item.name.replace(/"/g, '\\"') + '"]') ||
                     (item.name ? doc.getElementById(item.name) : null);
-          if (sel) {
+          if (sel && item.value) {
             for (var i = 0; i < sel.options.length; i++) {
               if ((sel.options[i].textContent || '').trim() === item.value) {
                 sel.selectedIndex = i;
@@ -624,7 +669,7 @@
         } else if (['text','number','email','tel','url','search'].indexOf(item.type) !== -1) {
           var inp = doc.querySelector('input[name="' + item.name.replace(/"/g, '\\"') + '"]') ||
                     (item.name ? doc.getElementById(item.name) : null);
-          if (inp) inp.value = item.value;
+          if (inp && item.value) inp.value = item.value;
         }
       } catch (e) {}
     });
@@ -656,10 +701,17 @@
 
     var data = captureAnswers();
     var total = data.inputs.length;
+    var answered = data.metadata.answered_count;
 
     var msg = 'مطمئنی که می‌خوای آزمون رو ثبت کنی؟\n';
-    if (total === 0) msg += '\n⚠️ هیچ پاسخی وارد نکردی!';
-    else msg += '\nتعداد پاسخ‌های ثبت‌شده: ' + total;
+    msg += '\nتعداد سؤالات: ' + total;
+    msg += '\nپاسخ‌داده: ' + answered;
+
+    if (answered === 0) {
+      msg += '\n\n⚠️ هیچ پاسخی وارد نکردی!';
+    } else if (answered < total) {
+      msg += '\n\n⚠️ ' + (total - answered) + ' سؤال بدون پاسخ مونده!';
+    }
 
     if (!confirm(msg)) return;
 
@@ -675,7 +727,7 @@
       var answers = captureAnswers();
       var duration = state.startedAt ? Math.floor((Date.now() - state.startedAt) / 1000) : 0;
 
-      console.log('[take] submitting...', { exam_id: state.examId, duration: duration });
+      log('📤 [Submit] ارسال...', { exam_id: state.examId, duration: duration, count: answers.inputs.length });
 
       var insertResult = await state.supabase
         .from('submissions')
@@ -689,7 +741,7 @@
         .maybeSingle();
 
       if (insertResult.error) {
-        console.error('[take] submit error:', insertResult.error);
+        logError('❌ [Submit]', insertResult.error);
 
         var errMsg = 'خطا در ثبت آزمون';
 
@@ -725,7 +777,7 @@
       window.location.replace('student.html');
 
     } catch (e) {
-      console.error('[take] submit fatal:', e);
+      logError('❌ [Submit]', e);
       state.isSubmitting = false;
       if (el.submitBtn) el.submitBtn.disabled = false;
       if (el.submitOverlay) el.submitOverlay.style.display = 'none';
@@ -747,7 +799,7 @@
       if (el.errorText) el.errorText.textContent = message;
     }
 
-    console.error('[take] error:', message);
+    logError('❌ [Error]', message);
   }
 
   /* ============================================================
@@ -755,7 +807,7 @@
    * ============================================================ */
   function bindEvents() {
     if (el.submitBtn) {
-      el.submitBtn.addEventListener('click', function () { doSubmit(); });
+      el.submitBtn.addEventListener('click', doSubmit);
     }
 
     window.addEventListener('beforeunload', function (e) {
@@ -790,8 +842,19 @@
    * INIT
    * ============================================================ */
   async function init() {
-    try { state.supabase = getSupabase(); }
-    catch (e) { console.error('[take]', e); return; }
+    log(
+      '%c📝 آزمون — سامانه آزمون\n%cطراحی: فاطمه جوادی',
+      'color: #6C5CE7; font-size: 16px; font-weight: bold;',
+      'color: #00CEC9; font-size: 12px;'
+    );
+
+    try {
+      state.supabase = getSupabase();
+    } catch (e) {
+      logError('❌ [Init]', e);
+      showError('خطا در بارگذاری سیستم');
+      return;
+    }
 
     cacheElements();
     initTheme();
@@ -828,13 +891,7 @@
     startAutosave();
     bindEvents();
 
-    try {
-      console.log(
-        '%c📝 آزمون آغاز شد\n%c' + (exam.title || 'آزمون'),
-        'color: #00CEC9; font-size: 14px; font-weight: bold;',
-        'color: #6C5CE7; font-size: 12px;'
-      );
-    } catch (e) {}
+    log('%c✅ [Init] آزمون آماده', 'color: #00B894; font-weight: bold;');
   }
 
   /* ============================================================
@@ -842,7 +899,6 @@
    * ============================================================ */
   window.TakePanel = {
     __loaded: true,
-    init: init,
     state: state,
     submit: doSubmit,
     saveDraft: saveDraft,
