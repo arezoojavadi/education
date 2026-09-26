@@ -94,7 +94,7 @@ body.dark.auth-page {
   padding: 18px;
   font-size: 36px;
   text-align: center;
-  letter-spacing: 12px;
+  letter-spacing: 8px;
   font-family: 'Vazirmatn', monospace;
   font-weight: 700;
   border: 2px solid var(--border);
@@ -112,6 +112,7 @@ body.dark.auth-page {
 
 .code-input::placeholder {
   color: var(--border);
+  letter-spacing: 8px;
 }
 
 .text-input {
