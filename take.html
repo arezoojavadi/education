@@ -1,81 +1,1151 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="در حال آزمون — سامانه آزمون فاطمه جوادی">
+<meta name="author" content="فاطمه جوادی">
+<meta name="theme-color" content="#6C5CE7" id="themeMeta">
+<meta name="color-scheme" content="light dark">
+
+<title>در حال آزمون | سامانه آزمون فاطمه جوادی</title>
+
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#6C5CE7">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="آزمون">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/components.css">
-<link rel="stylesheet" href="css/animations.css">
-<link rel="stylesheet" href="css/skeletons.css">
-<link rel="stylesheet" href="css/print.css" media="print">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#6C5CE7">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="آزمون">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>در حال آزمون</title>
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/components.css">
+<style>
+/* ============================================================
+   RESET
+============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ============================================================
+   TOKENS — LIGHT
+============================================================ */
+:root {
+  --brand-1: #6C5CE7;
+  --brand-2: #8E7CFF;
+  --brand-3: #00CEC9;
+  --brand-4: #FD79A8;
+  --brand-5: #FDCB6E;
+  --success: #00B894;
+  --danger:  #FF6B6B;
+  --warning: #FDCB6E;
+
+  --bg-1: #EEF0FF;
+  --bg-2: #F5F0FF;
+  --bg-3: #FFF0F8;
+
+  --card-bg: #FFFFFF;
+  --card-border: rgba(108, 92, 231, 0.08);
+
+  --text-1: #1E1B3A;
+  --text-2: #6B6789;
+  --text-3: #A5A0C0;
+
+  --input-bg: #F8F7FF;
+  --input-border: #E5E0FF;
+
+  --shadow-sm: 0 2px 8px rgba(108, 92, 231, 0.06);
+  --shadow-md: 0 6px 24px rgba(108, 92, 231, 0.10);
+  --shadow-lg: 0 12px 40px rgba(108, 92, 231, 0.15);
+  --shadow-btn: 0 6px 18px rgba(108, 92, 231, 0.28);
+
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+}
+
+/* ============================================================
+   TOKENS — DARK
+============================================================ */
+html.dark {
+  --bg-1: #0F0C24;
+  --bg-2: #14102E;
+  --bg-3: #1A1030;
+
+  --card-bg: #1A1638;
+  --card-border: rgba(162, 155, 254, 0.12);
+
+  --text-1: #F2F0FF;
+  --text-2: #A5A0C0;
+  --text-3: #6B6789;
+
+  --input-bg: #14102E;
+  --input-border: #2A2456;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.5);
+  --shadow-btn: 0 6px 18px rgba(108, 92, 231, 0.4);
+}
+
+/* ============================================================
+   BASE
+============================================================ */
+html, body {
+  min-height: 100%;
+  height: 100%;
+}
+
+body {
+  font-family: 'Vazirmatn', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 50%, var(--bg-3) 100%);
+  background-attachment: fixed;
+  color: var(--text-1);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background 0.4s var(--ease), color 0.4s var(--ease);
+}
+
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+/* ============================================================
+   BACKGROUND DECOR
+============================================================ */
+.bg-decor {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bg-decor::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='2' cy='2' r='1' fill='%236C5CE7' opacity='0.35'/></svg>");
+  background-size: 32px 32px;
+  opacity: 0.3;
+  mask-image: radial-gradient(ellipse at top, #000 10%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse at top, #000 10%, transparent 70%);
+}
+
+html.dark .bg-decor::before {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='2' cy='2' r='1' fill='%23A29BFE' opacity='0.5'/></svg>");
+  opacity: 0.45;
+}
+
+.bg-decor::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(108, 92, 231, 0.1) 0%, transparent 35%),
+    radial-gradient(circle at 85% 85%, rgba(0, 206, 201, 0.08) 0%, transparent 35%);
+}
+
+html.dark .bg-decor::after {
+  background:
+    radial-gradient(circle at 15% 15%, rgba(162, 155, 254, 0.13) 0%, transparent 35%),
+    radial-gradient(circle at 85% 85%, rgba(0, 206, 201, 0.1) 0%, transparent 35%);
+}
+
+/* ============================================================
+   TOP BAR
+============================================================ */
+.top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--card-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-sm);
+}
+
+.top-bar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+}
+
+.exam-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.exam-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #6C5CE7, #8E7CFF);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 6px 16px rgba(108, 92, 231, 0.28);
+}
+
+.exam-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke: #fff;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.exam-info-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  line-height: 1.3;
+  min-width: 0;
+  flex: 1;
+}
+
+.exam-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-3);
+  letter-spacing: 0.3px;
+}
+
+.exam-title {
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--text-1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 320px;
+}
+
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Timer */
+.timer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-md);
+  transition: all 0.3s var(--ease);
+  min-width: 130px;
+  justify-content: center;
+}
+
+.timer.warning {
+  background: rgba(255, 107, 107, 0.1);
+  border-color: rgba(255, 107, 107, 0.4);
+  animation: timerPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes timerPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.4); }
+  50%      { box-shadow: 0 0 0 8px rgba(255, 107, 107, 0); }
+}
+
+.timer-icon {
+  width: 18px;
+  height: 18px;
+  stroke: var(--brand-1);
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+.timer.warning .timer-icon {
+  stroke: var(--danger);
+}
+
+html.dark .timer-icon { stroke: var(--brand-2); }
+
+.timer-text {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--brand-1);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.5px;
+  font-family: 'Vazirmatn', monospace;
+}
+
+.timer.warning .timer-text {
+  color: var(--danger);
+}
+
+html.dark .timer-text { color: var(--brand-2); }
+
+/* Icon buttons */
+.icon-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-1);
+  transition: all 0.2s var(--ease);
+  flex-shrink: 0;
+}
+
+.icon-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--brand-1);
+  color: var(--brand-1);
+}
+
+html.dark .icon-btn:hover {
+  border-color: var(--brand-2);
+  color: var(--brand-2);
+}
+
+.icon-btn:active { transform: scale(0.94); }
+
+.icon-btn svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.icon-wrap {
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+
+.icon-wrap svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.25s, transform 0.35s var(--ease);
+}
+
+.icon-sun  { opacity: 1; transform: rotate(0) scale(1); }
+.icon-moon { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+
+html.dark .icon-sun  { opacity: 0; transform: rotate(90deg) scale(0.5); }
+html.dark .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
+
+/* ============================================================
+   TIMER PROGRESS BAR
+============================================================ */
+.timer-progress-wrap {
+  position: sticky;
+  top: 66px;
+  z-index: 99;
+  height: 4px;
+  background: var(--input-bg);
+  overflow: hidden;
+}
+
+.timer-progress {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #00B894, #55EFC4);
+  border-radius: 0 4px 4px 0;
+  transition: width 1s linear, background 0.5s var(--ease);
+  transform-origin: right center;
+  position: relative;
+  overflow: hidden;
+}
+
+.timer-progress::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  animation: progressShine 2s linear infinite;
+}
+
+@keyframes progressShine {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
+
+.timer-progress.mid {
+  background: linear-gradient(90deg, #FDCB6E, #FFEAA7);
+}
+
+.timer-progress.low {
+  background: linear-gradient(90deg, #FF6B6B, #FF8E8E);
+}
+
+/* ============================================================
+   BANNERS
+============================================================ */
+.banners {
+  max-width: 1200px;
+  margin: 12px auto 0;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.banner {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.6;
+  animation: bannerIn 0.4s var(--ease);
+}
+
+@keyframes bannerIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.banner.show { display: flex; }
+
+.banner.draft {
+  background: linear-gradient(135deg, rgba(0, 206, 201, 0.12), rgba(0, 184, 148, 0.08));
+  border: 1px solid rgba(0, 206, 201, 0.3);
+  border-right: 4px solid var(--brand-3);
+  color: #008B88;
+}
+
+html.dark .banner.draft {
+  color: #4DE3DF;
+  background: linear-gradient(135deg, rgba(0, 206, 201, 0.15), rgba(0, 184, 148, 0.1));
+}
+
+.banner-icon {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+.banner-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.banner-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s var(--ease);
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-sm.restore {
+  background: var(--success);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 184, 148, 0.28);
+}
+
+.btn-sm.restore:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 184, 148, 0.42);
+}
+
+.btn-sm.discard {
+  background: var(--input-bg);
+  color: var(--text-1);
+  border-color: var(--input-border);
+}
+
+.btn-sm.discard:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+/* ============================================================
+   MAIN
+============================================================ */
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 20px 140px;
+}
+
+/* ============================================================
+   STATES
+============================================================ */
+.state-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 80px 20px;
+  text-align: center;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.state-spinner {
+  width: 42px;
+  height: 42px;
+  border: 3.5px solid var(--input-border);
+  border-top-color: var(--brand-1);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.state-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-2);
+}
+
+.state-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-xl);
+  background: rgba(255, 107, 107, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(255, 107, 107, 0.25);
+}
+
+.state-icon svg {
+  width: 34px;
+  height: 34px;
+  stroke: var(--danger);
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.state-error-title {
+  font-size: 17px;
+  font-weight: 900;
+  color: var(--text-1);
+}
+
+.state-error-text {
+  font-size: 13.5px;
+  color: var(--text-2);
+  max-width: 380px;
+  line-height: 1.7;
+  font-weight: 600;
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, #6C5CE7 0%, #8E7CFF 100%);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-btn);
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+  margin-top: 8px;
+}
+
+.btn-back:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(108, 92, 231, 0.42);
+}
+
+.btn-back svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ============================================================
+   IFRAME
+============================================================ */
+.iframe-wrap {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: 8px;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.iframe-wrap::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #6C5CE7, #00CEC9, #FD79A8, #6C5CE7);
+  background-size: 200% 100%;
+  animation: shimmer 8s linear infinite;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  z-index: 1;
+}
+
+@keyframes shimmer { to { background-position: 200% 0; } }
+
+.exam-iframe {
+  width: 100%;
+  border: none;
+  border-radius: var(--radius-md);
+  min-height: 600px;
+  background: #fff;
+  display: block;
+}
+
+html.dark .exam-iframe {
+  background: #f5f5f5;
+}
+
+/* ============================================================
+   STICKY FOOTER
+============================================================ */
+.take-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  background: var(--card-bg);
+  border-top: 1px solid var(--card-border);
+  padding: 14px 20px calc(14px + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -6px 24px rgba(108, 92, 231, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+html.dark .take-footer {
+  box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.3);
+}
+
+.take-footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.footer-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-2);
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.footer-hint svg {
+  width: 16px;
+  height: 16px;
+  stroke: var(--brand-1);
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+html.dark .footer-hint svg { stroke: var(--brand-2); }
+
+.btn-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 32px;
+  font-size: 15.5px;
+  font-weight: 900;
+  color: #fff;
+  background: linear-gradient(135deg, #00B894 0%, #55EFC4 100%);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 24px rgba(0, 184, 148, 0.35);
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+  position: relative;
+  overflow: hidden;
+  min-height: 54px;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+}
+
+.btn-submit::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.6s var(--ease);
+}
+
+.btn-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(0, 184, 148, 0.45);
+}
+
+.btn-submit:hover:not(:disabled)::before {
+  left: 120%;
+}
+
+.btn-submit:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-submit svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  position: relative;
+  z-index: 1;
+}
+
+.btn-submit span {
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================================
+   SUBMIT OVERLAY
+============================================================ */
+.submit-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9500;
+  background: rgba(15, 12, 36, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.25s var(--ease);
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.submit-box {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-xl);
+  padding: 40px 44px;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  animation: boxIn 0.4s var(--bounce);
+  max-width: 380px;
+  width: 100%;
+}
+
+@keyframes boxIn {
+  0%   { opacity: 0; transform: scale(0.9) translateY(20px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.submit-spinner {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 20px;
+  border: 4px solid var(--input-border);
+  border-top-color: var(--brand-1);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+.submit-title {
+  font-size: 17px;
+  font-weight: 900;
+  color: var(--text-1);
+  margin-bottom: 8px;
+}
+
+.submit-text {
+  font-size: 13.5px;
+  color: var(--text-2);
+  font-weight: 600;
+  line-height: 1.7;
+}
+
+/* ============================================================
+   TOAST
+============================================================ */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 9000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+  max-width: 360px;
+}
+
+.toast {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  padding: 13px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-1);
+  box-shadow: var(--shadow-lg);
+  border-right: 4px solid var(--brand-1);
+  animation: toastIn 0.35s var(--bounce) both;
+  pointer-events: auto;
+  line-height: 1.5;
+}
+
+.toast.success { border-right-color: var(--success); }
+.toast.error   { border-right-color: var(--danger); }
+.toast.info    { border-right-color: var(--brand-3); }
+.toast.removing { animation: toastOut 0.25s var(--ease) forwards; }
+
+@keyframes toastIn {
+  0% { opacity: 0; transform: translateX(-30px) scale(0.95); }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes toastOut {
+  to { opacity: 0; transform: translateX(-30px) scale(0.95); }
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 720px) {
+  .top-bar-inner {
+    padding: 10px 14px;
+    gap: 8px;
+  }
+
+  .exam-icon { width: 36px; height: 36px; border-radius: 11px; }
+  .exam-icon svg { width: 18px; height: 18px; }
+  .exam-title { font-size: 13.5px; max-width: 180px; }
+  .exam-label { font-size: 10px; }
+
+  .timer {
+    padding: 6px 12px;
+    min-width: 100px;
+    gap: 6px;
+  }
+
+  .timer-icon { width: 15px; height: 15px; }
+  .timer-text { font-size: 14px; }
+
+  .icon-btn { width: 38px; height: 38px; }
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  .banners { padding: 0 14px; margin-top: 10px; }
+  .banner { padding: 10px 12px; font-size: 12px; flex-wrap: wrap; }
+  .banner-actions { width: 100%; justify-content: flex-start; }
+
+  .main { padding: 14px 14px 160px; }
+  .iframe-wrap { padding: 6px; border-radius: var(--radius-md); }
+  .exam-iframe { min-height: 450px; }
+
+  .take-footer { padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px)); }
+  .take-footer-inner { flex-direction: column; gap: 10px; }
+  .footer-hint { font-size: 11px; order: 2; }
+  .btn-submit { width: 100%; min-height: 50px; padding: 12px 24px; font-size: 14.5px; order: 1; }
+
+  .state-box { padding: 60px 16px; }
+  .state-icon { width: 64px; height: 64px; }
+  .state-icon svg { width: 30px; height: 30px; }
+
+  .submit-box { padding: 32px 24px; }
+  .submit-spinner { width: 48px; height: 48px; }
+  .submit-title { font-size: 15.5px; }
+
+  .toast-container { top: 14px; left: 14px; right: 14px; max-width: none; }
+}
+
+@media (max-width: 420px) {
+  .exam-label { display: none; }
+  .exam-title { font-size: 13px; max-width: 140px; }
+
+  .timer { min-width: 88px; padding: 6px 10px; }
+  .timer-text { font-size: 13px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .timer.warning,
+  .iframe-wrap::before,
+  .timer-progress::after {
+    animation: none;
+  }
+}
+</style>
 </head>
 <body>
 
-  <header class="take-header">
-    <div>
-      <strong id="examTitle">در حال بارگذاری...</strong>
-    </div>
-    <div class="timer" id="timer">
-      <span>⏱</span>
-      <span id="timerText">--:--</span>
-    </div>
-  </header>
+<div class="bg-decor" aria-hidden="true"></div>
 
-  <main class="container">
+<!-- ============ TOP BAR ============ -->
+<header class="top-bar">
+  <div class="top-bar-inner">
 
-    <div id="loading" class="loading">
-      <div class="spinner"></div>
-      در حال بارگذاری آزمون...
-    </div>
-
-    <div id="examContent" style="display:none;">
-      <div class="exam-frame-wrap">
-        <iframe id="examFrame" class="exam-frame"></iframe>
+    <div class="exam-info">
+      <div class="exam-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <path d="M14 2v6h6"/>
+          <path d="M9 15l2 2 4-4"/>
+        </svg>
       </div>
-
-      <div class="take-footer">
-        <button class="btn btn-success" 
-                style="padding:16px 48px; font-size:17px;"
-                onclick="submitExam()" 
-                id="submitBtn">
-          ✅ ثبت نهایی و ارسال به معلم
-        </button>
+      <div class="exam-info-text">
+        <span class="exam-label">در حال آزمون</span>
+        <span class="exam-title" id="examTitle">در حال بارگذاری...</span>
       </div>
     </div>
 
-  </main>
+    <div class="top-actions">
 
-  <script src="js/errors.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/utils.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/take.js"></script>
-</body>
+      <div class="timer" id="timerWrap">
+        <svg class="timer-icon" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <span class="timer-text" id="timerText">--:--</span>
+      </div>
+
+      <button class="icon-btn" id="themeBtn" type="button" title="تغییر حالت" aria-label="تغییر تم">
+        <span class="icon-wrap">
+          <svg class="icon-sun" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+          </svg>
+          <svg class="icon-moon" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </span>
+      </button>
+
+    </div>
+
+  </div>
+</header>
+
+<!-- ============ TIMER PROGRESS ============ -->
+<div class="timer-progress-wrap">
+  <div class="timer-progress" id="timerProgress"></div>
+</div>
+
+<!-- ============ BANNERS ============ -->
+<div class="banners">
+
+  <!-- Draft Banner -->
+  <div class="banner draft" id="draftBanner">
+    <svg class="banner-icon" viewBox="0 0 24 24">
+      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+      <polyline points="17 21 17 13 7 13 7 21"/>
+      <polyline points="7 3 7 8 15 8"/>
+    </svg>
+    <div class="banner-text">
+      <b>پیش‌نویس قبلی پیدا شد!</b> می‌خوای پاسخ‌هات رو بازیابی کنی؟
+    </div>
+    <div class="banner-actions">
+      <button class="btn-sm restore" id="draftRestore" type="button">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span>بازیابی</span>
+      </button>
+      <button class="btn-sm discard" id="draftDiscard" type="button">
+        <span>حذف</span>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============ MAIN ============ -->
+<main class="main">
+
+  <!-- Loading -->
+  <div id="loadingState" class="state-box">
+    <div class="state-spinner"></div>
+    <div class="state-text">در حال بارگذاری آزمون...</div>
+  </div>
+
+  <!-- Error -->
+  <div id="errorState" class="state-box" style="display:none;">
+    <div class="state-icon">
+      <svg viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+    </div>
+    <div class="state-error-title">مشکلی پیش آمد</div>
+    <div class="state-error-text" id="errorText">
+      لطفاً دوباره تلاش کن.
+    </div>
+    <a href="student.html" class="btn-back">
+      <svg viewBox="0 0 24 24">
+        <line x1="19" y1="12" x2="5" y2="12"/>
+        <polyline points="12 19 5 12 12 5"/>
+      </svg>
+      <span>بازگشت به پنل</span>
+    </a>
+  </div>
+
+  <!-- Exam Content -->
+  <div id="examContent" style="display:none;">
+    <div class="iframe-wrap" id="iframeWrap">
+      <iframe
+        id="examFrame"
+        class="exam-iframe"
+        title="محتوای آزمون"
+        sandbox="allow-same-origin allow-forms allow-scripts"
+      ></iframe>
+    </div>
+  </div>
+
+</main>
+
+<!-- ============ STICKY FOOTER ============ -->
+<footer class="take-footer" id="takeFooter" style="display:none;">
+  <div class="take-footer-inner">
+
+    <div class="footer-hint">
+      <svg viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="16" x2="12" y2="12"/>
+        <line x1="12" y1="8" x2="12.01" y2="8"/>
+      </svg>
+      <span>پاسخ‌ها هر ۵ ثانیه ذخیره می‌شن — با <b>Ctrl+S</b> می‌تونی دستی ذخیره کنی</span>
+    </div>
+
+    <button class="btn-submit" id="submitBtn" type="button">
+      <svg viewBox="0 0 24 24">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+        <polyline points="22 4 12 14.01 9 11.01"/>
+      </svg>
+      <span>ثبت نهایی و ارسال به معلم</span>
+    </button>
+
+  </div>
+</footer>
+
+<!-- ============ SUBMIT OVERLAY ============ -->
+<div class="submit-overlay" id="submitOverlay">
+  <div class="submit-box">
+    <div class="submit-spinner"></div>
+    <div class="submit-title">در حال ثبت آزمون</div>
+    <div class="submit-text" id="submitText">لطفاً صبر کن، پاسخ‌هات داره ارسال می‌شه...</div>
+  </div>
+</div>
+
+<!-- ============ TOASTS ============ -->
+<div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+<!-- ============ SCRIPTS ============ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/utils.js"></script>
-<script src="js/errors.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/a11y.js"></script>
-<!-- اسکریپت مخصوص صفحه -->
-</html>
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<script src="js/a11y.js"></script>
+<script src="js/take.js"></script>
+
+<!-- نمایش footer بعد از لود -->
 <script>
-  document.addEventListener('DOMContentLoaded', initAccessibility);
+(function () {
+  'use strict';
+  // وقتی که examContent نشون داده شد، footer هم نشون بده
+  var examContent = document.getElementById('examContent');
+  var takeFooter = document.getElementById('takeFooter');
+
+  if (examContent && takeFooter) {
+    var observer = new MutationObserver(function (mutations) {
+      mutations.forEach(function (m) {
+        if (m.type === 'attributes' && m.attributeName === 'style') {
+          if (examContent.style.display === 'block') {
+            takeFooter.style.display = 'block';
+          }
+        }
+      });
+    });
+    observer.observe(examContent, { attributes: true, attributeFilter: ['style'] });
+  }
+})();
 </script>
+</body>
+</html>
