@@ -1,939 +1,1300 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="description" content="سامانه آزمون آنلاین — طراحی فاطمه جوادی">
-  <meta name="author" content="فاطمه جوادی">
-  <meta name="theme-color" content="#6C5CE7" id="themeMeta">
-  <meta name="color-scheme" content="light dark">
-
-  <title>ورود | سامانه آزمون فاطمه جوادی</title>
-
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="manifest" href="manifest.json">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-
-  <style>
-    /* ============================================
-       RESET
-       ============================================ */
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    /* ============================================
-       DESIGN TOKENS — LIGHT (سریع و بدون blur)
-       ============================================ */
-    :root {
-      --brand-1: #6C5CE7;
-      --brand-2: #8E7CFF;
-      --brand-3: #00CEC9;
-      --brand-4: #FD79A8;
-      --brand-5: #FDCB6E;
-
-      --success: #00B894;
-      --danger: #FF6B6B;
-
-      /* پس‌زمینه — گرادیانت static */
-      --bg: linear-gradient(135deg, #EEF0FF 0%, #F5F0FF 50%, #FFF0F8 100%);
-
-      /* کارت */
-      --card-bg: #FFFFFF;
-      --card-border: rgba(108, 92, 231, 0.08);
-
-      /* متن */
-      --text-1: #1E1B3A;
-      --text-2: #6B6789;
-      --text-3: #A5A0C0;
-
-      /* ورودی */
-      --input-bg: #F8F7FF;
-      --input-border: #E5E0FF;
-      --input-focus: #6C5CE7;
-      --input-glow: rgba(108, 92, 231, 0.18);
-
-      --shadow: 0 4px 20px rgba(108, 92, 231, 0.08), 0 1px 3px rgba(0,0,0,0.03);
-      --shadow-hover: 0 8px 32px rgba(108, 92, 231, 0.15);
-
-      --ease: cubic-bezier(0.4, 0, 0.2, 1);
-      --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    /* DARK */
-    html.dark {
-      --bg: linear-gradient(135deg, #0F0C24 0%, #14102E 50%, #1A1030 100%);
-      --card-bg: #1A1638;
-      --card-border: rgba(162, 155, 254, 0.12);
-
-      --text-1: #F2F0FF;
-      --text-2: #A5A0C0;
-      --text-3: #6B6789;
-
-      --input-bg: #14102E;
-      --input-border: #2A2456;
-      --input-focus: #A29BFE;
-      --input-glow: rgba(162, 155, 254, 0.25);
-
-      --shadow: 0 4px 20px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.3);
-      --shadow-hover: 0 8px 32px rgba(0,0,0,0.5);
-    }
-
-    /* ============================================
-       BASE
-       ============================================ */
-    html, body {
-      height: 100%;
-      min-height: 100%;
-    }
-
-    body {
-      font-family: 'Vazirmatn', system-ui, -apple-system, sans-serif;
-      background: var(--bg);
-      background-attachment: fixed;
-      color: var(--text-1);
-      line-height: 1.6;
-      overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      transition: background 0.4s var(--ease), color 0.4s var(--ease);
-    }
-
-    button { font-family: inherit; cursor: pointer; }
-    input { font-family: inherit; }
-
-    /* ============================================
-       BACKGROUND PATTERN — SVG سبک (بدون blur)
-       ============================================ */
-    .bg-pattern {
-      position: fixed;
-      inset: 0;
-      z-index: -2;
-      opacity: 0.4;
-      pointer-events: none;
-      background-image:
-        radial-gradient(circle at 20% 20%, rgba(108, 92, 231, 0.08) 0%, transparent 40%),
-        radial-gradient(circle at 80% 80%, rgba(0, 206, 201, 0.06) 0%, transparent 40%),
-        radial-gradient(circle at 50% 50%, rgba(253, 121, 168, 0.05) 0%, transparent 50%);
-      transition: opacity 0.4s;
-    }
-
-    html.dark .bg-pattern {
-      opacity: 0.7;
-      background-image:
-        radial-gradient(circle at 20% 20%, rgba(162, 155, 254, 0.12) 0%, transparent 40%),
-        radial-gradient(circle at 80% 80%, rgba(0, 206, 201, 0.1) 0%, transparent 40%),
-        radial-gradient(circle at 50% 50%, rgba(253, 121, 168, 0.08) 0%, transparent 50%);
-    }
-
-    /* الگوی نقطه‌ای — SVG inline (سریع) */
-    .bg-dots {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      opacity: 0.35;
-      pointer-events: none;
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='2' cy='2' r='1' fill='%236C5CE7' opacity='0.35'/></svg>");
-      background-size: 32px 32px;
-      mask-image: radial-gradient(ellipse at center, black 10%, transparent 70%);
-      -webkit-mask-image: radial-gradient(ellipse at center, black 10%, transparent 70%);
-    }
-
-    html.dark .bg-dots {
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='2' cy='2' r='1' fill='%23A29BFE' opacity='0.5'/></svg>");
-      opacity: 0.5;
-    }
-
-    /* ============================================
-       TOP CONTROLS
-       ============================================ */
-    .top-controls {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      z-index: 100;
-    }
-
-    .icon-btn {
-      width: 46px;
-      height: 46px;
-      border-radius: 14px;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-1);
-      box-shadow: var(--shadow);
-      transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
-    }
-
-    .icon-btn:hover {
-      transform: translateY(-2px) scale(1.04);
-      box-shadow: var(--shadow-hover);
-    }
-
-    .icon-btn:active {
-      transform: scale(0.94);
-    }
-
-    .icon-wrap {
-      position: relative;
-      width: 22px;
-      height: 22px;
-    }
-
-    .icon-wrap svg {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      transition: opacity 0.25s, transform 0.3s var(--ease);
-    }
-
-    .icon-sun { opacity: 1; transform: rotate(0) scale(1); }
-    .icon-moon { opacity: 0; transform: rotate(-90deg) scale(0.5); }
-    html.dark .icon-sun { opacity: 0; transform: rotate(90deg) scale(0.5); }
-    html.dark .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
-
-    /* ============================================
-       APP / CARD
-       ============================================ */
-    .app {
-      position: relative;
-      min-height: 100vh;
-      min-height: 100dvh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 80px 20px 40px;
-    }
-
-    .card {
-      width: 100%;
-      max-width: 440px;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 28px;
-      padding: 42px 36px 30px;
-      box-shadow: var(--shadow);
-      position: relative;
-      overflow: hidden;
-      transition: background 0.4s var(--ease), border 0.4s var(--ease), box-shadow 0.4s var(--ease);
-    }
-
-    /* نوار رنگی بالای کارت */
-    .card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      left: 0;
-      height: 4px;
-      background: linear-gradient(90deg, #6C5CE7, #00CEC9, #FD79A8, #6C5CE7);
-      background-size: 200% 100%;
-      animation: shimmer 6s linear infinite;
-    }
-
-    @keyframes shimmer {
-      to { background-position: 200% 0; }
-    }
-
-    /* ============================================
-       LOGO — SVG سبک
-       ============================================ */
-    .logo-wrap {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-
-    .logo {
-      width: 76px;
-      height: 76px;
-      margin: 0 auto 18px;
-      border-radius: 22px;
-      background: linear-gradient(135deg, #6C5CE7, #00CEC9);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      box-shadow: 0 10px 28px rgba(108, 92, 231, 0.3);
-      animation: logoPop 0.6s var(--ease-bounce) both;
-    }
-
-    @keyframes logoPop {
-      0% { opacity: 0; transform: scale(0.4); }
-      100% { opacity: 1; transform: scale(1); }
-    }
-
-    .logo svg {
-      width: 40px;
-      height: 40px;
-      color: #fff;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .title {
-      font-size: 26px;
-      font-weight: 900;
-      letter-spacing: -0.3px;
-      background: linear-gradient(135deg, #6C5CE7, #00CEC9);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 6px;
-      line-height: 1.3;
-    }
-
-    .subtitle {
-      font-size: 13px;
-      color: var(--text-2);
-      font-weight: 500;
-      line-height: 1.7;
-    }
-
-    .designer-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      margin-top: 12px;
-      padding: 5px 13px;
-      background: linear-gradient(135deg, rgba(108, 92, 231, 0.08), rgba(0, 206, 201, 0.08));
-      border: 1px solid rgba(108, 92, 231, 0.15);
-      border-radius: 16px;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--brand-1);
-      letter-spacing: 0.2px;
-    }
-
-    html.dark .designer-badge {
-      background: linear-gradient(135deg, rgba(162, 155, 254, 0.12), rgba(0, 206, 201, 0.1));
-      border-color: rgba(162, 155, 254, 0.2);
-    }
-
-    /* ============================================
-       OTP
-       ============================================ */
-    .otp-hint {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin: 22px 0 14px;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-2);
-      letter-spacing: 0.4px;
-    }
-
-    .otp-hint::before,
-    .otp-hint::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--input-border), transparent);
-    }
-
-    .otp {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-      direction: ltr;
-      margin-bottom: 20px;
-    }
-
-    .otp input {
-      width: 50px;
-      height: 62px;
-      text-align: center;
-      font-size: 28px;
-      font-weight: 800;
-      font-family: 'Vazirmatn', monospace;
-      background: var(--input-bg);
-      border: 2px solid var(--input-border);
-      border-radius: 14px;
-      color: var(--text-1);
-      outline: none;
-      transition: border-color 0.2s var(--ease), background 0.2s var(--ease), transform 0.15s var(--ease);
-      caret-color: var(--brand-1);
-      -webkit-user-select: none;
-      user-select: none;
-    }
-
-    .otp input:focus {
-      border-color: var(--input-focus);
-      background: var(--card-bg);
-      transform: translateY(-3px);
-      box-shadow: 0 6px 16px var(--input-glow);
-    }
-
-    .otp input.filled {
-      border-color: var(--brand-1);
-      background: linear-gradient(135deg, rgba(108, 92, 231, 0.08), rgba(0, 206, 201, 0.06));
-    }
-
-    html.dark .otp input.filled {
-      background: linear-gradient(135deg, rgba(162, 155, 254, 0.15), rgba(0, 206, 201, 0.1));
-    }
-
-    .otp input.error {
-      border-color: var(--danger);
-      background: rgba(255, 107, 107, 0.08);
-      animation: shake 0.35s var(--ease);
-    }
-
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-8px); }
-      75% { transform: translateX(8px); }
-    }
-
-    .otp input.success {
-      border-color: var(--success);
-      background: rgba(0, 184, 148, 0.08);
-    }
-
-    /* ============================================
-       BUTTON
-       ============================================ */
-    .btn {
-      width: 100%;
-      padding: 16px 22px;
-      font-size: 15.5px;
-      font-weight: 800;
-      color: #fff;
-      background: linear-gradient(135deg, #6C5CE7, #8E7CFF);
-      border: none;
-      border-radius: 16px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      min-height: 56px;
-      box-shadow: 0 6px 18px rgba(108, 92, 231, 0.28);
-      transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 26px rgba(108, 92, 231, 0.4);
-    }
-
-    .btn:active:not(:disabled) {
-      transform: translateY(0) scale(0.98);
-    }
-
-    .btn:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .btn .label {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .spinner {
-      width: 18px;
-      height: 18px;
-      border: 2.5px solid rgba(255,255,255,0.3);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ============================================
-       MESSAGE
-       ============================================ */
-    .message {
-      margin-top: 14px;
-      padding: 0 16px;
-      text-align: center;
-      font-size: 13px;
-      font-weight: 700;
-      border-radius: 12px;
-      opacity: 0;
-      transform: translateY(-6px);
-      max-height: 0;
-      overflow: hidden;
-      transition: all 0.3s var(--ease);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .message.show {
-      opacity: 1;
-      transform: translateY(0);
-      max-height: 100px;
-      padding: 11px 16px;
-    }
-
-    .message.error {
-      background: rgba(255, 107, 107, 0.1);
-      color: var(--danger);
-      border: 1px solid rgba(255, 107, 107, 0.2);
-    }
-
-    .message.success {
-      background: rgba(0, 184, 148, 0.1);
-      color: var(--success);
-      border: 1px solid rgba(0, 184, 148, 0.2);
-    }
-
-    /* ============================================
-       FOOTER
-       ============================================ */
-    .footer {
-      text-align: center;
-      margin-top: 20px;
-      padding-top: 16px;
-      border-top: 1px solid var(--input-border);
-      font-size: 11px;
-      color: var(--text-3);
-      font-weight: 500;
-    }
-
-    .footer .heart {
-      display: inline-block;
-      color: #FD79A8;
-      animation: heartbeat 1.8s ease-in-out infinite;
-    }
-
-    @keyframes heartbeat {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.2); }
-    }
-
-    /* ============================================
-       RESPONSIVE
-       ============================================ */
-    @media (max-width: 520px) {
-      .card { padding: 34px 22px 24px; border-radius: 24px; }
-      .logo { width: 66px; height: 66px; border-radius: 20px; }
-      .logo svg { width: 34px; height: 34px; }
-      .title { font-size: 22px; }
-      .otp { gap: 6px; }
-      .otp input {
-        width: 44px;
-        height: 56px;
-        font-size: 24px;
-        border-radius: 12px;
-      }
-      .btn { padding: 14px 20px; font-size: 14.5px; min-height: 52px; }
-      .top-controls { top: 14px; left: 14px; }
-      .icon-btn { width: 42px; height: 42px; }
-    }
-
-    @media (max-width: 380px) {
-      .card { padding: 28px 16px 20px; }
-      .otp { gap: 4px; }
-      .otp input {
-        width: 38px;
-        height: 48px;
-        font-size: 20px;
-        border-radius: 10px;
-      }
-      .app { padding: 70px 12px 30px; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="سامانه آزمون آنلاین — طراحی فاطمه جوادی">
+<meta name="author" content="فاطمه جوادی">
+<meta name="theme-color" content="#6C5CE7" id="themeMeta">
+<meta name="color-scheme" content="light dark">
+
+<title>ورود | سامانه آزمون فاطمه جوادی</title>
+
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   RESET
+============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ============================================================
+   DESIGN TOKENS — LIGHT
+============================================================ */
+:root {
+  --brand-1: #6C5CE7;
+  --brand-2: #8E7CFF;
+  --brand-3: #00CEC9;
+  --brand-4: #FD79A8;
+  --brand-5: #FDCB6E;
+  --success: #00B894;
+  --danger:  #FF6B6B;
+  --warning: #FDCB6E;
+
+  --bg-1: #EEF0FF;
+  --bg-2: #F5F0FF;
+  --bg-3: #FFF0F8;
+
+  --card-bg: #FFFFFF;
+  --card-border: rgba(108, 92, 231, 0.08);
+
+  --text-1: #1E1B3A;
+  --text-2: #6B6789;
+  --text-3: #A5A0C0;
+
+  --input-bg: #F8F7FF;
+  --input-border: #E5E0FF;
+  --input-focus: #6C5CE7;
+  --input-glow: rgba(108, 92, 231, 0.18);
+
+  --shadow-sm: 0 2px 8px rgba(108, 92, 231, 0.06);
+  --shadow-md: 0 6px 24px rgba(108, 92, 231, 0.1);
+  --shadow-lg: 0 12px 40px rgba(108, 92, 231, 0.15);
+  --shadow-btn: 0 6px 18px rgba(108, 92, 231, 0.28);
+
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+}
+
+/* ============================================================
+   DESIGN TOKENS — DARK
+============================================================ */
+html.dark {
+  --bg-1: #0F0C24;
+  --bg-2: #14102E;
+  --bg-3: #1A1030;
+
+  --card-bg: #1A1638;
+  --card-border: rgba(162, 155, 254, 0.12);
+
+  --text-1: #F2F0FF;
+  --text-2: #A5A0C0;
+  --text-3: #6B6789;
+
+  --input-bg: #14102E;
+  --input-border: #2A2456;
+  --input-focus: #A29BFE;
+  --input-glow: rgba(162, 155, 254, 0.25);
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.5);
+  --shadow-btn: 0 6px 18px rgba(108, 92, 231, 0.4);
+}
+
+/* ============================================================
+   BASE
+============================================================ */
+html, body {
+  min-height: 100%;
+  height: 100%;
+}
+
+body {
+  font-family: 'Vazirmatn', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 50%, var(--bg-3) 100%);
+  background-attachment: fixed;
+  color: var(--text-1);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background 0.4s var(--ease), color 0.4s var(--ease);
+}
+
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+input, textarea { font-family: inherit; }
+
+/* ============================================================
+   BACKGROUND DECORATION (سبک و سریع)
+============================================================ */
+.bg-decor {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bg-decor::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='2' cy='2' r='1' fill='%236C5CE7' opacity='0.35'/></svg>");
+  background-size: 32px 32px;
+  opacity: 0.35;
+  mask-image: radial-gradient(ellipse at center, #000 10%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 10%, transparent 70%);
+}
+
+html.dark .bg-decor::before {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='2' cy='2' r='1' fill='%23A29BFE' opacity='0.5'/></svg>");
+  opacity: 0.5;
+}
+
+.bg-decor::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(108, 92, 231, 0.12) 0%, transparent 35%),
+    radial-gradient(circle at 85% 85%, rgba(0, 206, 201, 0.1) 0%, transparent 35%),
+    radial-gradient(circle at 50% 50%, rgba(253, 121, 168, 0.06) 0%, transparent 45%);
+}
+
+html.dark .bg-decor::after {
+  background:
+    radial-gradient(circle at 15% 15%, rgba(162, 155, 254, 0.15) 0%, transparent 35%),
+    radial-gradient(circle at 85% 85%, rgba(0, 206, 201, 0.12) 0%, transparent 35%),
+    radial-gradient(circle at 50% 50%, rgba(253, 121, 168, 0.08) 0%, transparent 45%);
+}
+
+/* ============================================================
+   TOP CONTROLS (تم)
+============================================================ */
+.top-bar {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.top-bar > * { pointer-events: auto; }
+
+.icon-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-md);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-1);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+
+.icon-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.icon-btn:active {
+  transform: scale(0.94);
+}
+
+.icon-wrap {
+  position: relative;
+  width: 22px;
+  height: 22px;
+}
+
+.icon-wrap svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: opacity 0.25s, transform 0.35s var(--ease);
+}
+
+.icon-sun  { opacity: 1; transform: rotate(0) scale(1); }
+.icon-moon { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+
+html.dark .icon-sun  { opacity: 0; transform: rotate(90deg) scale(0.5); }
+html.dark .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
+
+/* Network indicator */
+.net-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-2);
+  box-shadow: var(--shadow-sm);
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+}
+
+.net-indicator.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.net-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 0 3px rgba(0, 184, 148, 0.18);
+  animation: netPulse 2s ease-in-out infinite;
+}
+
+.net-dot.offline {
+  background: var(--danger);
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.18);
+}
+
+@keyframes netPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+/* ============================================================
+   APP LAYOUT
+============================================================ */
+.app {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px 40px;
+}
+
+/* ============================================================
+   CARD
+============================================================ */
+.card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-xl);
+  padding: 42px 36px 30px;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+  transition: background 0.4s var(--ease), border 0.4s var(--ease), box-shadow 0.4s var(--ease);
+}
+
+.card-top-bar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #6C5CE7, #00CEC9, #FD79A8, #6C5CE7);
+  background-size: 200% 100%;
+  animation: shimmer 8s linear infinite;
+}
+
+@keyframes shimmer {
+  to { background-position: 200% 0; }
+}
+
+/* ============================================================
+   LOGO & HEADER
+============================================================ */
+.header {
+  text-align: center;
+  margin-bottom: 26px;
+}
+
+.logo {
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 18px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #6C5CE7 0%, #00CEC9 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 28px rgba(108, 92, 231, 0.32);
+  animation: logoPop 0.6s var(--bounce) both;
+  position: relative;
+}
+
+.logo::after {
+  content: '';
+  position: absolute;
+  inset: -10px;
+  border-radius: 30px;
+  border: 1.5px dashed rgba(108, 92, 231, 0.25);
+  animation: slowRotate 30s linear infinite;
+}
+
+html.dark .logo::after {
+  border-color: rgba(162, 155, 254, 0.3);
+}
+
+@keyframes slowRotate {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes logoPop {
+  0% { opacity: 0; transform: scale(0.4) rotate(-15deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+.logo svg {
+  width: 40px;
+  height: 40px;
+  color: #fff;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.title {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: -0.3px;
+  background: linear-gradient(135deg, #6C5CE7 0%, #00CEC9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+html.dark .title {
+  background: linear-gradient(135deg, #A29BFE 0%, #00CEC9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: var(--text-2);
+  font-weight: 500;
+  line-height: 1.7;
+}
+
+.designer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 14px;
+  padding: 5px 13px;
+  background: linear-gradient(135deg, rgba(108, 92, 231, 0.08), rgba(0, 206, 201, 0.08));
+  border: 1px solid rgba(108, 92, 231, 0.15);
+  border-radius: 16px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--brand-1);
+  letter-spacing: 0.2px;
+}
+
+html.dark .designer-badge {
+  background: linear-gradient(135deg, rgba(162, 155, 254, 0.12), rgba(0, 206, 201, 0.1));
+  border-color: rgba(162, 155, 254, 0.2);
+  color: var(--brand-2);
+}
+
+.designer-badge .spark {
+  display: inline-block;
+  animation: sparkle 2.5s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% { transform: scale(1) rotate(0); opacity: 1; }
+  50% { transform: scale(1.25) rotate(15deg); opacity: 0.75; }
+}
+
+/* ============================================================
+   OTP SECTION
+============================================================ */
+.otp-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-2);
+  letter-spacing: 0.4px;
+}
+
+.otp-hint::before,
+.otp-hint::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--input-border), transparent);
+}
+
+.otp-hint svg {
+  width: 13px;
+  height: 13px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.otp {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  direction: ltr;
+  margin-bottom: 20px;
+}
+
+.otp input {
+  width: 50px;
+  height: 62px;
+  text-align: center;
+  font-size: 28px;
+  font-weight: 800;
+  font-family: 'Vazirmatn', monospace;
+  background: var(--input-bg);
+  border: 2px solid var(--input-border);
+  border-radius: var(--radius-md);
+  color: var(--text-1);
+  outline: none;
+  transition: border-color 0.2s var(--ease),
+              background 0.2s var(--ease),
+              transform 0.15s var(--ease),
+              box-shadow 0.2s var(--ease);
+  caret-color: var(--brand-1);
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.otp input:focus {
+  border-color: var(--input-focus);
+  background: var(--card-bg);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px var(--input-glow);
+}
+
+.otp input.filled {
+  border-color: var(--brand-1);
+  background: linear-gradient(135deg, rgba(108, 92, 231, 0.08), rgba(0, 206, 201, 0.06));
+}
+
+html.dark .otp input.filled {
+  background: linear-gradient(135deg, rgba(162, 155, 254, 0.12), rgba(0, 206, 201, 0.08));
+}
+
+.otp input.error {
+  border-color: var(--danger);
+  background: rgba(255, 107, 107, 0.08);
+  animation: shake 0.4s var(--ease);
+}
+
+.otp input.success {
+  border-color: var(--success);
+  background: rgba(0, 184, 148, 0.08);
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+}
+
+/* ============================================================
+   BUTTON
+============================================================ */
+.btn {
+  width: 100%;
+  padding: 16px 22px;
+  font-size: 15.5px;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, #6C5CE7 0%, #8E7CFF 100%);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 56px;
+  box-shadow: var(--shadow-btn);
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transition: left 0.6s var(--ease);
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(108, 92, 231, 0.42);
+}
+
+.btn:hover:not(:disabled)::before {
+  left: 120%;
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn .label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+}
+
+.btn .arrow {
+  display: inline-flex;
+  transition: transform 0.25s var(--ease);
+}
+
+.btn:hover:not(:disabled) .arrow {
+  transform: translateX(-3px);
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============================================================
+   MESSAGE
+============================================================ */
+.message {
+  margin-top: 14px;
+  padding: 0 16px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  opacity: 0;
+  transform: translateY(-6px);
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.3s var(--ease);
+  line-height: 1.6;
+}
+
+.message.show {
+  opacity: 1;
+  transform: translateY(0);
+  max-height: 300px;
+  padding: 12px 16px;
+}
+
+.message.error {
+  background: rgba(255, 107, 107, 0.1);
+  color: var(--danger);
+  border: 1px solid rgba(255, 107, 107, 0.2);
+}
+
+.message.success {
+  background: rgba(0, 184, 148, 0.1);
+  color: var(--success);
+  border: 1px solid rgba(0, 184, 148, 0.2);
+}
+
+.message.info {
+  background: rgba(0, 206, 201, 0.08);
+  color: #008B88;
+  border: 1px solid rgba(0, 206, 201, 0.2);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: right;
+  direction: rtl;
+  word-break: break-word;
+}
+
+html.dark .message.info {
+  color: #4DE3DF;
+  background: rgba(0, 206, 201, 0.1);
+}
+
+/* ============================================================
+   FOOTER
+============================================================ */
+.footer {
+  text-align: center;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--input-border);
+  font-size: 11px;
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+.footer .heart {
+  display: inline-block;
+  color: #FD79A8;
+  animation: heartbeat 1.8s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 520px) {
+  .app { padding: 76px 16px 32px; }
+  .card {
+    padding: 34px 22px 24px;
+    border-radius: var(--radius-lg);
+  }
+  .logo { width: 66px; height: 66px; border-radius: 20px; }
+  .logo svg { width: 34px; height: 34px; }
+  .title { font-size: 22px; }
+  .otp { gap: 6px; }
+  .otp input {
+    width: 44px;
+    height: 56px;
+    font-size: 24px;
+    border-radius: var(--radius-sm);
+  }
+  .btn {
+    padding: 14px 20px;
+    font-size: 14.5px;
+    min-height: 52px;
+  }
+  .top-bar { top: 14px; left: 14px; right: 14px; }
+  .icon-btn { width: 42px; height: 42px; }
+}
+
+@media (max-width: 380px) {
+  .card { padding: 28px 16px 22px; }
+  .otp { gap: 4px; }
+  .otp input {
+    width: 38px;
+    height: 48px;
+    font-size: 20px;
+  }
+  .app { padding: 68px 12px 28px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
 </head>
 <body>
 
-  <div class="bg-pattern" aria-hidden="true"></div>
-  <div class="bg-dots" aria-hidden="true"></div>
+<!-- Background -->
+<div class="bg-decor" aria-hidden="true"></div>
 
-  <div class="top-controls">
-    <button class="icon-btn" id="themeBtn" type="button" title="تغییر حالت روز/شب" aria-label="تغییر تم">
-      <span class="icon-wrap">
-        <svg class="icon-sun" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="4"/>
-          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+<!-- Top Bar -->
+<div class="top-bar">
+  <button class="icon-btn" id="themeBtn" type="button" title="تغییر حالت روز/شب" aria-label="تغییر تم">
+    <span class="icon-wrap">
+      <svg class="icon-sun" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="4"/>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+      </svg>
+      <svg class="icon-moon" viewBox="0 0 24 24">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </span>
+  </button>
+
+  <div class="net-indicator" id="netIndicator">
+    <span class="net-dot" id="netDot"></span>
+    <span id="netText">آنلاین</span>
+  </div>
+</div>
+
+<!-- Main -->
+<main class="app">
+  <div class="card">
+    <div class="card-top-bar"></div>
+
+    <div class="header">
+      <div class="logo">
+        <svg viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <path d="M14 2v6h6"/>
+          <path d="M9 15l2 2 4-4"/>
         </svg>
-        <svg class="icon-moon" viewBox="0 0 24 24">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-        </svg>
+      </div>
+      <h1 class="title">سامانه آزمون</h1>
+      <p class="subtitle">برای شروع، کد ورود ۶ رقمی خود را وارد کنید</p>
+      <div class="designer-badge">
+        <span class="spark">✨</span>
+        <span>طراحی: فاطمه جوادی</span>
+      </div>
+    </div>
+
+    <div class="otp-hint">
+      <svg viewBox="0 0 24 24">
+        <rect x="3" y="11" width="18" height="11" rx="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      <span>کد ۶ رقمی</span>
+    </div>
+
+    <div class="otp" id="otp" dir="ltr">
+      <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="رقم ۱" spellcheck="false">
+      <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="رقم ۲" spellcheck="false">
+      <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="رقم ۳" spellcheck="false">
+      <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="رقم ۴" spellcheck="false">
+      <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="رقم ۵" spellcheck="false">
+      <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="رقم ۶" spellcheck="false">
+    </div>
+
+    <button class="btn" id="loginBtn" type="button">
+      <span class="label">
+        <span>ورود به سامانه</span>
+        <span class="arrow">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+          </svg>
+        </span>
       </span>
     </button>
-  </div>
 
-  <main class="app">
-    <div class="card">
+    <div class="message" id="message"></div>
 
-      <div class="logo-wrap">
-        <div class="logo">
-          <svg viewBox="0 0 24 24">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <path d="M14 2v6h6"/>
-            <path d="M9 15l2 2 4-4"/>
-          </svg>
-        </div>
-        <h1 class="title">سامانه آزمون</h1>
-        <p class="subtitle">برای شروع، کد ورود ۶ رقمی خود را وارد کنید</p>
-        <div class="designer-badge">
-          <span>✨</span>
-          <span>طراحی: فاطمه جوادی</span>
-        </div>
-      </div>
-
-      <div class="otp-hint">
-        <span>کد ۶ رقمی</span>
-      </div>
-
-      <div class="otp" id="otp" dir="ltr">
-        <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="رقم ۱" spellcheck="false">
-        <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="رقم ۲" spellcheck="false">
-        <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="رقم ۳" spellcheck="false">
-        <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="رقم ۴" spellcheck="false">
-        <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="رقم ۵" spellcheck="false">
-        <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="رقم ۶" spellcheck="false">
-      </div>
-
-      <button class="btn" id="loginBtn" type="button">
-        <span class="label">
-          <span>ورود به سامانه</span>
-        </span>
-      </button>
-
-      <div class="message" id="message"></div>
-
-      <div class="footer">
-        ساخته شده با <span class="heart">♥</span> برای یادگیری بهتر
-      </div>
-
+    <div class="footer">
+      ساخته شده با <span class="heart">♥</span> برای یادگیری بهتر
     </div>
-  </main>
+  </div>
+</main>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-  (function() {
-    'use strict';
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function () {
+  'use strict';
 
-    var SUPABASE_URL = 'https://cfkwvzbqgapguuaqibmq.supabase.co';
-    var SUPABASE_KEY = 'sb_publishable_Qf3R9hPgjApwe2c-qQMoJA_jitobazq';
-    var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  /* ============================================================
+     CONFIG — Supabase
+  ============================================================ */
+  var SUPABASE_URL = 'https://cfkwvzbqgapguuaqibmq.supabase.co';
+  var SUPABASE_KEY = 'sb_publishable_Qf3R9hPgjApwe2c-qQMoJA_jitobazq';
 
-    var inputs = Array.prototype.slice.call(document.querySelectorAll('#otp input'));
-    var loginBtn = document.getElementById('loginBtn');
-    var message = document.getElementById('message');
-    var themeBtn = document.getElementById('themeBtn');
-    var isLogging = false;
-
-    // ============================================
-    // THEME
-    // ============================================
-    function setTheme(isDark) {
-      var html = document.documentElement;
-      if (isDark) html.classList.add('dark');
-      else html.classList.remove('dark');
-      try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch(e) {}
-      var meta = document.getElementById('themeMeta');
-      if (meta) meta.setAttribute('content', isDark ? '#0F0C24' : '#6C5CE7');
+  var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: false
     }
+  });
 
-    function initTheme() {
-      var saved = null;
-      try { saved = localStorage.getItem('theme'); } catch(e) {}
-      var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setTheme(saved === 'dark' || (!saved && prefersDark));
+  /* ============================================================
+     DOM ELEMENTS
+  ============================================================ */
+  var inputs = Array.prototype.slice.call(document.querySelectorAll('#otp input'));
+  var loginBtn = document.getElementById('loginBtn');
+  var message = document.getElementById('message');
+  var themeBtn = document.getElementById('themeBtn');
+  var netIndicator = document.getElementById('netIndicator');
+  var netDot = document.getElementById('netDot');
+  var netText = document.getElementById('netText');
+
+  /* ============================================================
+     STATE
+  ============================================================ */
+  var isLogging = false;
+  var currentTheme = 'light';
+
+  /* ============================================================
+     THEME
+  ============================================================ */
+  function applyTheme(isDark) {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+      currentTheme = 'dark';
+    } else {
+      document.documentElement.classList.remove('dark');
+      currentTheme = 'light';
     }
+    try { localStorage.setItem('theme', currentTheme); } catch (e) {}
+    var meta = document.getElementById('themeMeta');
+    if (meta) meta.setAttribute('content', isDark ? '#0F0C24' : '#6C5CE7');
+  }
 
-    themeBtn.addEventListener('click', function() {
-      setTheme(!document.documentElement.classList.contains('dark'));
-    });
+  function initTheme() {
+    var saved = null;
+    try { saved = localStorage.getItem('theme'); } catch (e) {}
+    var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyTheme(saved === 'dark' || (!saved && prefersDark));
+  }
 
-    // ============================================
-    // HELPERS
-    // ============================================
-    function getCode() {
-      var s = '';
-      for (var i = 0; i < inputs.length; i++) s += inputs[i].value;
-      return s;
+  themeBtn.addEventListener('click', function () {
+    applyTheme(!document.documentElement.classList.contains('dark'));
+  });
+
+  /* ============================================================
+     NETWORK
+  ============================================================ */
+  function updateNetwork() {
+    var online = navigator.onLine;
+    netDot.classList.toggle('offline', !online);
+    netText.textContent = online ? 'آنلاین' : 'آفلاین';
+    if (!online) {
+      netIndicator.classList.add('show');
+    } else {
+      setTimeout(function () { netIndicator.classList.remove('show'); }, 2000);
     }
+  }
 
-    function hideMessage() {
-      message.classList.remove('show');
+  window.addEventListener('online', function () {
+    updateNetwork();
+    showMessage('✅ اتصال اینترنت برقرار شد', 'success', 2500);
+  });
+
+  window.addEventListener('offline', function () {
+    updateNetwork();
+    showMessage('⚠️ اتصال اینترنت قطع است', 'error', 5000);
+  });
+
+  /* ============================================================
+     MESSAGE
+  ============================================================ */
+  var msgTimer = null;
+
+  function showMessage(html, type, duration) {
+    clearTimeout(msgTimer);
+    message.className = 'message ' + type + ' show';
+    message.innerHTML = html;
+    if (duration) {
+      msgTimer = setTimeout(function () { message.classList.remove('show'); }, duration);
     }
+  }
 
-    function showMessage(text, type) {
-      message.className = 'message ' + type + ' show';
-      message.textContent = text;
+  function hideMessage() {
+    clearTimeout(msgTimer);
+    message.classList.remove('show');
+  }
+
+  /* ============================================================
+     OTP HELPERS
+  ============================================================ */
+  function getCode() {
+    var s = '';
+    for (var i = 0; i < inputs.length; i++) s += inputs[i].value;
+    return s;
+  }
+
+  function focusIdx(i) {
+    if (i >= 0 && i < inputs.length) inputs[i].focus();
+  }
+
+  function clearErrors() {
+    for (var i = 0; i < inputs.length; i++) {
+      inputs[i].classList.remove('error');
+      inputs[i].classList.remove('success');
     }
+  }
 
-    function focusIdx(i) {
-      if (i >= 0 && i < inputs.length) inputs[i].focus();
+  function clearInputs() {
+    for (var i = 0; i < inputs.length; i++) {
+      inputs[i].value = '';
+      inputs[i].classList.remove('filled');
     }
+    focusIdx(0);
+  }
 
-    function clearErrors() {
-      inputs.forEach(function(inp) {
-        inp.classList.remove('error');
-        inp.classList.remove('success');
-      });
+  function shakeInputs() {
+    for (var i = 0; i < inputs.length; i++) inputs[i].classList.add('error');
+    if (navigator.vibrate && window.matchMedia('(pointer: coarse)').matches) {
+      try { navigator.vibrate([30, 40, 30]); } catch (e) {}
     }
+    setTimeout(function () {
+      for (var i = 0; i < inputs.length; i++) inputs[i].classList.remove('error');
+    }, 450);
+  }
 
-    // ============================================
-    // OTP
-    // ============================================
-    inputs.forEach(function(input, idx) {
-      input.addEventListener('keydown', function(e) {
-        if (e.ctrlKey || e.metaKey || e.altKey) return;
+  /* ============================================================
+     OTP EVENTS
+  ============================================================ */
+  inputs.forEach(function (input, idx) {
 
-        // عدد
-        if (e.key.length === 1 && e.key >= '0' && e.key <= '9') {
-          e.preventDefault();
-          input.value = e.key;
-          input.classList.add('filled');
-          clearErrors();
-          hideMessage();
+    /* --- keydown --- */
+    input.addEventListener('keydown', function (e) {
+      /* Ctrl/Alt/Meta — بذار رد شن */
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
 
-          if (idx < inputs.length - 1) {
-            focusIdx(idx + 1);
-          } else {
-            input.blur();
-            if (getCode().length === 6) {
-              setTimeout(doLogin, 200);
-            }
-          }
-          return;
+      /* عدد */
+      if (e.key.length === 1 && e.key >= '0' && e.key <= '9') {
+        e.preventDefault();
+        input.value = e.key;
+        input.classList.add('filled');
+        clearErrors();
+        hideMessage();
+        if (idx < inputs.length - 1) {
+          focusIdx(idx + 1);
+        } else {
+          input.blur();
+          if (getCode().length === 6) setTimeout(doLogin, 220);
         }
+        return;
+      }
 
-        // Backspace
-        if (e.key === 'Backspace') {
-          e.preventDefault();
-          if (input.value) {
-            input.value = '';
-            input.classList.remove('filled');
-            hideMessage();
-          } else if (idx > 0) {
-            inputs[idx - 1].value = '';
-            inputs[idx - 1].classList.remove('filled');
-            focusIdx(idx - 1);
-            hideMessage();
-          }
-          return;
-        }
-
-        if (e.key === 'Delete') {
-          e.preventDefault();
+      /* Backspace */
+      if (e.key === 'Backspace') {
+        e.preventDefault();
+        if (input.value) {
           input.value = '';
           input.classList.remove('filled');
-          return;
+          hideMessage();
+        } else if (idx > 0) {
+          inputs[idx - 1].value = '';
+          inputs[idx - 1].classList.remove('filled');
+          focusIdx(idx - 1);
+          hideMessage();
         }
+        return;
+      }
 
-        if (e.key === 'ArrowLeft') { e.preventDefault(); focusIdx(idx - 1); return; }
-        if (e.key === 'ArrowRight') { e.preventDefault(); focusIdx(idx + 1); return; }
-        if (e.key === 'Home') { e.preventDefault(); focusIdx(0); return; }
-        if (e.key === 'End') { e.preventDefault(); focusIdx(inputs.length - 1); return; }
-        if (e.key === 'Enter') { e.preventDefault(); doLogin(); return; }
-        if (e.key === 'Tab') return;
-        if (e.key.length === 1) e.preventDefault();
-      });
-
-      input.addEventListener('paste', function(e) {
+      /* Delete */
+      if (e.key === 'Delete') {
         e.preventDefault();
-        var text = '';
-        try {
-          text = (e.clipboardData || window.clipboardData).getData('text') || '';
-        } catch(err) { return; }
-        var digits = text.replace(/\D/g, '').slice(0, 6);
-        if (!digits) return;
-        clearErrors();
-        hideMessage();
-        for (var i = 0; i < inputs.length; i++) {
-          if (i < digits.length) {
-            inputs[i].value = digits[i];
-            inputs[i].classList.add('filled');
-          } else {
-            inputs[i].value = '';
-            inputs[i].classList.remove('filled');
-          }
-        }
-        if (digits.length === 6) {
-          inputs[5].blur();
-          setTimeout(doLogin, 200);
-        } else {
-          focusIdx(Math.min(digits.length, 5));
-        }
-      });
+        input.value = '';
+        input.classList.remove('filled');
+        return;
+      }
 
-      input.addEventListener('focus', function() {
-        setTimeout(function() { input.select(); }, 0);
-      });
+      /* Arrows */
+      if (e.key === 'ArrowLeft')  { e.preventDefault(); focusIdx(idx - 1); return; }
+      if (e.key === 'ArrowRight') { e.preventDefault(); focusIdx(idx + 1); return; }
+      if (e.key === 'Home')       { e.preventDefault(); focusIdx(0); return; }
+      if (e.key === 'End')        { e.preventDefault(); focusIdx(inputs.length - 1); return; }
+
+      /* Enter */
+      if (e.key === 'Enter') { e.preventDefault(); doLogin(); return; }
+
+      /* Tab — بذار عادی رد شه */
+      if (e.key === 'Tab') return;
+
+      /* هر چیز دیگه */
+      if (e.key.length === 1) e.preventDefault();
     });
 
-    // ============================================
-    // LOGIN
-    // ============================================
-    function setBtn(loading) {
-      if (loading) {
-        loginBtn.disabled = true;
-        loginBtn.innerHTML = '<span class="label"><span>در حال ورود</span><span class="spinner"></span></span>';
-      } else {
-        loginBtn.disabled = false;
-        loginBtn.innerHTML = '<span class="label"><span>ورود به سامانه</span></span>';
-      }
-    }
+    /* --- paste --- */
+    input.addEventListener('paste', function (e) {
+      e.preventDefault();
+      var text = '';
+      try {
+        text = (e.clipboardData || window.clipboardData).getData('text') || '';
+      } catch (err) { return; }
 
-    function shake() {
-      inputs.forEach(function(i) { i.classList.add('error'); });
-      if (navigator.vibrate && window.matchMedia('(pointer: coarse)').matches) {
-        try { navigator.vibrate([30, 40, 30]); } catch(e) {}
-      }
-      setTimeout(function() {
-        inputs.forEach(function(i) { i.classList.remove('error'); });
-      }, 400);
-    }
+      var digits = text.replace(/\D/g, '').slice(0, 6);
+      if (!digits) return;
 
-    function clearInputs() {
-      inputs.forEach(function(i) {
-        i.value = '';
-        i.classList.remove('filled');
-      });
-      focusIdx(0);
-    }
-
-    async function doLogin() {
-      if (isLogging) return;
-
-      var code = getCode();
-      if (code.length !== 6) {
-        shake();
-        showMessage('⚠️ کد باید ۶ رقم باشد', 'error');
-        return;
-      }
-
-      if (!navigator.onLine) {
-        shake();
-        showMessage('⚠️ اتصال اینترنت قطع است', 'error');
-        return;
-      }
-
-      isLogging = true;
       clearErrors();
       hideMessage();
-      setBtn(true);
 
-      try {
-        var result = await supabase.auth.signInWithPassword({
-          email: code + '@exam.local',
-          password: code + code
-        });
-
-        if (result.error) {
-          console.error('[login]', result.error);
-          setBtn(false);
-          isLogging = false;
-          shake();
-
-          var msg = 'کد وارد شده معتبر نیست';
-          if (result.error.message && result.error.message.indexOf('Failed to fetch') !== -1) {
-            msg = 'اتصال به سرور برقرار نشد';
-          }
-          showMessage('❌ ' + msg, 'error');
-
-          setTimeout(clearInputs, 500);
-          return;
+      for (var i = 0; i < inputs.length; i++) {
+        if (i < digits.length) {
+          inputs[i].value = digits[i];
+          inputs[i].classList.add('filled');
+        } else {
+          inputs[i].value = '';
+          inputs[i].classList.remove('filled');
         }
-
-        var profileResult = await supabase
-          .from('profiles')
-          .select('role, name_confirmed')
-          .eq('id', result.data.user.id)
-          .single();
-
-        if (profileResult.error || !profileResult.data) {
-          console.error('[profile]', profileResult.error);
-          setBtn(false);
-          isLogging = false;
-          shake();
-          showMessage('❌ خطا در بارگذاری اطلاعات', 'error');
-          return;
-        }
-
-        var profile = profileResult.data;
-
-        // موفقیت
-        inputs.forEach(function(i) { i.classList.add('success'); });
-        loginBtn.innerHTML = '<span class="label"><span>✅ موفق!</span></span>';
-        showMessage('✅ خوش آمدی!', 'success');
-
-        var dest;
-        if (!profile.name_confirmed) dest = 'choose-name.html';
-        else if (profile.role === 'teacher') dest = 'teacher.html';
-        else dest = 'student.html';
-
-        setTimeout(function() {
-          window.location.href = dest;
-        }, 600);
-
-      } catch (err) {
-        console.error('[fatal]', err);
-        setBtn(false);
-        isLogging = false;
-        shake();
-        showMessage('❌ خطای غیرمنتظره، دوباره تلاش کنید', 'error');
       }
-    }
 
-    loginBtn.addEventListener('click', doLogin);
-
-    // ============================================
-    // SHORTCUT: Ctrl+K
-    // ============================================
-    document.addEventListener('keydown', function(e) {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-        e.preventDefault();
-        clearInputs();
-        clearErrors();
-        hideMessage();
+      if (digits.length === 6) {
+        inputs[5].blur();
+        setTimeout(doLogin, 220);
+      } else {
+        focusIdx(Math.min(digits.length, 5));
       }
     });
 
-    // ============================================
-    // INIT
-    // ============================================
-    initTheme();
-    setTimeout(function() { focusIdx(0); }, 300);
+    /* --- focus --- */
+    input.addEventListener('focus', function () {
+      setTimeout(function () { input.select(); }, 0);
+    });
+  });
 
-    if (window.matchMedia) {
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
-        var saved = null;
-        try { saved = localStorage.getItem('theme'); } catch(err) {}
-        if (!saved) setTheme(e.matches);
-      });
+  /* ============================================================
+     BUTTON STATE
+  ============================================================ */
+  function setBtnLoading() {
+    loginBtn.disabled = true;
+    loginBtn.innerHTML =
+      '<span class="label">' +
+        '<span>در حال ورود</span>' +
+        '<span class="spinner"></span>' +
+      '</span>';
+  }
+
+  function setBtnDefault() {
+    loginBtn.disabled = false;
+    loginBtn.innerHTML =
+      '<span class="label">' +
+        '<span>ورود به سامانه</span>' +
+        '<span class="arrow">' +
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">' +
+            '<line x1="19" y1="12" x2="5" y2="12"/>' +
+            '<polyline points="12 19 5 12 12 5"/>' +
+          '</svg>' +
+        '</span>' +
+      '</span>';
+  }
+
+  function setBtnSuccess() {
+    loginBtn.innerHTML =
+      '<span class="label">' +
+        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
+          '<polyline points="20 6 9 17 4 12"/>' +
+        '</svg>' +
+        '<span>موفق!</span>' +
+      '</span>';
+  }
+
+  /* ============================================================
+     ERROR TRANSLATION
+  ============================================================ */
+  function translateError(err) {
+    if (!err) return 'خطای نامشخص';
+
+    var msg = '';
+    if (typeof err === 'string') msg = err;
+    else if (err.message) msg = err.message;
+    else if (err.error_description) msg = err.error_description;
+    else if (err.error) msg = String(err.error);
+
+    if (!msg) return 'خطای نامشخص';
+
+    var lower = msg.toLowerCase();
+
+    if (lower.indexOf('invalid login') !== -1 || lower.indexOf('invalid credentials') !== -1) {
+      return 'کد وارد شده معتبر نیست';
+    }
+    if (lower.indexOf('email not confirmed') !== -1) {
+      return 'ایمیل کاربر تأیید نشده است';
+    }
+    if (lower.indexOf('failed to fetch') !== -1 || lower.indexOf('network') !== -1) {
+      return 'اتصال به سرور برقرار نشد. اینترنت خود را بررسی کنید';
+    }
+    if (lower.indexOf('rate limit') !== -1 || lower.indexOf('too many') !== -1) {
+      return 'تلاش‌های زیاد. لطفاً چند دقیقه صبر کنید';
+    }
+    if (lower.indexOf('user not found') !== -1) {
+      return 'کاربری با این کد یافت نشد';
+    }
+    if (lower.indexOf('invalid api key') !== -1) {
+      return 'خطای تنظیمات سرور';
     }
 
-  })();
-  </script>
+    return msg;
+  }
+
+  /* ============================================================
+     LOGIN
+  ============================================================ */
+  async function doLogin() {
+    if (isLogging) return;
+
+    var code = getCode();
+
+    if (code.length !== 6) {
+      shakeInputs();
+      showMessage('⚠️ کد باید ۶ رقم باشد', 'error');
+      return;
+    }
+
+    if (!/^\d{6}$/.test(code)) {
+      shakeInputs();
+      showMessage('⚠️ فقط اعداد مجاز است', 'error');
+      return;
+    }
+
+    if (!navigator.onLine) {
+      shakeInputs();
+      showMessage('⚠️ اتصال اینترنت قطع است', 'error', 5000);
+      return;
+    }
+
+    isLogging = true;
+    clearErrors();
+    hideMessage();
+    setBtnLoading();
+
+    var email = code + '@exam.local';
+    var password = code + code;
+
+    try {
+      /* ۱) ورود */
+      var result = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+      if (result.error) {
+        console.error('[login]', result.error);
+        isLogging = false;
+        setBtnDefault();
+        shakeInputs();
+        showMessage('❌ ' + translateError(result.error), 'error');
+        setTimeout(clearInputs, 500);
+        return;
+      }
+
+      var user = result.data.user;
+
+      if (!user) {
+        isLogging = false;
+        setBtnDefault();
+        shakeInputs();
+        showMessage('❌ خطا در دریافت اطلاعات کاربر', 'error');
+        return;
+      }
+
+      /* ۲) گرفتن پروفایل (با maybeSingle تا خطا نده اگه نبود) */
+      var profileResult = await supabase
+        .from('profiles')
+        .select('role, name_confirmed')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (profileResult.error) {
+        console.warn('[profile]', profileResult.error);
+      }
+
+      var profile = profileResult.data;
+
+      /* ۳) موفقیت بصری */
+      for (var i = 0; i < inputs.length; i++) inputs[i].classList.add('success');
+      setBtnSuccess();
+      showMessage('✅ خوش آمدی!', 'success');
+
+      /* ۴) مسیر */
+      var dest = 'student.html';
+
+      if (profile) {
+        if (!profile.name_confirmed) {
+          dest = 'choose-name.html';
+        } else if (profile.role === 'teacher') {
+          dest = 'teacher.html';
+        } else {
+          dest = 'student.html';
+        }
+      } else {
+        /* پروفایل نداره — برو صفحه انتخاب نام */
+        dest = 'choose-name.html';
+      }
+
+      setTimeout(function () {
+        window.location.href = dest;
+      }, 600);
+
+    } catch (err) {
+      console.error('[fatal]', err);
+      isLogging = false;
+      setBtnDefault();
+      shakeInputs();
+      showMessage('❌ ' + translateError(err), 'error');
+    }
+  }
+
+  loginBtn.addEventListener('click', doLogin);
+
+  /* ============================================================
+     GLOBAL SHORTCUTS
+  ============================================================ */
+  document.addEventListener('keydown', function (e) {
+    /* Ctrl+K — پاک کن */
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+      e.preventDefault();
+      clearInputs();
+      clearErrors();
+      hideMessage();
+    }
+  });
+
+  /* ============================================================
+     VISIBILITY
+  ============================================================ */
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) updateNetwork();
+  });
+
+  /* ============================================================
+     INIT
+  ============================================================ */
+  initTheme();
+  updateNetwork();
+
+  /* فوکوس اولیه */
+  setTimeout(function () { focusIdx(0); }, 350);
+
+  /* گوش دادن به تم سیستم */
+  if (window.matchMedia) {
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    var handler = function (e) {
+      var saved = null;
+      try { saved = localStorage.getItem('theme'); } catch (err) {}
+      if (!saved) applyTheme(e.matches);
+    };
+    if (mq.addEventListener) mq.addEventListener('change', handler);
+    else if (mq.addListener) mq.addListener(handler);
+  }
+
+  /* خوش‌آمد در Console */
+  try {
+    console.log(
+      '%c🔐 سامانه آزمون\n%cطراحی: فاطمه جوادی',
+      'color: #6C5CE7; font-size: 16px; font-weight: bold;',
+      'color: #00CEC9; font-size: 12px;'
+    );
+  } catch (e) {}
+
+})();
+</script>
 </body>
 </html>
