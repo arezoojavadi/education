@@ -14,10 +14,9 @@
   <link rel="manifest" href="manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
-    /* ===== RESET ===== */
     *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
@@ -25,383 +24,210 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* ===== TOKENS ===== */
     :root {
       --brand-1: #6C5CE7;
-      --brand-2: #A29BFE;
+      --brand-2: #8E7CFF;
       --brand-3: #00CEC9;
-      --brand-4: #55EFC4;
-      --brand-5: #FD79A8;
-      --brand-6: #FDCB6E;
+      --brand-4: #FD79A8;
+      --brand-5: #FDCB6E;
 
       --success: #00B894;
       --danger: #FF6B6B;
-      --warning: #FDCB6E;
 
-      --bg-base: #F5F3FF;
-      --bg-grad-1: #EDE9FE;
-      --bg-grad-2: #DBEAFE;
-      --bg-grad-3: #FCE7F3;
+      --bg: linear-gradient(135deg, #EEF0FF 0%, #F5F0FF 50%, #FFF0F8 100%);
+      --card-bg: #FFFFFF;
+      --card-border: rgba(108, 92, 231, 0.08);
 
-      --aurora-1: rgba(108, 92, 231, 0.55);
-      --aurora-2: rgba(0, 206, 201, 0.45);
-      --aurora-3: rgba(253, 121, 168, 0.4);
-      --aurora-4: rgba(85, 239, 196, 0.35);
-
-      --card-bg: rgba(255, 255, 255, 0.72);
-      --card-border: rgba(255, 255, 255, 0.9);
-      --card-shadow: 0 20px 60px rgba(108, 92, 231, 0.18);
-
-      --text-1: #1F1B3A;
+      --text-1: #1E1B3A;
       --text-2: #6B6789;
-      --text-3: #A8A3C7;
+      --text-3: #A5A0C0;
 
-      --input-bg: rgba(255, 255, 255, 0.65);
-      --input-border: rgba(108, 92, 231, 0.15);
-      --input-border-focus: #6C5CE7;
-      --input-glow: rgba(108, 92, 231, 0.35);
+      --input-bg: #F8F7FF;
+      --input-border: #E5E0FF;
+      --input-focus: #6C5CE7;
+      --input-glow: rgba(108, 92, 231, 0.18);
 
-      --glow-1: rgba(108, 92, 231, 0.4);
-      --grid-color: rgba(108, 92, 231, 0.05);
+      --shadow: 0 4px 20px rgba(108, 92, 231, 0.08), 0 1px 3px rgba(0,0,0,0.03);
+      --shadow-hover: 0 8px 32px rgba(108, 92, 231, 0.15);
 
-      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+      --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     html.dark {
-      --brand-1: #A29BFE;
-      --brand-2: #6C5CE7;
-
-      --bg-base: #07061A;
-      --bg-grad-1: #0A0820;
-      --bg-grad-2: #140B2E;
-      --bg-grad-3: #1A0F35;
-
-      --aurora-1: rgba(162, 155, 254, 0.5);
-      --aurora-2: rgba(0, 206, 201, 0.4);
-      --aurora-3: rgba(253, 121, 168, 0.35);
-      --aurora-4: rgba(85, 239, 196, 0.3);
-
-      --card-bg: rgba(26, 22, 56, 0.65);
-      --card-border: rgba(162, 155, 254, 0.25);
-      --card-shadow: 0 20px 60px rgba(0, 0, 0, 0.65);
-
-      --text-1: #F5F3FF;
-      --text-2: #B8B3D4;
-      --text-3: #7A7599;
-
-      --input-bg: rgba(15, 12, 35, 0.7);
-      --input-border: rgba(162, 155, 254, 0.25);
-      --input-border-focus: #A29BFE;
-      --input-glow: rgba(162, 155, 254, 0.5);
-
-      --glow-1: rgba(162, 155, 254, 0.5);
-      --grid-color: rgba(162, 155, 254, 0.07);
+      --bg: linear-gradient(135deg, #0F0C24 0%, #14102E 50%, #1A1030 100%);
+      --card-bg: #1A1638;
+      --card-border: rgba(162, 155, 254, 0.12);
+      --text-1: #F2F0FF;
+      --text-2: #A5A0C0;
+      --text-3: #6B6789;
+      --input-bg: #14102E;
+      --input-border: #2A2456;
+      --input-focus: #A29BFE;
+      --input-glow: rgba(162, 155, 254, 0.25);
+      --shadow: 0 4px 20px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.3);
+      --shadow-hover: 0 8px 32px rgba(0,0,0,0.5);
     }
 
-    html, body { min-height: 100%; height: 100%; }
+    html, body { height: 100%; min-height: 100%; }
 
     body {
       font-family: 'Vazirmatn', system-ui, -apple-system, sans-serif;
-      background: var(--bg-base);
+      background: var(--bg);
+      background-attachment: fixed;
       color: var(--text-1);
-      overflow-x: hidden;
       line-height: 1.6;
+      overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      transition: background 0.6s var(--ease-out), color 0.4s var(--ease-out);
+      transition: background 0.4s var(--ease), color 0.4s var(--ease);
     }
 
     button { font-family: inherit; cursor: pointer; }
     input { font-family: inherit; }
 
-    /* ===== BACKGROUND ===== */
-    .bg-base {
-      position: fixed; inset: 0;
-      background: linear-gradient(135deg, var(--bg-grad-1) 0%, var(--bg-grad-2) 50%, var(--bg-grad-3) 100%);
-      z-index: -5;
-      transition: background 0.8s var(--ease-out);
-    }
-
-    .bg-aurora {
-      position: fixed; inset: -20%;
-      z-index: -4;
-      filter: blur(80px);
-      opacity: 0.85;
+    .bg-pattern {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      opacity: 0.4;
       pointer-events: none;
-    }
-
-    .aurora {
-      position: absolute;
-      border-radius: 50%;
-      mix-blend-mode: screen;
-      animation: auroraFloat 24s ease-in-out infinite;
-      will-change: transform;
-    }
-
-    html.dark .aurora { mix-blend-mode: lighten; }
-
-    .aurora-1 {
-      width: 60vw; height: 60vw;
-      max-width: 800px; max-height: 800px;
-      background: radial-gradient(circle, var(--aurora-1) 0%, transparent 65%);
-      top: -10%; right: -10%;
-    }
-
-    .aurora-2 {
-      width: 55vw; height: 55vw;
-      max-width: 750px; max-height: 750px;
-      background: radial-gradient(circle, var(--aurora-2) 0%, transparent 65%);
-      bottom: -15%; left: -10%;
-      animation-delay: -6s;
-    }
-
-    .aurora-3 {
-      width: 50vw; height: 50vw;
-      max-width: 700px; max-height: 700px;
-      background: radial-gradient(circle, var(--aurora-3) 0%, transparent 65%);
-      top: 30%; left: 20%;
-      animation-delay: -12s;
-    }
-
-    .aurora-4 {
-      width: 40vw; height: 40vw;
-      max-width: 600px; max-height: 600px;
-      background: radial-gradient(circle, var(--aurora-4) 0%, transparent 65%);
-      bottom: 10%; right: 25%;
-      animation-delay: -18s;
-    }
-
-    @keyframes auroraFloat {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      25% { transform: translate(6%, -8%) scale(1.1); }
-      50% { transform: translate(-5%, 6%) scale(0.95); }
-      75% { transform: translate(4%, 4%) scale(1.05); }
-    }
-
-    .bg-grid {
-      position: fixed; inset: 0;
       background-image:
-        linear-gradient(var(--grid-color) 1px, transparent 1px),
-        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-      background-size: 48px 48px;
-      z-index: -3;
-      animation: gridDrift 60s linear infinite;
-      mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
-      -webkit-mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
+        radial-gradient(circle at 20% 20%, rgba(108, 92, 231, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(0, 206, 201, 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(253, 121, 168, 0.05) 0%, transparent 50%);
+      transition: opacity 0.4s;
     }
 
-    @keyframes gridDrift {
-      from { background-position: 0 0, 0 0; }
-      to { background-position: 48px 48px, 48px 48px; }
+    html.dark .bg-pattern {
+      opacity: 0.7;
+      background-image:
+        radial-gradient(circle at 20% 20%, rgba(162, 155, 254, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(0, 206, 201, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(253, 121, 168, 0.08) 0%, transparent 50%);
     }
 
-    .bg-noise {
-      position: fixed; inset: 0; z-index: -2;
-      opacity: 0.035; pointer-events: none;
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
-    }
-
-    html.dark .bg-noise { opacity: 0.06; }
-
-    /* ===== PARTICLES ===== */
-    .particles { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
-
-    .particle {
-      position: absolute;
-      border-radius: 50%;
-      background: var(--brand-1);
+    .bg-dots {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
       opacity: 0.35;
-      animation: particleFloat linear infinite;
-      will-change: transform;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='2' cy='2' r='1' fill='%236C5CE7' opacity='0.35'/></svg>");
+      background-size: 32px 32px;
+      mask-image: radial-gradient(ellipse at center, black 10%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse at center, black 10%, transparent 70%);
     }
 
-    html.dark .particle { background: var(--brand-2); opacity: 0.5; }
-
-    @keyframes particleFloat {
-      0% { transform: translate(0, 0); opacity: 0; }
-      10% { opacity: 0.4; }
-      90% { opacity: 0.4; }
-      100% { transform: translate(var(--dx, 40px), var(--dy, -100vh)); opacity: 0; }
+    html.dark .bg-dots {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='2' cy='2' r='1' fill='%23A29BFE' opacity='0.5'/></svg>");
+      opacity: 0.5;
     }
 
-    /* ===== TOP CONTROLS ===== */
     .top-controls {
-      position: fixed; top: 20px; left: 20px;
-      display: flex; gap: 10px; z-index: 100;
+      position: fixed; top: 20px; left: 20px; z-index: 100;
     }
 
     .icon-btn {
-      width: 48px; height: 48px;
-      border-radius: 16px;
+      width: 46px; height: 46px;
+      border-radius: 14px;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
       display: flex; align-items: center; justify-content: center;
       color: var(--text-1);
-      transition: all 0.35s var(--ease-spring);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      box-shadow: var(--shadow);
+      transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
     }
 
-    .icon-btn:hover {
-      transform: translateY(-3px) scale(1.05);
-      box-shadow: 0 10px 28px var(--glow-1);
-    }
+    .icon-btn:hover { transform: translateY(-2px) scale(1.04); box-shadow: var(--shadow-hover); }
+    .icon-btn:active { transform: scale(0.94); }
 
-    .icon-btn:active { transform: scale(0.92); }
-
-    .icon-btn svg {
-      width: 22px; height: 22px;
+    .icon-wrap { position: relative; width: 22px; height: 22px; }
+    .icon-wrap svg {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
       stroke: currentColor; fill: none;
       stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+      transition: opacity 0.25s, transform 0.3s var(--ease);
     }
-
-    .theme-icon-wrap { position: relative; width: 22px; height: 22px; }
-
-    .theme-icon-wrap svg {
-      position: absolute; inset: 0;
-      transition: opacity 0.35s, transform 0.5s var(--ease-spring);
-    }
-
     .icon-sun { opacity: 1; transform: rotate(0) scale(1); }
-    .icon-moon { opacity: 0; transform: rotate(-90deg) scale(0.4); }
-    html.dark .icon-sun { opacity: 0; transform: rotate(90deg) scale(0.4); }
+    .icon-moon { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+    html.dark .icon-sun { opacity: 0; transform: rotate(90deg) scale(0.5); }
     html.dark .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
 
-    /* ===== APP ===== */
     .app {
       position: relative;
       min-height: 100vh;
       min-height: 100dvh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       padding: 80px 20px 40px;
-      z-index: 1;
     }
 
-    /* ===== CARD ===== */
     .card {
       width: 100%;
-      max-width: 500px;
+      max-width: 480px;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 32px;
-      padding: 44px 38px 32px;
-      backdrop-filter: blur(32px) saturate(180%);
-      -webkit-backdrop-filter: blur(32px) saturate(180%);
-      box-shadow: var(--card-shadow);
+      border-radius: 28px;
+      padding: 42px 36px 30px;
+      box-shadow: var(--shadow);
       position: relative;
       overflow: hidden;
-      animation: cardEnter 0.8s var(--ease-out) both;
-      transition: background 0.5s var(--ease-out), border 0.5s var(--ease-out), box-shadow 0.5s var(--ease-out);
+      transition: background 0.4s var(--ease), border 0.4s var(--ease), box-shadow 0.4s var(--ease);
     }
 
     .card::before {
       content: '';
       position: absolute;
-      top: 0; left: 0; right: 0; height: 3px;
-      background: linear-gradient(90deg,
-        transparent, var(--brand-1), var(--brand-3), var(--brand-5), var(--brand-1), transparent);
+      top: 0; right: 0; left: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #6C5CE7, #00CEC9, #FD79A8, #6C5CE7);
       background-size: 200% 100%;
-      animation: shineLine 4s linear infinite;
+      animation: shimmer 6s linear infinite;
     }
 
-    @keyframes shineLine {
-      from { background-position: 100% 0; }
-      to { background-position: -100% 0; }
-    }
+    @keyframes shimmer { to { background-position: 200% 0; } }
 
-    @keyframes cardEnter {
-      from { opacity: 0; transform: translateY(40px) scale(0.92); filter: blur(8px); }
-      to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-    }
-
-    /* ===== AVATAR PREVIEW ===== */
-    .avatar-preview {
-      width: 88px; height: 88px;
+    .avatar {
+      width: 76px; height: 76px;
       margin: 0 auto 18px;
-      border-radius: 26px;
-      background: linear-gradient(135deg, var(--brand-1) 0%, var(--brand-3) 100%);
+      border-radius: 22px;
+      background: linear-gradient(135deg, #6C5CE7, #00CEC9);
       display: flex; align-items: center; justify-content: center;
       color: #fff;
-      font-size: 34px;
+      font-size: 30px;
       font-weight: 900;
       letter-spacing: 1px;
-      position: relative;
-      box-shadow: 0 16px 40px var(--glow-1);
-      transition: all 0.4s var(--ease-spring);
-      animation: avatarEnter 1s var(--ease-spring) 0.15s both;
+      box-shadow: 0 10px 28px rgba(108, 92, 231, 0.3);
+      animation: avatarPop 0.6s var(--ease-bounce) both;
+      transition: background 0.3s var(--ease);
     }
 
-    .avatar-preview::before {
-      content: '';
-      position: absolute; inset: -8px;
-      border-radius: 34px;
-      background: linear-gradient(135deg, var(--brand-1), var(--brand-3), var(--brand-5));
-      opacity: 0.4; filter: blur(20px);
-      z-index: -1;
-      animation: logoGlow 4s ease-in-out infinite;
+    .avatar.has-name {
+      background: linear-gradient(135deg, #00CEC9, #55EFC4);
     }
 
-    .avatar-preview::after {
-      content: '';
-      position: absolute; inset: -14px;
-      border-radius: 40px;
-      border: 1.5px dashed rgba(108, 92, 231, 0.3);
-      animation: logoRotate 25s linear infinite;
+    @keyframes avatarPop {
+      0% { opacity: 0; transform: scale(0.4); }
+      100% { opacity: 1; transform: scale(1); }
     }
 
-    html.dark .avatar-preview::after { border-color: rgba(162, 155, 254, 0.35); }
-
-    .avatar-preview.has-name::before {
-      background: linear-gradient(135deg, var(--brand-3), var(--brand-4), var(--brand-1));
-    }
-
-    @keyframes avatarEnter {
-      0% { opacity: 0; transform: scale(0.2) rotate(-45deg); }
-      65% { transform: scale(1.15) rotate(8deg); }
-      100% { opacity: 1; transform: scale(1) rotate(0); }
-    }
-
-    @keyframes logoGlow {
-      0%, 100% { opacity: 0.35; transform: scale(1); }
-      50% { opacity: 0.65; transform: scale(1.08); }
-    }
-
-    @keyframes logoRotate { to { transform: rotate(360deg); } }
-
-    /* ===== HEADER ===== */
-    .header {
-      text-align: center;
-      margin-bottom: 22px;
-      position: relative;
-      z-index: 1;
-    }
+    .header { text-align: center; margin-bottom: 20px; }
 
     .title {
-      font-size: clamp(22px, 5vw, 27px);
+      font-size: 24px;
       font-weight: 900;
-      letter-spacing: -0.5px;
-      background: linear-gradient(135deg, var(--brand-1) 0%, var(--brand-3) 50%, var(--brand-5) 100%);
-      background-size: 200% 200%;
+      letter-spacing: -0.3px;
+      background: linear-gradient(135deg, #6C5CE7, #00CEC9);
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
       margin-bottom: 8px;
-      animation: gradientFlow 6s ease infinite;
       line-height: 1.3;
     }
 
-    @keyframes gradientFlow {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-    }
-
     .subtitle {
-      font-size: 13px;
+      font-size: 12.5px;
       color: var(--text-2);
       font-weight: 500;
       line-height: 1.75;
@@ -409,79 +235,59 @@
       margin: 0 auto;
     }
 
-    /* ===== CODE BADGE ===== */
     .code-badge {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      margin-top: 14px;
-      padding: 7px 16px;
-      background: linear-gradient(135deg, rgba(108,92,231,0.1), rgba(0,206,201,0.08));
-      border: 1px solid rgba(108,92,231,0.18);
-      border-radius: 20px;
-      font-size: 12.5px;
+      gap: 6px;
+      margin-top: 12px;
+      padding: 6px 14px;
+      background: linear-gradient(135deg, rgba(108, 92, 231, 0.08), rgba(0, 206, 201, 0.06));
+      border: 1px solid rgba(108, 92, 231, 0.15);
+      border-radius: 16px;
+      font-size: 12px;
       font-weight: 700;
       color: var(--brand-1);
-      letter-spacing: 2.5px;
+      letter-spacing: 2px;
       font-family: 'Vazirmatn', monospace;
-      transition: all 0.3s var(--ease-out);
     }
 
     html.dark .code-badge {
-      background: linear-gradient(135deg, rgba(162,155,254,0.15), rgba(0,206,201,0.12));
-      border-color: rgba(162,155,254,0.3);
+      background: linear-gradient(135deg, rgba(162, 155, 254, 0.12), rgba(0, 206, 201, 0.1));
+      border-color: rgba(162, 155, 254, 0.2);
     }
 
     .code-badge svg {
-      width: 14px; height: 14px;
+      width: 13px; height: 13px;
       stroke: currentColor; fill: none;
       stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;
     }
 
-    /* ===== WARNING ===== */
     .warning {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       align-items: flex-start;
-      padding: 14px 18px;
-      background: linear-gradient(135deg, rgba(253, 203, 110, 0.14), rgba(255, 107, 107, 0.06));
-      border: 1px solid rgba(253, 203, 110, 0.35);
-      border-right: 4px solid var(--brand-6);
-      border-radius: 14px;
-      font-size: 12.5px;
-      line-height: 1.8;
+      padding: 12px 16px;
+      background: rgba(253, 203, 110, 0.1);
+      border: 1px solid rgba(253, 203, 110, 0.3);
+      border-right: 3px solid var(--brand-5);
+      border-radius: 12px;
+      font-size: 12px;
+      line-height: 1.75;
       color: #8B6914;
-      margin-bottom: 22px;
-      position: relative;
-      z-index: 1;
-      animation: warningEnter 0.6s var(--ease-out) 0.3s both;
+      margin-bottom: 20px;
     }
 
     html.dark .warning {
-      color: var(--brand-6);
-      background: linear-gradient(135deg, rgba(253,203,110,0.1), rgba(255,107,107,0.04));
-      border-color: rgba(253,203,110,0.3);
-    }
-
-    @keyframes warningEnter {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
+      color: var(--brand-5);
+      background: rgba(253, 203, 110, 0.08);
     }
 
     .warning svg {
-      width: 20px; height: 20px;
+      width: 18px; height: 18px;
       flex-shrink: 0;
-      margin-top: 1px;
+      margin-top: 2px;
       stroke: currentColor; fill: none;
       stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
-    }
-
-    .warning b { font-weight: 800; }
-
-    /* ===== FORM ===== */
-    .form-section {
-      position: relative;
-      z-index: 1;
     }
 
     .label-row {
@@ -492,7 +298,7 @@
     }
 
     .label {
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 700;
       color: var(--text-2);
       display: flex;
@@ -507,270 +313,199 @@
     }
 
     .counter {
-      font-size: 11.5px;
+      font-size: 11px;
       font-weight: 700;
       color: var(--text-3);
       font-variant-numeric: tabular-nums;
       transition: color 0.3s;
     }
 
-    .counter.warn { color: var(--brand-6); }
+    .counter.warn { color: var(--brand-5); }
     .counter.full { color: var(--danger); }
 
     .name-input {
       width: 100%;
-      padding: 16px 20px;
-      font-size: 16.5px;
+      padding: 15px 18px;
+      font-size: 16px;
       font-weight: 600;
       background: var(--input-bg);
       border: 2px solid var(--input-border);
-      border-radius: 16px;
+      border-radius: 14px;
       color: var(--text-1);
       outline: none;
-      transition: all 0.25s var(--ease-out);
+      transition: border-color 0.2s var(--ease), background 0.2s var(--ease), transform 0.2s var(--ease);
       text-align: center;
     }
 
     .name-input::placeholder {
       color: var(--text-3);
-      opacity: 0.75;
       font-weight: 500;
     }
 
     .name-input:focus {
-      border-color: var(--input-border-focus);
+      border-color: var(--input-focus);
       background: var(--card-bg);
-      box-shadow: 0 8px 24px var(--input-glow), 0 0 0 4px rgba(108, 92, 231, 0.1);
       transform: translateY(-2px);
-    }
-
-    html.dark .name-input:focus {
-      box-shadow: 0 8px 24px var(--input-glow), 0 0 0 4px rgba(162, 155, 254, 0.15);
+      box-shadow: 0 6px 16px var(--input-glow);
     }
 
     .name-input.error {
       border-color: var(--danger);
-      background: rgba(255, 107, 107, 0.08);
-      animation: shakeX 0.4s var(--ease-out);
+      background: rgba(255, 107, 107, 0.06);
+      animation: shake 0.35s var(--ease);
     }
 
-    @keyframes shakeX {
+    @keyframes shake {
       0%, 100% { transform: translateX(0); }
-      20% { transform: translateX(-9px); }
-      40% { transform: translateX(9px); }
-      60% { transform: translateX(-5px); }
-      80% { transform: translateX(3px); }
+      25% { transform: translateX(-8px); }
+      75% { transform: translateX(8px); }
     }
 
-    /* ===== SUGGESTIONS ===== */
+    .suggestions-label {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 14px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
     .suggestions {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      margin-top: 12px;
     }
 
     .suggestion {
       padding: 6px 12px;
       background: var(--input-bg);
       border: 1px solid var(--input-border);
-      border-radius: 12px;
-      font-size: 12px;
+      border-radius: 10px;
+      font-size: 11.5px;
       font-weight: 600;
       color: var(--text-2);
       cursor: pointer;
-      transition: all 0.25s var(--ease-out);
+      transition: all 0.2s var(--ease);
     }
 
     .suggestion:hover {
       border-color: var(--brand-1);
       color: var(--brand-1);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px var(--glow-1);
+      transform: translateY(-1px);
     }
 
     .suggestion:active { transform: scale(0.96); }
 
-    .suggestions-label {
-      font-size: 11px;
-      color: var(--text-3);
-      margin-top: 12px;
-      margin-bottom: 6px;
-      font-weight: 600;
-    }
-
-    /* ===== BUTTON ===== */
-    .btn-primary {
+    .btn {
       width: 100%;
-      padding: 17px 24px;
-      font-size: 16px;
+      padding: 16px 22px;
+      font-size: 15.5px;
       font-weight: 800;
-      letter-spacing: 0.2px;
       color: #fff;
-      background: linear-gradient(135deg, var(--brand-1) 0%, var(--brand-2) 100%);
-      background-size: 200% 200%;
+      background: linear-gradient(135deg, #6C5CE7, #8E7CFF);
       border: none;
-      border-radius: 24px;
+      border-radius: 16px;
       cursor: pointer;
-      position: relative;
-      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      transition: all 0.4s var(--ease-out);
-      box-shadow:
-        0 10px 28px var(--glow-1),
-        inset 0 1px 0 rgba(255,255,255,0.3);
-      min-height: 58px;
-      margin-top: 22px;
+      min-height: 56px;
+      box-shadow: 0 6px 18px rgba(108, 92, 231, 0.28);
+      transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+      margin-top: 20px;
     }
 
-    .btn-primary::before {
-      content: '';
-      position: absolute;
-      top: 0; left: -100%;
-      width: 60%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
-      transition: left 0.7s var(--ease-out);
+    .btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 26px rgba(108, 92, 231, 0.4);
     }
 
-    .btn-primary:hover:not(:disabled) {
-      transform: translateY(-3px);
-      box-shadow:
-        0 18px 42px var(--glow-1),
-        inset 0 1px 0 rgba(255,255,255,0.4);
-      background-position: 100% 50%;
-    }
+    .btn:active:not(:disabled) { transform: translateY(0) scale(0.98); }
+    .btn:disabled { opacity: 0.7; cursor: not-allowed; }
 
-    .btn-primary:hover:not(:disabled)::before { left: 120%; }
-    .btn-primary:active:not(:disabled) { transform: translateY(-1px) scale(0.985); }
-    .btn-primary:disabled { opacity: 0.65; cursor: not-allowed; }
-
-    .btn-primary .label {
+    .btn .label {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      position: relative;
-      z-index: 1;
     }
 
     .spinner {
-      width: 20px; height: 20px;
+      width: 18px; height: 18px;
       border: 2.5px solid rgba(255,255,255,0.3);
       border-top-color: #fff;
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      display: inline-block;
+      animation: spin 0.7s linear infinite;
     }
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ===== MESSAGE ===== */
     .message {
-      margin-top: 16px;
-      padding: 0 18px;
+      margin-top: 14px;
+      padding: 0 16px;
       text-align: center;
-      font-size: 13.5px;
+      font-size: 13px;
       font-weight: 700;
-      line-height: 1.6;
-      border-radius: 14px;
+      border-radius: 12px;
       opacity: 0;
-      transform: translateY(-10px);
+      transform: translateY(-6px);
       max-height: 0;
       overflow: hidden;
-      transition: all 0.4s var(--ease-out);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+      transition: all 0.3s var(--ease);
     }
 
     .message.show {
       opacity: 1;
       transform: translateY(0);
-      max-height: 120px;
-      padding: 13px 18px;
+      max-height: 100px;
+      padding: 11px 16px;
     }
 
     .message.error {
-      background: rgba(255, 107, 107, 0.12);
+      background: rgba(255, 107, 107, 0.1);
       color: var(--danger);
-      border: 1px solid rgba(255, 107, 107, 0.25);
+      border: 1px solid rgba(255, 107, 107, 0.2);
     }
 
     .message.success {
-      background: rgba(0, 184, 148, 0.12);
+      background: rgba(0, 184, 148, 0.1);
       color: var(--success);
-      border: 1px solid rgba(0, 184, 148, 0.25);
+      border: 1px solid rgba(0, 184, 148, 0.2);
     }
 
-    /* ===== FOOTER ===== */
-    .card-footer {
+    .footer {
       text-align: center;
-      margin-top: 22px;
-      padding-top: 18px;
+      margin-top: 20px;
+      padding-top: 16px;
       border-top: 1px solid var(--input-border);
-      font-size: 11.5px;
+      font-size: 11px;
       color: var(--text-3);
       font-weight: 500;
-      position: relative;
-      z-index: 1;
     }
 
-    .heart {
+    .footer .heart {
       display: inline-block;
-      color: var(--brand-5);
-      animation: heartbeat 1.6s var(--ease-in-out) infinite;
+      color: #FD79A8;
+      animation: heartbeat 1.8s ease-in-out infinite;
     }
 
     @keyframes heartbeat {
       0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.25); }
+      50% { transform: scale(1.2); }
     }
 
-    /* ===== CONFETTI ===== */
-    .confetti-container {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 999;
-      overflow: hidden;
-    }
-
-    .confetti {
-      position: absolute;
-      width: 10px; height: 10px;
-      opacity: 0;
-      animation: confettiFall linear forwards;
-    }
-
-    @keyframes confettiFall {
-      0% {
-        opacity: 1;
-        transform: translateY(-10vh) rotate(0deg);
-      }
-      100% {
-        opacity: 0;
-        transform: translateY(110vh) rotate(720deg);
-      }
-    }
-
-    /* ===== RESPONSIVE ===== */
     @media (max-width: 520px) {
-      .card { padding: 36px 24px 26px; border-radius: 28px; }
-      .avatar-preview { width: 74px; height: 74px; border-radius: 22px; font-size: 28px; }
-      .title { font-size: 22px; }
-      .name-input { padding: 14px 16px; font-size: 15.5px; }
-      .btn-primary { padding: 15px 20px; font-size: 15px; min-height: 54px; }
-      .top-controls { top: 14px; left: 14px; gap: 8px; }
-      .icon-btn { width: 44px; height: 44px; border-radius: 14px; }
-      .icon-btn svg { width: 20px; height: 20px; }
+      .card { padding: 34px 22px 24px; border-radius: 24px; }
+      .avatar { width: 66px; height: 66px; border-radius: 20px; font-size: 26px; }
+      .title { font-size: 21px; }
+      .name-input { padding: 13px 16px; font-size: 15px; }
+      .btn { padding: 14px 20px; font-size: 14.5px; min-height: 52px; }
+      .top-controls { top: 14px; left: 14px; }
+      .icon-btn { width: 42px; height: 42px; }
     }
 
     @media (max-width: 380px) {
-      .card { padding: 30px 18px 22px; }
-      .app { padding: 70px 14px 30px; }
+      .card { padding: 28px 16px 20px; }
+      .app { padding: 70px 12px 30px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -779,28 +514,17 @@
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
       }
-      .bg-aurora, .particles { display: none; }
     }
   </style>
 </head>
 <body>
 
-  <!-- BACKGROUND -->
-  <div class="bg-base"></div>
-  <div class="bg-aurora" aria-hidden="true">
-    <div class="aurora aurora-1"></div>
-    <div class="aurora aurora-2"></div>
-    <div class="aurora aurora-3"></div>
-    <div class="aurora aurora-4"></div>
-  </div>
-  <div class="bg-grid" aria-hidden="true"></div>
-  <div class="particles" id="particles" aria-hidden="true"></div>
-  <div class="bg-noise" aria-hidden="true"></div>
+  <div class="bg-pattern" aria-hidden="true"></div>
+  <div class="bg-dots" aria-hidden="true"></div>
 
-  <!-- THEME TOGGLE -->
   <div class="top-controls">
     <button class="icon-btn" id="themeBtn" type="button" title="تغییر حالت روز/شب" aria-label="تغییر تم">
-      <span class="theme-icon-wrap">
+      <span class="icon-wrap">
         <svg class="icon-sun" viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="4"/>
           <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
@@ -812,15 +536,15 @@
     </button>
   </div>
 
-  <!-- MAIN -->
   <main class="app">
     <div class="card">
 
+      <div class="avatar" id="avatar">؟</div>
+
       <div class="header">
-        <div class="avatar-preview" id="avatarPreview">؟</div>
         <h1 class="title">خوش آمدی!</h1>
         <p class="subtitle">
-          برای شروع، نام و نام خانوادگی واقعی‌ت را وارد کن.<br>
+          برای شروع، نام و نام خانوادگی واقعی‌ت را وارد کن.
           این نام در همه‌ی آزمون‌ها به معلم نمایش داده می‌شود.
         </p>
         <div class="code-badge">
@@ -839,86 +563,70 @@
           <line x1="12" y1="17" x2="12.01" y2="17"/>
         </svg>
         <div>
-          <b>توجه مهم:</b> بعد از تأیید، امکان تغییر نام وجود ندارد. پس با دقت واردش کن.
+          <b>توجه:</b> بعد از تأیید، امکان تغییر نام وجود ندارد.
         </div>
       </div>
 
-      <div class="form-section">
-        <div class="label-row">
-          <label class="label" for="nameInput">
-            <svg viewBox="0 0 24 24">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
-            </svg>
-            <span>نام و نام خانوادگی</span>
-          </label>
-          <span class="counter" id="counter">۰ / ۶۰</span>
-        </div>
-
-        <input
-          type="text"
-          id="nameInput"
-          class="name-input"
-          placeholder="مثلاً: علی رضایی"
-          maxlength="60"
-          autocomplete="off"
-          spellcheck="false"
-          aria-label="نام و نام خانوادگی"
-        >
-
-        <div class="suggestions-label">پیشنهاد:</div>
-        <div class="suggestions" id="suggestions">
-          <!-- JS fills -->
-        </div>
-
-        <button class="btn-primary" id="saveBtn" type="button">
-          <span class="label">
-            <span>تأیید و ادامه</span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="20 6 9 17 4 12"/>
-            </svg>
-          </span>
-        </button>
-
-        <div class="message" id="message"></div>
+      <div class="label-row">
+        <label class="label" for="nameInput">
+          <svg viewBox="0 0 24 24">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          <span>نام و نام خانوادگی</span>
+        </label>
+        <span class="counter" id="counter">۰ / ۶۰</span>
       </div>
 
-      <div class="card-footer">
+      <input
+        type="text"
+        id="nameInput"
+        class="name-input"
+        placeholder="مثلاً: علی رضایی"
+        maxlength="60"
+        autocomplete="off"
+        spellcheck="false"
+        aria-label="نام و نام خانوادگی"
+      >
+
+      <div class="suggestions-label">پیشنهاد:</div>
+      <div class="suggestions" id="suggestions"></div>
+
+      <button class="btn" id="saveBtn" type="button">
+        <span class="label">
+          <span>تأیید و ادامه</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </span>
+      </button>
+
+      <div class="message" id="message"></div>
+
+      <div class="footer">
         ساخته شده با <span class="heart">♥</span> برای یادگیری بهتر
       </div>
 
     </div>
   </main>
 
-  <!-- CONFETTI -->
-  <div class="confetti-container" id="confettiContainer" aria-hidden="true"></div>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
   (function() {
     'use strict';
 
-    // ============================================
-    // CONFIG
-    // ============================================
     var SUPABASE_URL = 'https://cfkwvzbqgapguuaqibmq.supabase.co';
     var SUPABASE_KEY = 'sb_publishable_Qf3R9hPgjApwe2c-qQMoJA_jitobazq';
-
     var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // ============================================
-    // ELEMENTS
-    // ============================================
     var nameInput = document.getElementById('nameInput');
     var saveBtn = document.getElementById('saveBtn');
     var message = document.getElementById('message');
     var counter = document.getElementById('counter');
-    var avatarPreview = document.getElementById('avatarPreview');
+    var avatar = document.getElementById('avatar');
     var codeText = document.getElementById('codeText');
     var themeBtn = document.getElementById('themeBtn');
     var suggestionsEl = document.getElementById('suggestions');
-    var particlesContainer = document.getElementById('particles');
-    var confettiContainer = document.getElementById('confettiContainer');
 
     var currentUser = null;
     var currentRole = 'student';
@@ -933,7 +641,7 @@
       else html.classList.remove('dark');
       try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch(e) {}
       var meta = document.getElementById('themeMeta');
-      if (meta) meta.setAttribute('content', isDark ? '#0A0820' : '#6C5CE7');
+      if (meta) meta.setAttribute('content', isDark ? '#0F0C24' : '#6C5CE7');
     }
 
     function initTheme() {
@@ -948,70 +656,7 @@
     });
 
     // ============================================
-    // PARTICLES
-    // ============================================
-    function createParticles() {
-      var count = window.innerWidth < 640 ? 14 : 24;
-      var html = '';
-      for (var i = 0; i < count; i++) {
-        var size = 2 + Math.random() * 4;
-        var left = Math.random() * 100;
-        var top = 100 + Math.random() * 20;
-        var duration = 18 + Math.random() * 20;
-        var delay = -Math.random() * 30;
-        var dx = (Math.random() - 0.5) * 200;
-        html += '<div class="particle" style="' +
-          'width:' + size.toFixed(1) + 'px;' +
-          'height:' + size.toFixed(1) + 'px;' +
-          'left:' + left.toFixed(2) + '%;' +
-          'top:' + top.toFixed(2) + '%;' +
-          '--dx:' + dx.toFixed(0) + 'px;' +
-          'animation-duration:' + duration.toFixed(1) + 's;' +
-          'animation-delay:' + delay.toFixed(1) + 's;' +
-          '"></div>';
-      }
-      particlesContainer.innerHTML = html;
-    }
-
-    // ============================================
-    // MESSAGE
-    // ============================================
-    var msgTimer = null;
-    function showMessage(text, type, duration) {
-      clearTimeout(msgTimer);
-      message.className = 'message ' + (type || 'info') + ' show';
-      message.innerHTML = '<span>' + text + '</span>';
-      if (duration) {
-        msgTimer = setTimeout(function() { message.classList.remove('show'); }, duration);
-      }
-    }
-
-    function hideMessage() {
-      clearTimeout(msgTimer);
-      message.classList.remove('show');
-    }
-
-    // ============================================
-    // AVATAR PREVIEW
-    // ============================================
-    function updateAvatar(name) {
-      var clean = (name || '').trim();
-      if (!clean) {
-        avatarPreview.textContent = '؟';
-        avatarPreview.classList.remove('has-name');
-        return;
-      }
-      var parts = clean.split(/\s+/);
-      var initials = parts[0] ? parts[0][0] : '';
-      if (parts.length > 1 && parts[parts.length - 1][0]) {
-        initials += parts[parts.length - 1][0];
-      }
-      avatarPreview.textContent = initials;
-      avatarPreview.classList.add('has-name');
-    }
-
-    // ============================================
-    // COUNTER
+    // COUNTER + AVATAR
     // ============================================
     function toFa(n) {
       var fa = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
@@ -1026,23 +671,46 @@
       else if (len >= 40) counter.classList.add('warn');
     }
 
+    function updateAvatar(name) {
+      var clean = (name || '').trim();
+      if (!clean) {
+        avatar.textContent = '؟';
+        avatar.classList.remove('has-name');
+        return;
+      }
+      var parts = clean.split(/\s+/);
+      var initials = parts[0] ? parts[0][0] : '';
+      if (parts.length > 1 && parts[parts.length - 1][0]) {
+        initials += parts[parts.length - 1][0];
+      }
+      avatar.textContent = initials;
+      avatar.classList.add('has-name');
+    }
+
+    // ============================================
+    // MESSAGE
+    // ============================================
+    var msgTimer = null;
+    function showMessage(text, type) {
+      clearTimeout(msgTimer);
+      message.className = 'message ' + type + ' show';
+      message.textContent = text;
+    }
+
+    function hideMessage() {
+      clearTimeout(msgTimer);
+      message.classList.remove('show');
+    }
+
     // ============================================
     // VALIDATION
     // ============================================
-    function validateName(name) {
+    function validate(name) {
       var trimmed = name.trim().replace(/\s+/g, ' ');
-
-      if (trimmed.length < 3) {
-        return { ok: false, msg: 'نام باید حداقل ۳ حرف باشد' };
-      }
-      if (trimmed.length > 60) {
-        return { ok: false, msg: 'نام بسیار طولانی است' };
-      }
-      if (!/^[\u0600-\u06FF\s\u200cA-Za-z\u0621-\u063A]+$/.test(trimmed)) {
+      if (trimmed.length < 3) return { ok: false, msg: 'نام باید حداقل ۳ حرف باشد' };
+      if (trimmed.length > 60) return { ok: false, msg: 'نام بسیار طولانی است' };
+      if (!/^[\u0600-\u06FF\s\u200cA-Za-z]+$/.test(trimmed)) {
         return { ok: false, msg: 'فقط حروف فارسی یا انگلیسی مجاز است' };
-      }
-      if (/^\s|\s$/.test(name)) {
-        return { ok: false, msg: 'نام نباید با فاصله شروع یا تمام شود' };
       }
       return { ok: true, value: trimmed };
     }
@@ -1051,23 +719,12 @@
     // SUGGESTIONS
     // ============================================
     function buildSuggestions() {
-      var suggestions = [
-        'علی رضایی',
-        'زهرا محمدی',
-        'امیر حسینی',
-        'فاطمه کریمی',
-        'محمد صادقی',
-        'مریم احمدی',
-        'حسین نوری',
-        'سارا موسوی'
-      ];
-
+      var names = ['علی رضایی', 'زهرا محمدی', 'امیر حسینی', 'فاطمه کریمی', 'محمد صادقی', 'مریم احمدی'];
       var html = '';
-      suggestions.forEach(function(s) {
-        html += '<button type="button" class="suggestion" data-name="' + s + '">' + s + '</button>';
+      names.forEach(function(n) {
+        html += '<button type="button" class="suggestion" data-name="' + n + '">' + n + '</button>';
       });
       suggestionsEl.innerHTML = html;
-
       suggestionsEl.addEventListener('click', function(e) {
         var btn = e.target.closest('.suggestion');
         if (!btn) return;
@@ -1080,52 +737,15 @@
     }
 
     // ============================================
-    // CONFETTI
-    // ============================================
-    function launchConfetti() {
-      var colors = ['#6C5CE7', '#A29BFE', '#00CEC9', '#55EFC4', '#FD79A8', '#FDCB6E'];
-      var count = 60;
-
-      for (var i = 0; i < count; i++) {
-        (function(idx) {
-          setTimeout(function() {
-            var c = document.createElement('div');
-            c.className = 'confetti';
-            c.style.left = (Math.random() * 100) + '%';
-            c.style.top = '-20px';
-            c.style.background = colors[Math.floor(Math.random() * colors.length)];
-            c.style.width = (6 + Math.random() * 8) + 'px';
-            c.style.height = (6 + Math.random() * 8) + 'px';
-            c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-            c.style.animationDuration = (2.2 + Math.random() * 1.8) + 's';
-            c.style.animationDelay = '0s';
-            confettiContainer.appendChild(c);
-            setTimeout(function() { c.remove(); }, 4500);
-          }, idx * 18);
-        })(i);
-      }
-    }
-
-    // ============================================
     // SAVE
     // ============================================
-    function setButtonLoading(loading) {
+    function setBtn(loading) {
       if (loading) {
         saveBtn.disabled = true;
-        saveBtn.innerHTML =
-          '<span class="label">' +
-            '<span>در حال ذخیره</span>' +
-            '<span class="spinner"></span>' +
-          '</span>';
+        saveBtn.innerHTML = '<span class="label"><span>در حال ذخیره</span><span class="spinner"></span></span>';
       } else {
         saveBtn.disabled = false;
-        saveBtn.innerHTML =
-          '<span class="label">' +
-            '<span>تأیید و ادامه</span>' +
-            '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">' +
-              '<polyline points="20 6 9 17 4 12"/>' +
-            '</svg>' +
-          '</span>';
+        saveBtn.innerHTML = '<span class="label"><span>تأیید و ادامه</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>';
       }
     }
 
@@ -1134,89 +754,74 @@
       if (navigator.vibrate && window.matchMedia('(pointer: coarse)').matches) {
         try { navigator.vibrate([30, 40, 30]); } catch(e) {}
       }
-      setTimeout(function() { nameInput.classList.remove('error'); }, 500);
+      setTimeout(function() { nameInput.classList.remove('error'); }, 400);
     }
 
     async function saveName() {
       if (isSaving) return;
 
-      var raw = nameInput.value;
-      var validation = validateName(raw);
-
-      if (!validation.ok) {
+      var v = validate(nameInput.value);
+      if (!v.ok) {
         shakeInput();
-        showMessage('❌ ' + validation.msg, 'error', 3500);
+        showMessage('❌ ' + v.msg, 'error');
         return;
       }
 
-      var trimmed = validation.value;
-
-      // هشدار اسم تک‌کلمه
-      if (trimmed.split(' ').length < 2) {
+      if (v.value.split(' ').length < 2) {
         if (!confirm('معمولاً نام و نام خانوادگی را با هم می‌نویسند. مطمئنی فقط همین کافی است؟')) {
           return;
         }
       }
 
       isSaving = true;
-      setButtonLoading(true);
+      setBtn(true);
       hideMessage();
 
       try {
         var result = await supabase
           .from('profiles')
           .update({
-            full_name: trimmed,
+            full_name: v.value,
             name_confirmed: true
           })
           .eq('id', currentUser.id);
 
         if (result.error) {
           console.error('[save]', result.error);
-          setButtonLoading(false);
+          setBtn(false);
           isSaving = false;
           shakeInput();
 
-          var errMsg = 'خطا در ذخیره نام';
+          var msg = 'خطا در ذخیره نام';
           if (result.error.message && result.error.message.indexOf('policy') !== -1) {
-            errMsg = 'این نام قبلاً تأیید شده و قابل تغییر نیست';
+            msg = 'این نام قبلاً تأیید شده';
           }
-          showMessage('❌ ' + errMsg, 'error', 4000);
+          showMessage('❌ ' + msg, 'error');
           return;
         }
 
-        // موفقیت
-        launchConfetti();
-
         if (navigator.vibrate) {
-          try { navigator.vibrate([50, 30, 50, 30, 100]); } catch(e) {}
+          try { navigator.vibrate([50, 30, 50]); } catch(e) {}
         }
 
-        showMessage('✅ نام شما با موفقیت ثبت شد!', 'success');
-
-        saveBtn.innerHTML =
-          '<span class="label">' +
-            '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
-              '<polyline points="20 6 9 17 4 12"/>' +
-            '</svg>' +
-            '<span>موفق!</span>' +
-          '</span>';
+        showMessage('✅ نام با موفقیت ثبت شد!', 'success');
+        saveBtn.innerHTML = '<span class="label"><span>✅ موفق!</span></span>';
 
         setTimeout(function() {
           window.location.href = currentRole === 'teacher' ? 'teacher.html' : 'student.html';
-        }, 1400);
+        }, 1000);
 
       } catch (err) {
         console.error('[fatal]', err);
-        setButtonLoading(false);
+        setBtn(false);
         isSaving = false;
         shakeInput();
-        showMessage('❌ خطای غیرمنتظره، دوباره تلاش کنید', 'error', 4000);
+        showMessage('❌ خطای غیرمنتظره', 'error');
       }
     }
 
     // ============================================
-    // BIND
+    // EVENTS
     // ============================================
     nameInput.addEventListener('input', function() {
       updateCounter();
@@ -1237,11 +842,9 @@
     // INIT
     // ============================================
     initTheme();
-    createParticles();
     buildSuggestions();
     updateCounter();
 
-    // بارگذاری کاربر
     (async function() {
       var userResult = await supabase.auth.getUser();
       var user = userResult.data.user;
@@ -1254,7 +857,7 @@
 
       var profileResult = await supabase
         .from('profiles')
-        .select('code, name_confirmed, role, full_name')
+        .select('code, name_confirmed, role')
         .eq('id', user.id)
         .single();
 
@@ -1270,7 +873,7 @@
         codeText.textContent = profile.code || '------';
       }
 
-      setTimeout(function() { nameInput.focus(); }, 500);
+      setTimeout(function() { nameInput.focus(); }, 300);
     })();
 
   })();
