@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>ورود | سامانه آزمون</title>
+  <title>سامانه آزمون | فاطمه جوادی</title>
 
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <meta name="theme-color" content="#6C5CE7">
@@ -18,44 +18,45 @@
       --primary: #6C5CE7;
       --primary-2: #A29BFE;
       --accent: #00CEC9;
+      --accent-2: #55EFC4;
+      --pink: #FD79A8;
       --danger: #FF6B6B;
       --success: #00B894;
-      --bg-1: #F5F3FF;
-      --bg-2: #E8E3FF;
-      --card-bg: rgba(255, 255, 255, 0.85);
-      --card-border: rgba(255, 255, 255, 0.6);
+      --bg-1: #EDE9FE;
+      --bg-2: #DBEAFE;
+      --card-bg: rgba(255, 255, 255, 0.75);
+      --card-border: rgba(255, 255, 255, 0.9);
       --text: #1F1B3A;
       --text-muted: #6B6789;
-      --input-bg: rgba(255, 255, 255, 0.7);
+      --input-bg: rgba(255, 255, 255, 0.6);
       --input-border: rgba(108, 92, 231, 0.15);
-      --input-focus: #6C5CE7;
-      --shadow: 0 20px 60px rgba(108, 92, 231, 0.15);
-      --blob-1: #A29BFE;
-      --blob-2: #00CEC9;
-      --blob-3: #FFB8B8;
+      --shadow: 0 20px 60px rgba(108, 92, 231, 0.18);
+      --glow: rgba(108, 92, 231, 0.4);
     }
 
     body.dark {
+      --primary: #A29BFE;
+      --primary-2: #6C5CE7;
+      --accent: #00CEC9;
+      --pink: #FD79A8;
       --bg-1: #0A0820;
-      --bg-2: #150F35;
-      --card-bg: rgba(26, 22, 56, 0.85);
-      --card-border: rgba(162, 155, 254, 0.15);
+      --bg-2: #1A0F35;
+      --card-bg: rgba(26, 22, 56, 0.7);
+      --card-border: rgba(162, 155, 254, 0.2);
       --text: #F5F3FF;
       --text-muted: #A8A3C7;
       --input-bg: rgba(15, 12, 35, 0.6);
-      --input-border: rgba(162, 155, 254, 0.2);
-      --input-focus: #A29BFE;
-      --shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-      --blob-1: #4B3F8E;
-      --blob-2: #1A7B78;
-      --blob-3: #7B3F52;
+      --input-border: rgba(162, 155, 254, 0.25);
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+      --glow: rgba(162, 155, 254, 0.5);
     }
 
     html, body {
-      height: 100%;
+      min-height: 100vh;
       font-family: 'Vazirmatn', Tahoma, sans-serif;
       color: var(--text);
-      overflow: hidden;
+      overflow-x: hidden;
+      transition: color 0.5s ease;
     }
 
     /* ============ Background ============ */
@@ -63,55 +64,122 @@
       position: fixed;
       inset: 0;
       background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 100%);
-      transition: background 0.6s ease;
-      z-index: -2;
+      transition: background 0.8s ease;
+      z-index: -3;
     }
 
+    /* گرید متحرک - شبیه کد */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(108, 92, 231, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(108, 92, 231, 0.06) 1px, transparent 1px);
+      background-size: 40px 40px;
+      z-index: -2;
+      animation: gridMove 20s linear infinite;
+      transition: opacity 0.5s;
+    }
+
+    body.dark .bg-grid {
+      background-image:
+        linear-gradient(rgba(162, 155, 254, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(162, 155, 254, 0.08) 1px, transparent 1px);
+    }
+
+    @keyframes gridMove {
+      from { background-position: 0 0; }
+      to { background-position: 40px 40px; }
+    }
+
+    /* حباب‌های نوری */
     .blob {
       position: fixed;
       border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.5;
-      animation: float 20s ease-in-out infinite;
+      filter: blur(90px);
+      opacity: 0.55;
       z-index: -1;
       transition: background 0.6s ease;
     }
 
     .blob-1 {
-      width: 400px; height: 400px;
-      background: var(--blob-1);
-      top: -100px; right: -100px;
-      animation-delay: 0s;
+      width: 450px; height: 450px;
+      background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+      top: -150px; right: -150px;
+      animation: float1 22s ease-in-out infinite;
     }
 
     .blob-2 {
-      width: 350px; height: 350px;
-      background: var(--blob-2);
-      bottom: -100px; left: -100px;
-      animation-delay: -5s;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+      bottom: -120px; left: -120px;
+      animation: float2 25s ease-in-out infinite;
     }
 
     .blob-3 {
-      width: 300px; height: 300px;
-      background: var(--blob-3);
-      top: 50%; left: 50%;
-      animation-delay: -10s;
+      width: 350px; height: 350px;
+      background: radial-gradient(circle, var(--pink) 0%, transparent 70%);
+      top: 40%; left: 30%;
+      animation: float3 28s ease-in-out infinite;
     }
 
-    @keyframes float {
+    @keyframes float1 {
       0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(40px, -50px) scale(1.1); }
-      66% { transform: translate(-40px, 30px) scale(0.95); }
+      50% { transform: translate(-60px, 80px) scale(1.15); }
     }
+
+    @keyframes float2 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(80px, -60px) scale(1.1); }
+    }
+
+    @keyframes float3 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(-50px, 50px) scale(0.9); }
+      66% { transform: translate(50px, -30px) scale(1.1); }
+    }
+
+    /* ============ آیکون‌های شناور تکنولوژی ============ */
+    .float-icons {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .float-icon {
+      position: absolute;
+      font-size: 28px;
+      opacity: 0.15;
+      animation: floatAround 18s ease-in-out infinite;
+      transition: opacity 0.5s;
+    }
+
+    body.dark .float-icon { opacity: 0.25; }
+
+    @keyframes floatAround {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-30px) rotate(15deg); }
+    }
+
+    .float-icon:nth-child(1) { top: 10%; left: 8%; animation-delay: 0s; }
+    .float-icon:nth-child(2) { top: 20%; right: 12%; animation-delay: 2s; }
+    .float-icon:nth-child(3) { bottom: 15%; left: 15%; animation-delay: 4s; }
+    .float-icon:nth-child(4) { bottom: 25%; right: 10%; animation-delay: 6s; }
+    .float-icon:nth-child(5) { top: 45%; left: 5%; animation-delay: 8s; }
+    .float-icon:nth-child(6) { top: 60%; right: 6%; animation-delay: 10s; }
+    .float-icon:nth-child(7) { top: 15%; left: 45%; animation-delay: 12s; }
+    .float-icon:nth-child(8) { bottom: 8%; right: 45%; animation-delay: 14s; }
 
     /* ============ Theme Toggle ============ */
     .theme-toggle {
       position: fixed;
       top: 24px;
       left: 24px;
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
+      width: 52px;
+      height: 52px;
+      border-radius: 18px;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       backdrop-filter: blur(20px);
@@ -121,17 +189,18 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      box-shadow: 0 4px 16px rgba(108, 92, 231, 0.15);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 8px 24px rgba(108, 92, 231, 0.15);
       z-index: 100;
+      overflow: hidden;
     }
 
     .theme-toggle:hover {
-      transform: rotate(20deg) scale(1.1);
-      box-shadow: 0 8px 24px rgba(108, 92, 231, 0.3);
+      transform: translateY(-3px) rotate(-10deg);
+      box-shadow: 0 12px 32px var(--glow);
     }
 
-    .theme-toggle:active { transform: scale(0.95); }
+    .theme-toggle:active { transform: scale(0.92); }
 
     /* ============ Card ============ */
     .login-wrap {
@@ -141,116 +210,181 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
+      z-index: 1;
     }
 
     .login-card {
       width: 100%;
-      max-width: 440px;
+      max-width: 460px;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 32px;
-      padding: 48px 40px 40px;
+      padding: 44px 36px 32px;
       backdrop-filter: blur(30px) saturate(180%);
       -webkit-backdrop-filter: blur(30px) saturate(180%);
       box-shadow: var(--shadow);
-      animation: cardIn 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.2);
-      transition: background 0.4s, border 0.4s;
+      animation: cardIn 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+      transition: background 0.5s, border 0.5s, box-shadow 0.5s;
       position: relative;
       overflow: hidden;
     }
 
+    /* خط رنگی بالای کارت */
     .login-card::before {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0;
       height: 4px;
-      background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary-2));
-      background-size: 200% 100%;
-      animation: shimmer 3s linear infinite;
+      background: linear-gradient(90deg, var(--primary), var(--accent), var(--pink), var(--primary));
+      background-size: 300% 100%;
+      animation: shimmer 4s linear infinite;
     }
 
     @keyframes shimmer {
       from { background-position: 0% 0; }
-      to { background-position: 200% 0; }
+      to { background-position: 300% 0; }
     }
 
     @keyframes cardIn {
-      from { opacity: 0; transform: translateY(30px) scale(0.95); }
+      from { opacity: 0; transform: translateY(40px) scale(0.94); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    /* ============ Logo & Header ============ */
+    /* ============ Logo ============ */
     .logo-wrap {
       text-align: center;
-      margin-bottom: 32px;
+      margin-bottom: 28px;
     }
 
     .logo-circle {
-      width: 80px;
-      height: 80px;
+      width: 88px;
+      height: 88px;
       margin: 0 auto 20px;
-      border-radius: 24px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 100%);
+      border-radius: 26px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 40px;
-      box-shadow: 0 12px 32px rgba(108, 92, 231, 0.35);
-      animation: bounceIn 0.8s cubic-bezier(0.3, 1.5, 0.6, 1) 0.2s both;
+      font-size: 42px;
+      box-shadow: 0 16px 40px var(--glow);
+      animation: logoBounce 1s cubic-bezier(0.3, 1.5, 0.6, 1) 0.2s both;
       position: relative;
     }
 
-    .logo-circle::after {
+    .logo-circle::before {
       content: '';
       position: absolute;
-      inset: -4px;
-      border-radius: 28px;
-      background: linear-gradient(135deg, var(--primary), var(--accent), var(--primary-2));
-      opacity: 0.4;
-      filter: blur(12px);
+      inset: -6px;
+      border-radius: 32px;
+      background: linear-gradient(135deg, var(--primary), var(--accent), var(--pink));
+      opacity: 0.5;
+      filter: blur(16px);
       z-index: -1;
-      animation: pulse 3s ease-in-out infinite;
+      animation: pulseGlow 3s ease-in-out infinite;
     }
 
-    @keyframes pulse {
+    @keyframes pulseGlow {
       0%, 100% { opacity: 0.3; transform: scale(1); }
-      50% { opacity: 0.6; transform: scale(1.05); }
+      50% { opacity: 0.7; transform: scale(1.08); }
     }
 
-    @keyframes bounceIn {
-      0% { opacity: 0; transform: scale(0.3) rotate(-20deg); }
-      60% { opacity: 1; transform: scale(1.1) rotate(5deg); }
+    @keyframes logoBounce {
+      0% { opacity: 0; transform: scale(0.3) rotate(-25deg); }
+      60% { opacity: 1; transform: scale(1.12) rotate(8deg); }
       100% { opacity: 1; transform: scale(1) rotate(0); }
     }
 
+    /* حلقه‌ی چرخان دور لوگو */
+    .logo-circle::after {
+      content: '';
+      position: absolute;
+      inset: -12px;
+      border-radius: 38px;
+      border: 2px dashed rgba(108, 92, 231, 0.3);
+      animation: rotate 20s linear infinite;
+    }
+
+    body.dark .logo-circle::after {
+      border-color: rgba(162, 155, 254, 0.3);
+    }
+
+    @keyframes rotate {
+      to { transform: rotate(360deg); }
+    }
+
     .title {
-      font-size: 28px;
+      font-size: 30px;
       font-weight: 900;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 50%, var(--pink) 100%);
+      background-size: 200% 200%;
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       letter-spacing: -0.5px;
+      animation: gradientShift 5s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
     }
 
     .subtitle {
-      font-size: 14px;
+      font-size: 13.5px;
       color: var(--text-muted);
       font-weight: 500;
+      line-height: 1.7;
     }
 
-    /* ============ OTP Input ============ */
+    .designer-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+      padding: 6px 14px;
+      background: linear-gradient(135deg, rgba(108, 92, 231, 0.1), rgba(0, 206, 201, 0.1));
+      border: 1px solid rgba(108, 92, 231, 0.2);
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 0.3px;
+      animation: fadeIn 1s ease 0.8s both;
+    }
+
+    body.dark .designer-tag {
+      background: linear-gradient(135deg, rgba(162, 155, 254, 0.15), rgba(0, 206, 201, 0.15));
+      border-color: rgba(162, 155, 254, 0.3);
+      color: var(--primary-2);
+    }
+
+    .designer-tag .spark {
+      animation: sparkle 2s ease-in-out infinite;
+    }
+
+    @keyframes sparkle {
+      0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+      50% { transform: scale(1.3) rotate(20deg); opacity: 0.7; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ============ OTP Label ============ */
     .otp-label {
       text-align: center;
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 12.5px;
+      font-weight: 700;
       color: var(--text-muted);
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 10px;
+      letter-spacing: 0.5px;
     }
 
     .otp-label::before,
@@ -261,19 +395,20 @@
       background: linear-gradient(90deg, transparent, var(--input-border), transparent);
     }
 
+    /* ============ OTP Input ============ */
     .otp-input {
       display: flex;
       gap: 10px;
       direction: ltr;
       justify-content: center;
-      margin-bottom: 24px;
+      margin-bottom: 22px;
     }
 
     .otp-input input {
-      width: 52px;
-      height: 64px;
+      width: 54px;
+      height: 66px;
       text-align: center;
-      font-size: 28px;
+      font-size: 30px;
       font-weight: 800;
       font-family: 'Vazirmatn', monospace;
       background: var(--input-bg);
@@ -281,31 +416,46 @@
       border-radius: 16px;
       color: var(--text);
       outline: none;
-      transition: all 0.2s ease;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       caret-color: var(--primary);
+      position: relative;
+    }
+
+    .otp-input input:hover {
+      border-color: var(--primary-2);
     }
 
     .otp-input input:focus {
-      border-color: var(--input-focus);
+      border-color: var(--primary);
       background: var(--card-bg);
-      transform: translateY(-3px) scale(1.05);
-      box-shadow: 0 8px 24px rgba(108, 92, 231, 0.25);
+      transform: translateY(-4px) scale(1.06);
+      box-shadow: 0 12px 28px var(--glow);
     }
 
     .otp-input input.filled {
       border-color: var(--primary);
-      background: linear-gradient(135deg, rgba(108, 92, 231, 0.1), rgba(162, 155, 254, 0.1));
+      background: linear-gradient(135deg, rgba(108, 92, 231, 0.12), rgba(0, 206, 201, 0.12));
+      animation: digitIn 0.3s cubic-bezier(0.4, 1.5, 0.6, 1);
+    }
+
+    @keyframes digitIn {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1); }
     }
 
     .otp-input input.error {
       border-color: var(--danger);
+      background: rgba(255, 107, 107, 0.1);
       animation: shake 0.4s ease;
     }
 
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-8px); }
-      75% { transform: translateX(8px); }
+      20% { transform: translateX(-10px); }
+      40% { transform: translateX(10px); }
+      60% { transform: translateX(-6px); }
+      80% { transform: translateX(6px); }
     }
 
     /* ============ Button ============ */
@@ -317,55 +467,58 @@
       font-family: inherit;
       color: #fff;
       background: linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 100%);
+      background-size: 200% 200%;
       border: none;
       border-radius: 18px;
       cursor: pointer;
       position: relative;
       overflow: hidden;
-      transition: all 0.3s ease;
-      box-shadow: 0 8px 24px rgba(108, 92, 231, 0.35);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 10px 28px var(--glow);
       letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
     }
 
     .btn-login::before {
       content: '';
       position: absolute;
-      top: 50%; left: 50%;
-      width: 0; height: 0;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.3);
-      transform: translate(-50%, -50%);
-      transition: width 0.6s ease, height 0.6s ease;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      transition: left 0.5s ease;
     }
 
     .btn-login:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 32px rgba(108, 92, 231, 0.5);
+      transform: translateY(-3px);
+      box-shadow: 0 16px 40px var(--glow);
+      background-position: 100% 50%;
     }
 
     .btn-login:hover:not(:disabled)::before {
-      width: 400px;
-      height: 400px;
+      left: 100%;
     }
 
-    .btn-login:active:not(:disabled) { transform: translateY(0) scale(0.98); }
+    .btn-login:active:not(:disabled) {
+      transform: translateY(-1px) scale(0.99);
+    }
 
     .btn-login:disabled {
-      opacity: 0.5;
+      opacity: 0.6;
       cursor: not-allowed;
-      box-shadow: 0 4px 12px rgba(108, 92, 231, 0.2);
     }
 
     .btn-login .spinner {
-      display: inline-block;
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
       border: 2.5px solid rgba(255, 255, 255, 0.3);
       border-top-color: #fff;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
-      vertical-align: middle;
-      margin-left: 8px;
     }
 
     @keyframes spin {
@@ -377,55 +530,89 @@
       margin-top: 16px;
       text-align: center;
       font-size: 13.5px;
-      font-weight: 600;
+      font-weight: 700;
       min-height: 20px;
-      padding: 10px 16px;
-      border-radius: 12px;
-      transition: all 0.3s ease;
+      padding: 12px 18px;
+      border-radius: 14px;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       opacity: 0;
-      transform: translateY(-8px);
+      transform: translateY(-10px);
+      max-height: 0;
+      overflow: hidden;
     }
 
     .msg.show {
       opacity: 1;
       transform: translateY(0);
+      max-height: 100px;
     }
 
     .msg.error {
       background: rgba(255, 107, 107, 0.12);
       color: var(--danger);
+      border: 1px solid rgba(255, 107, 107, 0.2);
     }
 
     .msg.success {
       background: rgba(0, 184, 148, 0.12);
       color: var(--success);
+      border: 1px solid rgba(0, 184, 148, 0.2);
+    }
+
+    /* ============ Footer ============ */
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      opacity: 0.7;
+      font-weight: 500;
+    }
+
+    .footer .heart {
+      display: inline-block;
+      color: var(--pink);
+      animation: heartbeat 1.5s ease-in-out infinite;
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.25); }
     }
 
     /* ============ Responsive ============ */
     @media (max-width: 480px) {
       .login-card {
-        padding: 40px 24px 32px;
+        padding: 36px 22px 26px;
         border-radius: 28px;
       }
 
-      .logo-circle { width: 68px; height: 68px; font-size: 34px; }
+      .logo-circle { width: 72px; height: 72px; font-size: 34px; border-radius: 22px; }
       .title { font-size: 24px; }
+      .subtitle { font-size: 12.5px; }
 
       .otp-input { gap: 6px; }
       .otp-input input {
-        width: 44px;
-        height: 54px;
-        font-size: 22px;
+        width: 46px;
+        height: 56px;
+        font-size: 24px;
         border-radius: 13px;
       }
 
-      .btn-login { padding: 16px; font-size: 16px; }
-      .theme-toggle { top: 16px; left: 16px; width: 42px; height: 42px; font-size: 20px; }
+      .btn-login { padding: 16px; font-size: 15.5px; }
+      .theme-toggle { top: 16px; left: 16px; width: 46px; height: 46px; font-size: 20px; }
     }
 
     @media (max-width: 360px) {
-      .otp-input input { width: 38px; height: 48px; font-size: 20px; }
+      .otp-input input { width: 40px; height: 50px; font-size: 21px; }
       .otp-input { gap: 4px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
     }
   </style>
 </head>
@@ -433,12 +620,25 @@
 
   <!-- Background -->
   <div class="bg"></div>
+  <div class="bg-grid"></div>
   <div class="blob blob-1"></div>
   <div class="blob blob-2"></div>
   <div class="blob blob-3"></div>
 
+  <!-- Floating Tech Icons -->
+  <div class="float-icons">
+    <div class="float-icon">💻</div>
+    <div class="float-icon">🤖</div>
+    <div class="float-icon">📚</div>
+    <div class="float-icon">🚀</div>
+    <div class="float-icon">⚡</div>
+    <div class="float-icon">🎯</div>
+    <div class="float-icon">🧠</div>
+    <div class="float-icon">✨</div>
+  </div>
+
   <!-- Theme Toggle -->
-  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="تغییر حالت">
+  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="تغییر حالت" aria-label="تغییر تم">
     <span id="themeIcon">🌙</span>
   </button>
 
@@ -448,25 +648,33 @@
       <div class="logo-wrap">
         <div class="logo-circle">📝</div>
         <h1 class="title">سامانه آزمون</h1>
-        <p class="subtitle">برای شروع، کد ورود خود را وارد کنید</p>
+        <p class="subtitle">برای شروع، کد ورود ۶ رقمی خود را وارد کنید</p>
+        <div class="designer-tag">
+          <span class="spark">✨</span>
+          طراحی از فاطمه جوادی
+        </div>
       </div>
 
       <div class="otp-label">کد ۶ رقمی</div>
 
       <div class="otp-input" id="otpInput" dir="ltr">
-        <input type="text" inputmode="numeric" maxlength="1" data-index="0" autocomplete="off">
-        <input type="text" inputmode="numeric" maxlength="1" data-index="1" autocomplete="off">
-        <input type="text" inputmode="numeric" maxlength="1" data-index="2" autocomplete="off">
-        <input type="text" inputmode="numeric" maxlength="1" data-index="3" autocomplete="off">
-        <input type="text" inputmode="numeric" maxlength="1" data-index="4" autocomplete="off">
-        <input type="text" inputmode="numeric" maxlength="1" data-index="5" autocomplete="off">
+        <input type="text" inputmode="numeric" maxlength="1" data-index="0" autocomplete="off" aria-label="رقم ۱">
+        <input type="text" inputmode="numeric" maxlength="1" data-index="1" autocomplete="off" aria-label="رقم ۲">
+        <input type="text" inputmode="numeric" maxlength="1" data-index="2" autocomplete="off" aria-label="رقم ۳">
+        <input type="text" inputmode="numeric" maxlength="1" data-index="3" autocomplete="off" aria-label="رقم ۴">
+        <input type="text" inputmode="numeric" maxlength="1" data-index="4" autocomplete="off" aria-label="رقم ۵">
+        <input type="text" inputmode="numeric" maxlength="1" data-index="5" autocomplete="off" aria-label="رقم ۶">
       </div>
 
       <button class="btn-login" id="loginBtn" onclick="login()">
-        ورود به سامانه
+        <span>ورود به سامانه</span>
       </button>
 
       <div class="msg" id="msg"></div>
+
+      <div class="footer">
+        ساخته شده با <span class="heart">♥</span> برای یادگیری بهتر
+      </div>
     </div>
   </div>
 
@@ -480,12 +688,15 @@
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     // ============================================
-    // OTP Input
+    // Elements
     // ============================================
     const inputs = document.querySelectorAll('#otpInput input');
     const msg = document.getElementById('msg');
     const btn = document.getElementById('loginBtn');
 
+    // ============================================
+    // OTP Logic
+    // ============================================
     function getCode() {
       return Array.from(inputs).map(i => i.value).join('');
     }
@@ -496,21 +707,22 @@
     }
 
     inputs.forEach((input, idx) => {
-      // فقط عدد
+      // تایپ → برو بعدی
       input.addEventListener('input', e => {
-        e.target.value = e.target.value.replace(/\D/g, '').slice(0, 1);
+        const val = e.target.value.replace(/\D/g, '');
+        e.target.value = val.slice(-1);
         clearError();
 
         if (e.target.value) {
           e.target.classList.add('filled');
-          // فوکوس خودکار روی خانه بعد
+          // انیمیشن + برو بعدی
           if (idx < inputs.length - 1) {
             inputs[idx + 1].focus();
           } else {
-            // آخرین خانه پر شد → ورود خودکار
+            // آخرین خانه
             input.blur();
             if (getCode().length === 6) {
-              setTimeout(login, 150);
+              setTimeout(() => login(), 200);
             }
           }
         } else {
@@ -518,27 +730,44 @@
         }
       });
 
-      // Backspace → برگرد به عقب
+      // کیبورد
       input.addEventListener('keydown', e => {
         if (e.key === 'Backspace') {
-          if (!e.target.value && idx > 0) {
-            inputs[idx - 1].focus();
-            inputs[idx - 1].value = '';
-            inputs[idx - 1].classList.remove('filled');
+          if (!e.target.value) {
+            // خالی → برو عقب و پاک کن
+            if (idx > 0) {
+              e.preventDefault();
+              inputs[idx - 1].focus();
+              inputs[idx - 1].value = '';
+              inputs[idx - 1].classList.remove('filled');
+              clearError();
+            }
           } else {
+            // پر → فقط پاک کن
+            e.target.value = '';
             e.target.classList.remove('filled');
+            clearError();
           }
+        } else if (e.key === 'ArrowLeft') {
+          if (idx > 0) { e.preventDefault(); inputs[idx - 1].focus(); }
+        } else if (e.key === 'ArrowRight') {
+          if (idx < inputs.length - 1) { e.preventDefault(); inputs[idx + 1].focus(); }
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          login();
+        } else if (e.key === 'Delete') {
+          e.target.value = '';
+          e.target.classList.remove('filled');
         }
-        if (e.key === 'ArrowLeft' && idx > 0) inputs[idx - 1].focus();
-        if (e.key === 'ArrowRight' && idx < 5) inputs[idx + 1].focus();
-        if (e.key === 'Enter') login();
       });
 
-      // Paste → توزیع در همه خانه‌ها
+      // Paste
       input.addEventListener('paste', e => {
         e.preventDefault();
         const text = (e.clipboardData || window.clipboardData).getData('text');
         const digits = text.replace(/\D/g, '').slice(0, 6);
+
+        if (!digits) return;
 
         inputs.forEach((inp, i) => {
           if (i < digits.length) {
@@ -553,18 +782,18 @@
         clearError();
         if (digits.length === 6) {
           inputs[5].blur();
-          setTimeout(login, 150);
+          setTimeout(() => login(), 200);
         } else {
           inputs[Math.min(digits.length, 5)].focus();
         }
       });
 
-      // کلیک → انتخاب محتوا
+      // فوکوس
       input.addEventListener('focus', e => e.target.select());
     });
 
-    // فوکوس اولیه روی خانه اول
-    inputs[0].focus();
+    // فوکوس اولیه
+    setTimeout(() => inputs[0].focus(), 300);
 
     // ============================================
     // ورود
@@ -578,7 +807,7 @@
       }
 
       btn.disabled = true;
-      btn.innerHTML = 'در حال ورود<span class="spinner"></span>';
+      btn.innerHTML = '<span>در حال ورود</span><span class="spinner"></span>';
       clearError();
 
       const email = code + '@exam.local';
@@ -611,7 +840,14 @@
           return;
         }
 
-        window.location.href = profile.role === 'teacher' ? 'teacher.html' : 'student.html';
+        // موفق
+        msg.textContent = '✅ خوش آمدی! در حال انتقال...';
+        msg.className = 'msg success show';
+        btn.innerHTML = '<span>✅ موفق</span>';
+
+        setTimeout(() => {
+          window.location.href = profile.role === 'teacher' ? 'teacher.html' : 'student.html';
+        }, 600);
 
       } catch (err) {
         console.error('Unexpected error:', err);
@@ -627,36 +863,41 @@
       msg.textContent = text;
       msg.className = 'msg error show';
       btn.disabled = false;
-      btn.innerHTML = 'ورود به سامانه';
+      btn.innerHTML = '<span>ورود به سامانه</span>';
 
-      // لرزش کد
       setTimeout(() => {
-        inputs.forEach(i => i.classList.remove('error'));
+        inputs.forEach(i => {
+          i.classList.remove('error');
+          i.value = '';
+          i.classList.remove('filled');
+        });
+        inputs[0].focus();
       }, 500);
-
-      // فوکوس روی خانه اول
-      inputs[0].focus();
-      inputs.forEach(i => {
-        i.value = '';
-        i.classList.remove('filled');
-      });
     }
 
     // ============================================
-    // تم
+    // تم — با کلاس روی <html> که مطمئن‌تره
     // ============================================
     function toggleTheme() {
-      document.body.classList.toggle('dark');
-      const isDark = document.body.classList.contains('dark');
+      const isDark = document.documentElement.classList.toggle('dark');
+      document.body.classList.toggle('dark', isDark);
       document.getElementById('themeIcon').textContent = isDark ? '☀️' : '🌙';
       localStorage.setItem('theme', isDark ? 'dark' : 'light');
+
+      // آپدیت meta theme-color
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.content = isDark ? '#0A0820' : '#6C5CE7';
     }
 
     // بازیابی تم
-    if (localStorage.getItem('theme') === 'dark') {
-      document.body.classList.add('dark');
-      document.getElementById('themeIcon').textContent = '☀️';
-    }
+    (function initTheme() {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.body.classList.add('dark');
+        document.getElementById('themeIcon').textContent = '☀️';
+      }
+    })();
   </script>
 </body>
 </html>
