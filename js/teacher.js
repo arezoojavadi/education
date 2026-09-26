@@ -1,19 +1,8 @@
 /* ============================================================
  * js/teacher.js
  * ------------------------------------------------------------
- * منطق پنل معلم
+ * پنل معلم — نسخه‌ی مقاوم با عیب‌یابی کامل
  * طراحی: فاطمه جوادی
- *
- * قابلیت‌ها:
- *   • چک لاگین + نقش معلم
- *   • لود آزمون‌های معلم + آمار
- *   • آپلود فایل HTML با progress
- *   • فعال/غیرفعال کردن آزمون
- *   • حذف آزمون (با فایل Storage)
- *   • مودال آپلود کامل
- *   • Toast + Theme + ریسپانسیو
- *
- * وابستگی: @supabase/supabase-js از CDN
  * ============================================================ */
 
 (function () {
@@ -21,14 +10,10 @@
 
   if (window.TeacherPanel && window.TeacherPanel.__loaded) return;
 
-  /* ============================================================
-   * CONFIG
-   * ============================================================ */
   var SUPABASE_URL = 'https://cfkwvzbqgapguuaqibmq.supabase.co';
   var SUPABASE_KEY = 'sb_publishable_Qf3R9hPgjApwe2c-qQMoJA_jitobazq';
-
   var BUCKET = 'exam-files';
-  var MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  var MAX_FILE_SIZE = 10 * 1024 * 1024;
   var ALLOWED_EXT = ['.html', '.htm'];
 
   /* ============================================================
@@ -56,9 +41,7 @@
     counts: {},
     stats: { exams: 0, submissions: 0, students: 0 },
     selectedFile: null,
-    isUploading: false,
-    isRedirecting: false,
-    ready: false
+    isUploading: false
   };
 
   /* ============================================================
@@ -175,16 +158,6 @@
         applyTheme(!document.documentElement.classList.contains('dark'));
       });
     }
-    if (window.matchMedia) {
-      var mq = window.matchMedia('(prefers-color-scheme: dark)');
-      var handler = function (e) {
-        var saved = null;
-        try { saved = localStorage.getItem('theme'); } catch (err) {}
-        if (!saved) applyTheme(e.matches);
-      };
-      if (mq.addEventListener) mq.addEventListener('change', handler);
-      else if (mq.addListener) mq.addListener(handler);
-    }
   }
 
   /* ============================================================
@@ -207,64 +180,193 @@
   }
 
   /* ============================================================
-   * AUTH GUARD — فقط معلم
+   * 🆕 نمایش خطا به‌جای پرت کردن
+   * ============================================================ */
+  function showBlocker(title, detail, actions) {
+    /* پنهان کردن همه‌چیز */
+    document.body.innerHTML = '';
+
+    var wrapper = document.createElement('div');
+    wrapper.style.cssText =
+      'min-height:100vh; display:flex; align-items:center; justify-content:center;' +
+      'padding:20px; font-family:Vazirmatn,system-ui,sans-serif;' +
+      'background:linear-gradient(135deg,#EEF0FF 0%,#F5F0FF 50%,#FFF0F8 100%);' +
+      'direction:rtl;';
+
+    var card = document.createElement('div');
+    card.style.cssText =
+      'background:#fff; border-radius:24px; padding:32px 28px;' +
+      'max-width:440px; width:100%; box-shadow:0 12px 40px rgba(108,92,231,0.15);' +
+      'text-align:center;';
+
+    var icon = document.createElement('div');
+    icon.style.cssText =
+      'width:72px; height:72px; margin:0 auto 16px; border-radius:22px;' +
+      'background:linear-gradient(135deg,#FF6B6B,#FF8E8E);' +
+      'display:flex; align-items:center; justify-content:center;' +
+      'box-shadow:0 10px 24px rgba(255,107,107,0.3);';
+    icon.innerHTML =
+      '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+        '<circle cx="12" cy="12" r="10"/>' +
+        '<line x1="12" y1="8" x2="12" y2="12"/>' +
+        '<line x1="12" y1="16" x2="12.01" y2="16"/>' +
+      '</svg>';
+
+    var h = document.createElement('h2');
+    h.style.cssText = 'font-size:19px; font-weight:900; color:#1E1B3A; margin-bottom:8px;';
+    h.textContent = title;
+
+    var p = document.createElement('p');
+    p.style.cssText = 'font-size:13.5px; color:#6B6789; line-height:1.7; margin-bottom:20px; font-weight:600; white-space:pre-wrap; word-break:break-word;';
+    p.textContent = detail;
+
+    card.appendChild(icon);
+    card.appendChild(h);
+    card.appendChild(p);
+
+    (actions || []).forEach(function (action) {
+      var btn = document.createElement('a');
+      btn.href = action.href || '#';
+      btn.textContent = action.label;
+      btn.style.cssText =
+        'display:inline-block; margin:4px; padding:12px 22px; border-radius:14px;' +
+        'font-size:14px; font-weight:800; text-decoration:none; cursor:pointer;' +
+        'background:linear-gradient(135deg,#6C5CE7,#8E7CFF); color:#fff;' +
+        'box-shadow:0 6px 18px rgba(108,92,231,0.28);';
+      if (action.onclick) {
+        btn.onclick = function (e) { e.preventDefault(); action.onclick(); };
+      }
+      card.appendChild(btn);
+    });
+
+    wrapper.appendChild(card);
+    document.body.appendChild(wrapper);
+  }
+
+  /* ============================================================
+   * AUTH GUARD — 🆕 با لاگ کامل
    * ============================================================ */
   async function requireTeacher() {
     var sb = state.supabase;
 
-    /* ۱) نشست */
-    var sessionResult;
-    try { sessionResult = await sb.auth.getSession(); }
-    catch (e) { window.location.replace('index.html'); return null; }
+    console.log('🔐 [teacher] شروع بررسی احراز هویت...');
 
-    if (!sessionResult || !sessionResult.data || !sessionResult.data.session) {
+    /* ─── ۱) نشست ─── */
+    var sessionResult;
+    try {
+      sessionResult = await sb.auth.getSession();
+    } catch (e) {
+      console.error('❌ [teacher] خطای getSession:', e);
+      showBlocker(
+        'خطا در بررسی نشست',
+        'اتصال به سرور برقرار نشد. اینترنت خود را بررسی کنید.\n\n' + (e.message || ''),
+        [
+          { label: 'تلاش مجدد', onclick: function () { window.location.reload(); } },
+          { label: 'خروج', href: 'index.html' }
+        ]
+      );
+      return null;
+    }
+
+    var session = sessionResult && sessionResult.data && sessionResult.data.session;
+    console.log('📋 [teacher] session:', session ? 'وجود دارد' : 'خالی');
+
+    if (!session) {
+      console.log('➡️ [teacher] نشست نیست → index.html');
       window.location.replace('index.html');
       return null;
     }
 
-    /* ۲) کاربر */
+    /* ─── ۲) کاربر ─── */
     var userResult;
-    try { userResult = await sb.auth.getUser(); }
-    catch (e) { window.location.replace('index.html'); return null; }
+    try {
+      userResult = await sb.auth.getUser();
+    } catch (e) {
+      console.error('❌ [teacher] خطای getUser:', e);
+      showBlocker(
+        'خطا در دریافت کاربر',
+        e.message || 'دوباره تلاش کنید',
+        [{ label: 'تلاش مجدد', onclick: function () { window.location.reload(); } }]
+      );
+      return null;
+    }
 
     var user = userResult && userResult.data && userResult.data.user;
-    if (!user) { window.location.replace('index.html'); return null; }
+    console.log('👤 [teacher] user:', user ? user.id : 'خالی');
 
-    /* ۳) پروفایل — با RPC امن */
+    if (!user) {
+      window.location.replace('index.html');
+      return null;
+    }
+
+    /* ─── ۳) پروفایل — با RPC ─── */
     var profile = null;
 
     try {
-      var rpcResult = await sb.rpc('get_my_profile');
-      if (!rpcResult.error && rpcResult.data) profile = rpcResult.data;
+      var rpc = await sb.rpc('get_my_profile');
+      console.log('🔍 [teacher] RPC result:', rpc);
+
+      if (rpc.error) {
+        console.warn('⚠️ [teacher] RPC error:', rpc.error);
+      } else if (rpc.data) {
+        profile = rpc.data;
+      }
     } catch (e) {
-      console.warn('[teacher] RPC failed:', e);
+      console.warn('⚠️ [teacher] RPC exception:', e);
     }
 
-    /* فallback: SELECT */
+    /* ─── ۴) پروفایل — با SELECT (backup) ─── */
     if (!profile) {
+      console.log('🔍 [teacher] تلاش با SELECT مستقیم...');
+
       try {
         var sel = await sb
           .from('profiles')
           .select('id, code, full_name, role, name_confirmed')
           .eq('id', user.id)
           .maybeSingle();
-        if (!sel.error && sel.data) profile = sel.data;
-      } catch (e) {}
+
+        console.log('🔍 [teacher] SELECT result:', sel);
+
+        if (sel.error) {
+          console.warn('⚠️ [teacher] SELECT error:', sel.error);
+        } else if (sel.data) {
+          profile = sel.data;
+        }
+      } catch (e) {
+        console.warn('⚠️ [teacher] SELECT exception:', e);
+      }
     }
 
-    /* اگه پروفایل نیست → انتخاب نام */
+    console.log('📄 [teacher] profile:', profile);
+
+    /* ─── ۵) پروفایل نیست؟ ─── */
     if (!profile) {
-      window.location.replace('choose-name.html');
+      console.error('❌ [teacher] پروفایل پیدا نشد');
+      showBlocker(
+        'پروفایل شما پیدا نشد',
+        'ممکن است حساب شما کامل ساخته نشده باشد.\n' +
+        'کد شما: ' + (user.email || '').replace('@exam.local', '') + '\n\n' +
+        'لطفاً با مدیر سامانه تماس بگیرید.',
+        [
+          { label: 'انتخاب نام دوباره', href: 'choose-name.html' },
+          { label: 'خروج', href: 'index.html' }
+        ]
+      );
       return null;
     }
 
-    /* اگه نام تأیید نشده → انتخاب نام */
+    /* ─── ۶) نام تأیید نشده؟ ─── */
     if (profile.name_confirmed !== true) {
-      await sleep(500);
+      console.log('⚠️ [teacher] نام تأیید نشده → choose-name');
+
+      /* یه بار دیگه چک کن */
+      await sleep(600);
       try {
         var retry = await sb.rpc('get_my_profile');
         if (!retry.error && retry.data && retry.data.name_confirmed === true) {
           profile = retry.data;
+          console.log('✅ [teacher] بعد از retry، نام تأیید شده');
         }
       } catch (e) {}
 
@@ -274,12 +376,28 @@
       }
     }
 
-    /* اگه معلم نیست → پنل دانش‌آموز */
-    if (profile.role !== 'teacher') {
+    /* ─── ۷) نقش ─── */
+    console.log('🎭 [teacher] نقش:', profile.role);
+
+    if (profile.role === 'student') {
+      console.log('➡️ [teacher] نقش دانش‌آموز است → student.html');
       window.location.replace('student.html');
       return null;
     }
 
+    if (profile.role !== 'teacher') {
+      console.error('❌ [teacher] نقش نامعتبر:', profile.role);
+      showBlocker(
+        'نقش شما معلم نیست',
+        'نقش فعلی: ' + (profile.role || 'نامشخص') + '\n' +
+        'کد: ' + (profile.code || '—') + '\n\n' +
+        'اگه فکر می‌کنی اشتباهه، با مدیر تماس بگیر.',
+        [{ label: 'خروج', href: 'index.html' }]
+      );
+      return null;
+    }
+
+    console.log('✅ [teacher] احراز هویت موفق');
     return { user: user, profile: profile };
   }
 
@@ -300,7 +418,7 @@
   }
 
   /* ============================================================
-   * HEADER FILL
+   * HEADER
    * ============================================================ */
   function fillHeader() {
     if (!state.profile) return;
@@ -325,11 +443,13 @@
       state.stats.submissions = results[1].count || 0;
       state.stats.students = results[2].count || 0;
 
-      if (el.statExams)    el.statExams.textContent = toFa(state.stats.exams);
-      if (el.statSubs)     el.statSubs.textContent = toFa(state.stats.submissions);
+      if (el.statExams) el.statExams.textContent = toFa(state.stats.exams);
+      if (el.statSubs) el.statSubs.textContent = toFa(state.stats.submissions);
       if (el.statStudents) el.statStudents.textContent = toFa(state.stats.students);
+
+      console.log('📊 [teacher] stats:', state.stats);
     } catch (e) {
-      console.warn('[teacher] stats failed:', e);
+      console.warn('⚠️ [teacher] stats failed:', e);
     }
   }
 
@@ -346,19 +466,21 @@
         .select('id, title, description, file_path, file_size, is_active, created_at')
         .order('created_at', { ascending: false });
     } catch (e) {
+      console.error('❌ [teacher] loadExams:', e);
       renderExamsError();
       return;
     }
 
     if (result.error) {
-      console.warn('[teacher] exams:', result.error);
+      console.error('❌ [teacher] exams error:', result.error);
       renderExamsError();
       return;
     }
 
     state.exams = result.data || [];
+    console.log('📚 [teacher] exams:', state.exams.length);
 
-    /* تعداد پاسخ‌ها */
+    /* شمارش پاسخ‌ها */
     try {
       var subsResult = await sb.from('submissions').select('exam_id');
       state.counts = {};
@@ -391,7 +513,7 @@
           '</div>' +
           '<div class="empty-title">هنوز آزمونی نساختی</div>' +
           '<div class="empty-text">' +
-            'روی «آزمون جدید» بزن و یه فایل HTML آپلود کن تا شروع کنیم.' +
+            'روی «آزمون جدید» بزن و یه فایل HTML آپلود کن.' +
           '</div>' +
           '<button class="btn-primary" onclick="TeacherPanel.openUpload()" style="margin-top:16px;">' +
             '<svg viewBox="0 0 24 24" style="width:18px;height:18px;">' +
@@ -451,16 +573,6 @@
               '</svg>' +
               '<span>' + formatDate(exam.created_at) + '</span>' +
             '</div>' +
-            (exam.file_size
-              ? '<div class="stat-pill">' +
-                  '<svg viewBox="0 0 24 24">' +
-                    '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>' +
-                    '<polyline points="17 8 12 3 7 8"/>' +
-                    '<line x1="12" y1="3" x2="12" y2="15"/>' +
-                  '</svg>' +
-                  '<span>' + formatBytes(exam.file_size) + '</span>' +
-                '</div>'
-              : '') +
           '</div>' +
 
           '<div class="exam-card-footer">' +
@@ -503,13 +615,13 @@
             '<line x1="12" y1="16" x2="12.01" y2="16"/>' +
           '</svg>' +
         '</div>' +
-        '<div class="empty-title">خطا در بارگذاری آزمون‌ها</div>' +
-        '<div class="empty-text">اینترنت رو چک کن و صفحه رو رفرش کن.</div>' +
+        '<div class="empty-title">خطا در بارگذاری</div>' +
+        '<div class="empty-text">اتصال اینترنت را بررسی کن و رفرش کن.</div>' +
       '</div>';
   }
 
   /* ============================================================
-   * TOGGLE EXAM
+   * TOGGLE / DELETE
    * ============================================================ */
   async function toggleExam(examId, newState) {
     if (!examId) return;
@@ -521,85 +633,61 @@
         .eq('id', examId);
 
       if (result.error) {
-        console.warn('[toggle]', result.error);
-        toast('خطا در تغییر وضعیت', 'error');
+        toast('خطا: ' + (result.error.message || ''), 'error');
         return;
       }
 
       toast(newState ? '✅ آزمون فعال شد' : '⏸ آزمون غیرفعال شد', 'success');
       await loadExams();
-
     } catch (e) {
-      console.warn('[toggle fatal]', e);
       toast('خطای غیرمنتظره', 'error');
     }
   }
 
-  /* ============================================================
-   * DELETE EXAM
-   * ============================================================ */
   async function deleteExam(examId, title) {
     if (!examId) return;
-
-    if (!confirm('مطمئنی «' + title + '» رو حذف کنی؟\nتمام پاسخ‌های این آزمون هم پاک می‌شن.')) {
-      return;
-    }
+    if (!confirm('مطمئنی «' + title + '» حذف بشه؟\nهمه‌ی پاسخ‌ها هم پاک می‌شن.')) return;
 
     try {
-      /* ۱) فایل رو از Storage پاک کن */
       try {
         var examResult = await state.supabase
-          .from('exams')
-          .select('file_path')
-          .eq('id', examId)
-          .maybeSingle();
+          .from('exams').select('file_path').eq('id', examId).maybeSingle();
 
         if (examResult.data && examResult.data.file_path) {
-          await state.supabase.storage
-            .from(BUCKET)
-            .remove([examResult.data.file_path]);
+          await state.supabase.storage.from(BUCKET).remove([examResult.data.file_path]);
         }
-      } catch (e) {
-        console.warn('[delete] storage remove failed:', e);
-      }
+      } catch (e) {}
 
-      /* ۲) رکورد رو حذف کن */
       var del = await state.supabase.from('exams').delete().eq('id', examId);
 
       if (del.error) {
-        console.warn('[delete]', del.error);
-        toast('خطا در حذف آزمون', 'error');
+        toast('خطا: ' + (del.error.message || ''), 'error');
         return;
       }
 
-      toast('✅ آزمون حذف شد', 'success');
+      toast('✅ حذف شد', 'success');
       await loadExams();
       await loadStats();
-
     } catch (e) {
-      console.warn('[delete fatal]', e);
       toast('خطای غیرمنتظره', 'error');
     }
   }
 
   /* ============================================================
-   * UPLOAD MODAL
+   * UPLOAD
    * ============================================================ */
   function openUpload() {
     if (!el.uploadModal) return;
     resetUploadModal();
     el.uploadModal.classList.add('show');
     document.body.style.overflow = 'hidden';
-
     setTimeout(function () {
       if (el.modalTitle) el.modalTitle.focus();
     }, 200);
   }
 
   function closeUpload() {
-    if (state.isUploading) {
-      if (!confirm('آپلود در حال انجامه. مطمئنی می‌خوای ببندی؟')) return;
-    }
+    if (state.isUploading && !confirm('آپلود در جریانه. ببندم؟')) return;
     if (!el.uploadModal) return;
     el.uploadModal.classList.remove('show');
     document.body.style.overflow = '';
@@ -621,7 +709,7 @@
     if (el.uploadBtn) {
       el.uploadBtn.disabled = true;
       el.uploadBtn.innerHTML =
-        '<svg viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/><polyline points="16 16 12 12 8 16"/></svg>' +
+        '<svg viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>' +
         '<span>آپلود و ساخت آزمون</span>';
     }
   }
@@ -646,32 +734,24 @@
       el.filePreview.innerHTML =
         '<div class="file-preview-item">' +
           '<div class="file-preview-icon">' +
-            '<svg viewBox="0 0 24 24">' +
-              '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>' +
-              '<path d="M14 2v6h6"/>' +
-            '</svg>' +
+            '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>' +
           '</div>' +
           '<div class="file-preview-info">' +
             '<div class="file-preview-name">' + escapeHtml(file.name) + '</div>' +
             '<div class="file-preview-size">' + formatBytes(file.size) + '</div>' +
           '</div>' +
-          '<button type="button" class="file-preview-remove" aria-label="حذف">' +
-            '<svg viewBox="0 0 24 24">' +
-              '<line x1="18" y1="6" x2="6" y2="18"/>' +
-              '<line x1="6" y1="6" x2="18" y2="18"/>' +
-            '</svg>' +
+          '<button type="button" class="file-preview-remove">' +
+            '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
           '</button>' +
         '</div>';
 
-      var removeBtn = el.filePreview.querySelector('.file-preview-remove');
-      if (removeBtn) {
-        removeBtn.addEventListener('click', function () {
-          state.selectedFile = null;
-          el.filePreview.innerHTML = '';
-          if (el.fileInput) el.fileInput.value = '';
-          updateUploadBtn();
-        });
-      }
+      var rm = el.filePreview.querySelector('.file-preview-remove');
+      if (rm) rm.addEventListener('click', function () {
+        state.selectedFile = null;
+        el.filePreview.innerHTML = '';
+        if (el.fileInput) el.fileInput.value = '';
+        updateUploadBtn();
+      });
     }
 
     updateUploadBtn();
@@ -680,22 +760,13 @@
   function updateUploadBtn() {
     if (!el.uploadBtn) return;
     var title = el.modalTitle ? el.modalTitle.value.trim() : '';
-    var hasFile = !!state.selectedFile;
-    el.uploadBtn.disabled = !(hasFile && title.length >= 2);
+    el.uploadBtn.disabled = !(state.selectedFile && title.length >= 2);
   }
 
   function bindUploadEvents() {
-    if (el.newExamBtn) {
-      el.newExamBtn.addEventListener('click', openUpload);
-    }
-
-    if (el.closeModal) {
-      el.closeModal.addEventListener('click', closeUpload);
-    }
-
-    if (el.cancelBtn) {
-      el.cancelBtn.addEventListener('click', closeUpload);
-    }
+    if (el.newExamBtn) el.newExamBtn.addEventListener('click', openUpload);
+    if (el.closeModal) el.closeModal.addEventListener('click', closeUpload);
+    if (el.cancelBtn) el.cancelBtn.addEventListener('click', closeUpload);
 
     if (el.uploadModal) {
       el.uploadModal.addEventListener('click', function (e) {
@@ -713,9 +784,7 @@
       el.uploadZone.addEventListener('click', function () { el.fileInput.click(); });
 
       el.fileInput.addEventListener('change', function (e) {
-        if (e.target.files && e.target.files.length) {
-          handleFile(e.target.files[0]);
-        }
+        if (e.target.files && e.target.files.length) handleFile(e.target.files[0]);
       });
 
       el.uploadZone.addEventListener('dragover', function (e) {
@@ -736,32 +805,18 @@
       });
     }
 
-    if (el.modalTitle) {
-      el.modalTitle.addEventListener('input', updateUploadBtn);
-    }
-
-    if (el.uploadBtn) {
-      el.uploadBtn.addEventListener('click', doUpload);
-    }
+    if (el.modalTitle) el.modalTitle.addEventListener('input', updateUploadBtn);
+    if (el.uploadBtn) el.uploadBtn.addEventListener('click', doUpload);
   }
 
-  /* ============================================================
-   * DO UPLOAD
-   * ============================================================ */
   async function doUpload() {
     if (state.isUploading) return;
-    if (!state.selectedFile) {
-      toast('فایل رو انتخاب کن', 'error');
-      return;
-    }
+    if (!state.selectedFile) { toast('فایل انتخاب کن', 'error'); return; }
 
     var title = el.modalTitle ? el.modalTitle.value.trim() : '';
     var description = el.modalDesc ? el.modalDesc.value.trim() : '';
 
-    if (title.length < 2) {
-      toast('عنوان آزمون رو وارد کن', 'error');
-      return;
-    }
+    if (title.length < 2) { toast('عنوان رو وارد کن', 'error'); return; }
 
     state.isUploading = true;
     if (el.uploadBtn) {
@@ -775,14 +830,12 @@
     var sb = state.supabase;
 
     try {
-      /* ۱) ساخت مسیر یکتا */
       var ext = fileExt(state.selectedFile.name) || '.html';
       var path = state.user.id + '/' + Date.now() + ext;
 
       if (el.progressFill) el.progressFill.style.width = '20%';
       if (el.progressText) el.progressText.textContent = 'در حال آپلود فایل...';
 
-      /* ۲) آپلود به Storage */
       var uploadResult = await sb.storage
         .from(BUCKET)
         .upload(path, state.selectedFile, {
@@ -792,14 +845,12 @@
         });
 
       if (uploadResult.error) {
-        console.warn('[upload]', uploadResult.error);
-        throw new Error(uploadResult.error.message || 'خطا در آپلود فایل');
+        throw new Error(uploadResult.error.message || 'خطا در آپلود');
       }
 
       if (el.progressFill) el.progressFill.style.width = '70%';
-      if (el.progressText) el.progressText.textContent = 'در حال ذخیره در دیتابیس...';
+      if (el.progressText) el.progressText.textContent = 'در حال ذخیره...';
 
-      /* ۳) ساخت رکورد در exams */
       var dbResult = await sb
         .from('exams')
         .insert({
@@ -814,28 +865,22 @@
         .single();
 
       if (dbResult.error) {
-        /* rollback */
         try { await sb.storage.from(BUCKET).remove([path]); } catch (e) {}
-        console.warn('[insert]', dbResult.error);
-
-        if ((dbResult.error.message || '').indexOf('محدودیت') !== -1) {
-          throw new Error('محدودیت آپلود: حداکثر ۱۰ فایل در ساعت');
-        }
         throw new Error(dbResult.error.message || 'خطا در ذخیره');
       }
 
       if (el.progressFill) el.progressFill.style.width = '100%';
-      if (el.progressText) el.progressText.textContent = '✅ آپلود موفق!';
+      if (el.progressText) el.progressText.textContent = '✅ موفق!';
 
-      toast('✅ آزمون با موفقیت ساخته شد', 'success');
+      toast('✅ آزمون ساخته شد', 'success');
 
-      await sleep(700);
+      await sleep(600);
       closeUpload();
       await loadExams();
       await loadStats();
 
     } catch (err) {
-      console.warn('[upload fatal]', err);
+      console.warn('[upload]', err);
       state.isUploading = false;
 
       if (el.uploadBtn) {
@@ -846,8 +891,7 @@
       }
       if (el.progressBar) el.progressBar.style.display = 'none';
 
-      var msg = err.message || 'خطای غیرمنتظره';
-      toast('❌ ' + msg, 'error', 5000);
+      toast('❌ ' + (err.message || 'خطا'), 'error', 5000);
     }
   }
 
@@ -855,9 +899,12 @@
    * INIT
    * ============================================================ */
   async function init() {
+    console.log('%c🚀 [teacher] شروع پنل معلم', 'color: #6C5CE7; font-size: 16px; font-weight: bold;');
+
     try { state.supabase = getSupabase(); }
     catch (e) {
-      console.error('[teacher]', e);
+      console.error('❌ [teacher] Supabase init failed:', e);
+      showBlocker('Supabase لود نشد', 'اینترنت خود را بررسی کنید.', [{ label: 'تلاش مجدد', onclick: function () { location.reload(); } }]);
       return;
     }
 
@@ -867,41 +914,31 @@
     bindLogout();
     bindUploadEvents();
 
-    /* Auth */
     var auth = await requireTeacher();
     if (!auth) return;
 
     state.user = auth.user;
     state.profile = auth.profile;
 
+    console.log('✅ [teacher] Auth موفق، بارگذاری داده‌ها...');
+
     fillHeader();
 
-    /* Load */
-    await Promise.all([
-      loadStats(),
-      loadExams()
-    ]);
-
-    state.ready = true;
+    await Promise.all([loadStats(), loadExams()]);
 
     try {
-      console.log(
-        '%c👨‍🏫 پنل معلم آماده\n%c' + (state.profile.full_name || 'کاربر'),
-        'color: #6C5CE7; font-size: 14px; font-weight: bold;',
-        'color: #00CEC9; font-size: 12px;'
-      );
+      console.log('%c✅ [teacher] پنل آماده', 'color: #00B894; font-size: 14px; font-weight: bold;');
     } catch (e) {}
   }
 
   /* ============================================================
-   * API عمومی
+   * API
    * ============================================================ */
   window.TeacherPanel = {
     __loaded: true,
-    init: init,
-    logout: logout,
-    toast: toast,
     state: state,
+    toast: toast,
+    logout: logout,
     reload: async function () { await loadExams(); await loadStats(); },
     openUpload: openUpload,
     closeUpload: closeUpload,
