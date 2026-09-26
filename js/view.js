@@ -1,25 +1,22 @@
 /* ============================================================
  * js/view.js
  * ------------------------------------------------------------
- * منطق مشاهده‌ی پاسخ‌های دانش‌آموزان توسط معلم
+ * پنل مشاهده و تحلیل پاسخ‌های دانش‌آموزان
  * طراحی: فاطمه جوادی
  *
- * 🆕 در این نسخه:
- *   • نمایش تاریخ + ساعت + ثانیه‌ی ثبت آزمون
- *   • زمان نسبی («۵ دقیقه پیش»، «دیروز»)
- *   • بج ویژه‌ی تاریخ/ساعت در کارت و جزئیات
- *
- * قابلیت‌ها:
- *   • چک لاگین + نقش معلم
- *   • لود آزمون و پاسخ‌های مربوطه
- *   • لیست دانش‌آموزان با جستجوی زنده
- *   • نمایش جزئیات یک پاسخ
- *   • مرتب‌سازی بر اساس تاریخ / نام
- *   • خروجی CSV (شامل تاریخ و ساعت دقیق)
- *   • Realtime — پاسخ جدید زنده میاد
- *   • Toast + Theme + ریسپانسیو
- *
- * وابستگی: @supabase/supabase-js از CDN
+ * قابلیت‌های کامل:
+ *   • لیست پاسخ‌دهندگان با آواتار و اطلاعات کامل
+ *   • آمار زنده (تعداد، میانگین، سریع‌ترین، کندترین)
+ *   • نمودار ساده‌ی مدت‌های پاسخ‌دهی
+ *   • فیلتر (همه / کامل / ناقص)
+ *   • جستجو در نام، کد، و محتوای پاسخ‌ها
+ *   • مرتب‌سازی (تاریخ، نام، مدت، تعداد پاسخ)
+ *   • جزئیات پاسخ با جدول و نوع هر سؤال
+ *   • دکمه‌ی کپی پاسخ‌ها
+ *   • خروجی CSV + JSON
+ *   • پرینت تمیز
+ *   • Realtime — پاسخ جدید زنده
+ *   • تاریخ و ساعت کامل + زمان نسبی
  * ============================================================ */
 
 (function () {
@@ -60,9 +57,9 @@
     currentId: null,
     view: 'list',
     sort: 'date-desc',
+    filter: 'all',           // all | complete | partial | empty
     query: '',
     channel: null,
-    isRedirecting: false,
     ready: false
   };
 
@@ -76,6 +73,7 @@
       themeBtn:      document.getElementById('themeBtn'),
       logoutBtn:     document.getElementById('logoutBtn'),
       backToList:    document.getElementById('backToList'),
+      refreshBtn:    document.getElementById('refreshBtn'),
 
       userName:      document.getElementById('userName'),
       userAvatar:    document.getElementById('userAvatar'),
@@ -88,20 +86,46 @@
       studentsView:  document.getElementById('studentsView'),
       detailView:    document.getElementById('detailView'),
 
+      /* آمار */
+      statsBar:      document.getElementById('statsBar'),
+      statTotal:     document.getElementById('statTotal'),
+      statAvgTime:   document.getElementById('statAvgTime'),
+      statFastest:   document.getElementById('statFastest'),
+      statSlowest:   document.getElementById('statSlowest'),
+      statAvgAnswers:document.getElementById('statAvgAnswers'),
+
+      /* نمودار */
+      chartWrap:     document.getElementById('chartWrap'),
+      chartBars:     document.getElementById('chartBars'),
+
+      /* نوار ابزار */
       searchInput:   document.getElementById('searchInput'),
       sortSelect:    document.getElementById('sortSelect'),
-      exportBtn:     document.getElementById('exportBtn'),
+      filterSelect:  document.getElementById('filterSelect'),
+      exportCsvBtn:  document.getElementById('exportCsvBtn'),
+      exportJsonBtn: document.getElementById('exportJsonBtn'),
 
+      /* لیست */
       totalCount:    document.getElementById('totalCount'),
+      filteredCount: document.getElementById('filteredCount'),
       submissionsList: document.getElementById('submissionsList'),
 
+      /* جزئیات */
       detailAvatar:  document.getElementById('detailAvatar'),
       detailName:    document.getElementById('detailName'),
       detailMeta:    document.getElementById('detailMeta'),
       detailTime:    document.getElementById('detailTime'),
       detailTimeRelative: document.getElementById('detailTimeRelative'),
+      detailProgress:document.getElementById('detailProgress'),
+      detailProgressText: document.getElementById('detailProgressText'),
       answersList:   document.getElementById('answersList'),
 
+      /* دکمه‌های جزئیات */
+      copyBtn:       document.getElementById('copyBtn'),
+      printBtn:      document.getElementById('printBtn'),
+      detailExportCsv: document.getElementById('detailExportCsv'),
+
+      /* ناوبری */
       prevBtn:       document.getElementById('prevBtn'),
       nextBtn:       document.getElementById('nextBtn'),
       positionText:  document.getElementById('positionText'),
@@ -120,6 +144,8 @@
       .replace(/\d/g, function (d) { return FA[+d]; });
   }
 
+  function pad(n) { return n < 10 ? '0' + n : String(n); }
+
   function escapeHtml(text) {
     if (text === null || text === undefined) return '';
     var div = document.createElement('div');
@@ -135,137 +161,84 @@
     return (parts[0][0] || '') + (parts[parts.length - 1][0] || '');
   }
 
-  /* ============================================================
-   * 🆕 DATE & TIME — نمایش کامل و حرفه‌ای
-   * ============================================================ */
-
-  /**
-   * تاریخ کامل: «۱۴۰۳/۰۷/۰۵»
-   */
+  /* ─── Date & Time ─── */
   function formatDate(iso) {
     if (!iso) return '—';
     try {
       return new Intl.DateTimeFormat('fa-IR', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
+        year: 'numeric', month: '2-digit', day: '2-digit'
       }).format(new Date(iso));
     } catch (e) { return '—'; }
   }
 
-  /**
-   * تاریخ کامل فارسی: «۵ مهر ۱۴۰۳»
-   */
   function formatDateLong(iso) {
     if (!iso) return '—';
     try {
       return new Intl.DateTimeFormat('fa-IR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
+        year: 'numeric', month: 'long', day: 'numeric'
       }).format(new Date(iso));
     } catch (e) { return '—'; }
   }
 
-  /**
-   * ساعت کامل با ثانیه: «۱۰:۳۲:۴۵»
-   */
   function formatTimeWithSeconds(iso) {
     if (!iso) return '—';
     try {
       return new Intl.DateTimeFormat('fa-IR', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
       }).format(new Date(iso));
     } catch (e) { return '—'; }
   }
 
-  /**
-   * 🆕 تاریخ + ساعت + ثانیه کامل
-   * «۱۴۰۳/۰۷/۰۵ ساعت ۱۰:۳۲:۴۵»
-   */
-  function formatDateTimeFull(iso) {
-    if (!iso) return '—';
-    try {
-      var d = new Date(iso);
-      var datePart = new Intl.DateTimeFormat('fa-IR', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-      }).format(d);
-      var timePart = new Intl.DateTimeFormat('fa-IR', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
-      }).format(d);
-      return datePart + ' — ساعت ' + timePart;
-    } catch (e) { return '—'; }
-  }
-
-  /**
-   * 🆕 تاریخ و ساعت به فرمت کوتاه (برای کارت‌ها)
-   * «۱۴۰۳/۰۷/۰۵ — ۱۰:۳۲»
-   */
   function formatDateTime(iso) {
     if (!iso) return '—';
     try {
       var d = new Date(iso);
       var datePart = new Intl.DateTimeFormat('fa-IR', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
+        year: 'numeric', month: '2-digit', day: '2-digit'
       }).format(d);
       var timePart = new Intl.DateTimeFormat('fa-IR', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
+        hour: '2-digit', minute: '2-digit', hour12: false
       }).format(d);
       return datePart + ' — ' + timePart;
     } catch (e) { return '—'; }
   }
 
-  /**
-   * 🆕 زمان نسبی: «۵ دقیقه پیش»، «دیروز»، «همین الان»
-   */
+  function formatDateTimeFull(iso) {
+    if (!iso) return '—';
+    try {
+      var d = new Date(iso);
+      var datePart = new Intl.DateTimeFormat('fa-IR', {
+        year: 'numeric', month: '2-digit', day: '2-digit'
+      }).format(d);
+      var timePart = new Intl.DateTimeFormat('fa-IR', {
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+      }).format(d);
+      return datePart + ' — ساعت ' + timePart;
+    } catch (e) { return '—'; }
+  }
+
   function formatRelativeTime(iso) {
     if (!iso) return '';
-
     try {
-      var now = Date.now();
-      var then = new Date(iso).getTime();
-      var diffSec = Math.floor((now - then) / 1000);
-
-      /* آینده */
+      var diffSec = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
       if (diffSec < 0) return 'به‌زودی';
-
-      /* کمتر از ۳۰ ثانیه */
       if (diffSec < 30) return 'همین الان';
-
-      /* کمتر از ۶۰ ثانیه */
       if (diffSec < 60) return toFa(diffSec) + ' ثانیه پیش';
 
-      /* دقیقه‌ها */
       var diffMin = Math.floor(diffSec / 60);
       if (diffMin < 60) {
         if (diffMin === 1) return 'یک دقیقه پیش';
         if (diffMin === 2) return 'دو دقیقه پیش';
-        if (diffMin < 10) return toFa(diffMin) + ' دقیقه پیش';
         return toFa(diffMin) + ' دقیقه پیش';
       }
 
-      /* ساعت‌ها */
       var diffHour = Math.floor(diffMin / 60);
       if (diffHour < 24) {
         if (diffHour === 1) return 'یک ساعت پیش';
         if (diffHour === 2) return 'دو ساعت پیش';
-        if (diffHour < 10) return toFa(diffHour) + ' ساعت پیش';
         return toFa(diffHour) + ' ساعت پیش';
       }
 
-      /* روزها */
       var diffDay = Math.floor(diffHour / 24);
       if (diffDay === 1) return 'دیروز';
       if (diffDay === 2) return 'پریروز';
@@ -273,20 +246,34 @@
       if (diffDay < 30) return toFa(Math.floor(diffDay / 7)) + ' هفته پیش';
       if (diffDay < 365) return toFa(Math.floor(diffDay / 30)) + ' ماه پیش';
       return toFa(Math.floor(diffDay / 365)) + ' سال پیش';
-
-    } catch (e) {
-      return '';
-    }
+    } catch (e) { return ''; }
   }
 
   function formatDuration(seconds) {
     if (seconds === null || seconds === undefined) return '—';
     var s = parseInt(seconds, 10) || 0;
-    var m = Math.floor(s / 60);
+    if (s === 0) return 'صفر ثانیه';
+
+    var h = Math.floor(s / 3600);
+    var m = Math.floor((s % 3600) / 60);
     var sec = s % 60;
+
+    if (h > 0) {
+      return toFa(h) + ' ساعت' + (m > 0 ? ' و ' + toFa(m) + ' دقیقه' : '');
+    }
     if (m === 0) return toFa(sec) + ' ثانیه';
     if (sec === 0) return toFa(m) + ' دقیقه';
-    return toFa(m) + ':' + (sec < 10 ? '۰' : '') + toFa(sec) + ' دقیقه';
+    return toFa(m) + ' دقیقه و ' + toFa(sec) + ' ثانیه';
+  }
+
+  function formatDurationShort(seconds) {
+    if (seconds === null || seconds === undefined) return '—';
+    var s = parseInt(seconds, 10) || 0;
+    var h = Math.floor(s / 3600);
+    var m = Math.floor((s % 3600) / 60);
+    var sec = s % 60;
+    if (h > 0) return toFa(h) + ':' + pad(m) + ':' + pad(sec);
+    return toFa(m) + ':' + pad(sec);
   }
 
   function sleep(ms) {
@@ -299,6 +286,18 @@
     } catch (e) {
       return { get: function () { return null; } };
     }
+  }
+
+  function getAnswersCount(sub) {
+    if (!sub || !sub.answers || !sub.answers.inputs) return 0;
+    return sub.answers.inputs.filter(function (i) {
+      return i.value !== null && i.value !== undefined && String(i.value).trim() !== '';
+    }).length;
+  }
+
+  function getTotalQuestions(sub) {
+    if (!sub || !sub.answers || !sub.answers.inputs) return 0;
+    return sub.answers.inputs.length;
   }
 
   /* ============================================================
@@ -534,11 +533,14 @@
 
       subs.forEach(function (s) {
         s.profiles = profilesMap[s.student_id] || null;
+        s._answersCount = getAnswersCount(s);
+        s._totalQuestions = getTotalQuestions(s);
       });
 
       state.submissions = subs;
-      state.filtered = subs.slice();
       applySortAndFilter();
+      renderStats();
+      renderChart();
       renderList();
 
     } catch (e) {
@@ -548,21 +550,145 @@
   }
 
   /* ============================================================
+   * STATS
+   * ============================================================ */
+  function computeStats() {
+    var subs = state.submissions;
+    var total = subs.length;
+
+    if (!total) {
+      return {
+        total: 0,
+        avgTime: 0,
+        fastest: 0,
+        slowest: 0,
+        avgAnswers: 0,
+        avgPercent: 0
+      };
+    }
+
+    var durations = subs.map(function (s) { return s.duration_seconds || 0; });
+    var answers = subs.map(function (s) { return s._answersCount; });
+
+    var sumDuration = durations.reduce(function (a, b) { return a + b; }, 0);
+    var sumAnswers = answers.reduce(function (a, b) { return a + b; }, 0);
+
+    var validDurations = durations.filter(function (d) { return d > 0; });
+    var avgTime = validDurations.length ? Math.round(sumDuration / validDurations.length) : 0;
+    var fastest = validDurations.length ? Math.min.apply(null, validDurations) : 0;
+    var slowest = validDurations.length ? Math.max.apply(null, validDurations) : 0;
+
+    var totalQ = subs[0] ? subs[0]._totalQuestions : 0;
+    var avgPercent = totalQ > 0 ? Math.round((sumAnswers / (total * totalQ)) * 100) : 0;
+
+    return {
+      total: total,
+      avgTime: avgTime,
+      fastest: fastest,
+      slowest: slowest,
+      avgAnswers: Math.round(sumAnswers / total * 10) / 10,
+      avgPercent: avgPercent,
+      totalQuestions: totalQ
+    };
+  }
+
+  function renderStats() {
+    var s = computeStats();
+
+    if (el.statTotal) el.statTotal.textContent = toFa(s.total);
+    if (el.statAvgTime) el.statAvgTime.textContent = formatDurationShort(s.avgTime);
+    if (el.statFastest) el.statFastest.textContent = formatDurationShort(s.fastest);
+    if (el.statSlowest) el.statSlowest.textContent = formatDurationShort(s.slowest);
+    if (el.statAvgAnswers) el.statAvgAnswers.textContent = toFa(s.avgAnswers);
+
+    if (el.totalCount) el.totalCount.textContent = toFa(s.total);
+  }
+
+  /* ============================================================
+   * CHART — نمودار ساده بر اساس مدت پاسخ‌دهی
+   * ============================================================ */
+  function renderChart() {
+    if (!el.chartBars || !el.chartWrap) return;
+
+    var subs = state.submissions.slice(0, 12);  /* ۱۲ تای آخر */
+
+    if (!subs.length) {
+      el.chartWrap.style.display = 'none';
+      return;
+    }
+
+    var durations = subs.map(function (s) { return s.duration_seconds || 0; });
+    var maxDuration = Math.max.apply(null, durations.concat([1]));
+
+    var html = '';
+    subs.reverse().forEach(function (s, i) {
+      var d = s.duration_seconds || 0;
+      var pct = maxDuration > 0 ? (d / maxDuration) * 100 : 0;
+      if (pct < 4) pct = 4;
+
+      var name = (s.profiles && s.profiles.full_name) || 'کاربر';
+      var initials = getInitials(name);
+
+      html +=
+        '<div class="chart-bar-item" title="' + escapeHtml(name) + ' — ' + formatDuration(d) + '">' +
+          '<div class="chart-bar-wrap">' +
+            '<div class="chart-bar" style="height:' + pct + '%; animation-delay:' + (i * 0.04).toFixed(2) + 's;"></div>' +
+          '</div>' +
+          '<div class="chart-bar-avatar">' + escapeHtml(initials) + '</div>' +
+        '</div>';
+    });
+
+    el.chartBars.innerHTML = html;
+    el.chartWrap.style.display = 'block';
+  }
+
+  /* ============================================================
    * SORT + FILTER
    * ============================================================ */
   function applySortAndFilter() {
     var list = state.submissions.slice();
 
+    /* فیلتر جستجو */
     if (state.query) {
       var q = state.query.toLowerCase();
       list = list.filter(function (s) {
         var name = (s.profiles && s.profiles.full_name) || '';
         var code = (s.profiles && s.profiles.code) || '';
-        return name.toLowerCase().indexOf(q) !== -1 ||
-               code.indexOf(q) !== -1;
+
+        if (name.toLowerCase().indexOf(q) !== -1) return true;
+        if (code.indexOf(q) !== -1) return true;
+
+        /* جستجو در محتوای پاسخ‌ها */
+        if (s.answers && s.answers.inputs) {
+          for (var i = 0; i < s.answers.inputs.length; i++) {
+            var item = s.answers.inputs[i];
+            var text = String(item.value || '').toLowerCase();
+            if (text.indexOf(q) !== -1) return true;
+            var label = String(item.label || item.name || '').toLowerCase();
+            if (label.indexOf(q) !== -1) return true;
+          }
+        }
+
+        return false;
       });
     }
 
+    /* فیلتر وضعیت */
+    if (state.filter === 'complete') {
+      list = list.filter(function (s) {
+        return s._totalQuestions > 0 && s._answersCount === s._totalQuestions;
+      });
+    } else if (state.filter === 'partial') {
+      list = list.filter(function (s) {
+        return s._answersCount > 0 && s._answersCount < s._totalQuestions;
+      });
+    } else if (state.filter === 'empty') {
+      list = list.filter(function (s) {
+        return s._answersCount === 0;
+      });
+    }
+
+    /* مرتب‌سازی */
     if (state.sort === 'date-desc') {
       list.sort(function (a, b) {
         return new Date(b.submitted_at) - new Date(a.submitted_at);
@@ -581,9 +707,21 @@
       list.sort(function (a, b) {
         return (b.duration_seconds || 0) - (a.duration_seconds || 0);
       });
+    } else if (state.sort === 'duration-asc') {
+      list.sort(function (a, b) {
+        return (a.duration_seconds || 0) - (b.duration_seconds || 0);
+      });
+    } else if (state.sort === 'answers-desc') {
+      list.sort(function (a, b) {
+        return b._answersCount - a._answersCount;
+      });
     }
 
     state.filtered = list;
+
+    if (el.filteredCount) {
+      el.filteredCount.textContent = toFa(list.length);
+    }
   }
 
   /* ============================================================
@@ -595,10 +733,6 @@
     if (el.studentsView) el.studentsView.style.display = 'block';
     if (el.detailView) el.detailView.style.display = 'none';
     state.view = 'list';
-
-    if (el.totalCount) {
-      el.totalCount.textContent = toFa(state.submissions.length);
-    }
 
     if (!state.submissions.length) {
       el.submissionsList.innerHTML =
@@ -627,7 +761,7 @@
             '</svg>' +
           '</div>' +
           '<div class="empty-title">نتیجه‌ای پیدا نشد</div>' +
-          '<div class="empty-text">عبارت دیگه‌ای جستجو کن.</div>' +
+          '<div class="empty-text">فیلتر یا جستجو رو تغییر بده.</div>' +
         '</div>';
       return;
     }
@@ -638,23 +772,34 @@
       var name = profile.full_name || 'دانش‌آموز';
       var code = profile.code || '—';
       var initials = getInitials(name);
-      var answersCount = (s.answers && s.answers.inputs) ? s.answers.inputs.length : 0;
+      var answersCount = s._answersCount;
+      var totalQ = s._totalQuestions;
       var delay = (i * 0.04).toFixed(2) + 's';
 
-      /* 🆕 زمان‌ها */
       var dateStr = formatDate(s.submitted_at);
       var timeStr = formatTimeWithSeconds(s.submitted_at);
       var relative = formatRelativeTime(s.submitted_at);
 
+      /* وضعیت */
+      var status = 'partial';
+      var statusLabel = 'ناقص';
+      if (answersCount === 0) { status = 'empty'; statusLabel = 'بدون پاسخ'; }
+      else if (answersCount === totalQ && totalQ > 0) { status = 'complete'; statusLabel = 'کامل'; }
+
+      /* درصد پیشرفت */
+      var pct = totalQ > 0 ? Math.round((answersCount / totalQ) * 100) : 0;
+
       html +=
-        '<div class="submission-card" data-id="' + s.id + '" style="animation-delay:' + delay + ';">' +
+        '<div class="submission-card status-' + status + '" data-id="' + s.id + '" style="animation-delay:' + delay + ';">' +
           '<div class="submission-avatar">' + escapeHtml(initials) + '</div>' +
           '<div class="submission-info">' +
-            '<div class="submission-name">' + escapeHtml(name) + '</div>' +
+            '<div class="submission-name-row">' +
+              '<div class="submission-name">' + escapeHtml(name) + '</div>' +
+              '<span class="status-badge ' + status + '">' + statusLabel + '</span>' +
+            '</div>' +
             '<div class="submission-meta">' +
               '<span class="submission-code">' + escapeHtml(code) + '</span>' +
             '</div>' +
-            /* 🆕 بلوک تاریخ و ساعت */
             '<div class="submission-time">' +
               '<svg viewBox="0 0 24 24">' +
                 '<rect x="3" y="4" width="18" height="18" rx="2"/>' +
@@ -672,20 +817,21 @@
               (relative ? '<span class="time-relative">(' + escapeHtml(relative) + ')</span>' : '') +
             '</div>' +
           '</div>' +
-          '<div class="submission-stats">' +
-            '<div class="submission-stat">' +
-              '<svg viewBox="0 0 24 24">' +
-                '<polyline points="9 11 12 14 22 4"/>' +
-                '<path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>' +
-              '</svg>' +
-              '<span>' + toFa(answersCount) + ' پاسخ</span>' +
+          '<div class="submission-right">' +
+            '<div class="submission-progress">' +
+              '<div class="submission-progress-bar">' +
+                '<div class="submission-progress-fill" style="width:' + pct + '%"></div>' +
+              '</div>' +
+              '<div class="submission-progress-text">' +
+                '<b>' + toFa(answersCount) + '</b> / ' + toFa(totalQ) + ' پاسخ' +
+              '</div>' +
             '</div>' +
-            '<div class="submission-stat">' +
+            '<div class="submission-stat-mini">' +
               '<svg viewBox="0 0 24 24">' +
                 '<circle cx="12" cy="12" r="10"/>' +
                 '<polyline points="12 6 12 12 16 14"/>' +
               '</svg>' +
-              '<span>' + formatDuration(s.duration_seconds) + '</span>' +
+              '<span>' + formatDurationShort(s.duration_seconds) + '</span>' +
             '</div>' +
           '</div>' +
           '<div class="submission-arrow">' +
@@ -720,7 +866,7 @@
             '</svg>' +
           '</div>' +
           '<div class="empty-title">خطا</div>' +
-          '<div class="empty-text">' + (message || 'دوباره تلاش کن.') + '</div>' +
+          '<div class="empty-text">' + escapeHtml(message || 'دوباره تلاش کن.') + '</div>' +
         '</div>';
     }
   }
@@ -731,25 +877,14 @@
   function showDetail(submissionId) {
     var sub = null;
     for (var i = 0; i < state.filtered.length; i++) {
-      if (state.filtered[i].id === submissionId) {
-        sub = state.filtered[i];
-        break;
-      }
+      if (state.filtered[i].id === submissionId) { sub = state.filtered[i]; break; }
     }
-
     if (!sub) {
       for (var j = 0; j < state.submissions.length; j++) {
-        if (state.submissions[j].id === submissionId) {
-          sub = state.submissions[j];
-          break;
-        }
+        if (state.submissions[j].id === submissionId) { sub = state.submissions[j]; break; }
       }
     }
-
-    if (!sub) {
-      toast('پاسخ پیدا نشد', 'error');
-      return;
-    }
+    if (!sub) { toast('پاسخ پیدا نشد', 'error'); return; }
 
     state.currentId = submissionId;
     state.view = 'detail';
@@ -776,7 +911,7 @@
       el.detailMeta.textContent = parts.join(' • ');
     }
 
-    /* 🆕 بلوک تاریخ و ساعت کامل */
+    /* زمان */
     if (el.detailTime) {
       el.detailTime.innerHTML =
         '<svg viewBox="0 0 24 24">' +
@@ -796,7 +931,28 @@
       el.detailTimeRelative.textContent = rel ? rel : '';
     }
 
-    renderAnswers(sub.answers);
+    /* پیشرفت */
+    if (el.detailProgress && el.detailProgressText) {
+      var ansCount = sub._answersCount;
+      var totalQ = sub._totalQuestions;
+      var pct = totalQ > 0 ? Math.round((ansCount / totalQ) * 100) : 0;
+
+      el.detailProgress.style.width = pct + '%';
+
+      var statusText = '';
+      if (ansCount === 0) statusText = 'بدون پاسخ';
+      else if (ansCount === totalQ) statusText = 'کامل';
+      else statusText = 'ناقص';
+
+      el.detailProgressText.innerHTML =
+        '<b>' + toFa(ansCount) + '</b> از <b>' + toFa(totalQ) + '</b> پاسخ داده شده — ' +
+        '<span class="detail-pct">' + toFa(pct) + '٪</span> — ' +
+        '<span class="detail-status ' + (pct === 100 ? 'ok' : (pct === 0 ? 'empty' : 'partial')) + '">' +
+          statusText +
+        '</span>';
+    }
+
+    renderAnswers(sub.answers, sub);
     updatePosition();
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -860,7 +1016,7 @@
   /* ============================================================
    * RENDER ANSWERS
    * ============================================================ */
-  function renderAnswers(answers) {
+  function renderAnswers(answers, sub) {
     if (!el.answersList) return;
 
     var inputs = (answers && answers.inputs) ? answers.inputs : [];
@@ -897,6 +1053,20 @@
       file: 'فایل'
     };
 
+    var typeIcons = {
+      radio: '🔘',
+      checkbox: '☑️',
+      text: '📝',
+      number: '🔢',
+      email: '📧',
+      tel: '📞',
+      textarea: '📄',
+      select: '📋',
+      url: '🔗',
+      date: '📅',
+      time: '⏰'
+    };
+
     var html = '';
     inputs.forEach(function (item, i) {
       var idx = item.index || (i + 1);
@@ -905,18 +1075,24 @@
       var hasValue = value !== null && value !== undefined && String(value).trim() !== '';
       var label = item.label || item.name || 'سؤال ' + toFa(idx);
       var typeLabel = typeLabels[type] || type;
+      var icon = typeIcons[type] || '📌';
 
       html +=
-        '<div class="answer-item" style="animation-delay:' + (i * 0.03).toFixed(2) + 's;">' +
+        '<div class="answer-item ' + (hasValue ? 'has-value' : 'no-value') + '" style="animation-delay:' + (i * 0.03).toFixed(2) + 's;">' +
           '<div class="answer-head">' +
             '<span class="answer-number">' + toFa(idx) + '</span>' +
             '<div class="answer-label">' +
               '<div class="answer-label-text">' + escapeHtml(label) + '</div>' +
-              '<span class="answer-type">' + escapeHtml(typeLabel) + '</span>' +
+              '<div class="answer-badges">' +
+                '<span class="answer-type">' + escapeHtml(typeLabel) + '</span>' +
+                (hasValue
+                  ? '<span class="answer-badge-ok">پاسخ داده</span>'
+                  : '<span class="answer-badge-empty">بدون پاسخ</span>') +
+              '</div>' +
             '</div>' +
           '</div>' +
           '<div class="answer-value ' + (hasValue ? '' : 'empty') + '">' +
-            (hasValue ? escapeHtml(String(value)) : 'بدون پاسخ') +
+            (hasValue ? escapeHtml(String(value)) : '— بدون پاسخ —') +
           '</div>' +
         '</div>';
     });
@@ -925,29 +1101,94 @@
   }
 
   /* ============================================================
-   * EXPORT CSV — 🆕 با تاریخ و ساعت کامل
+   * COPY ANSWERS
+   * ============================================================ */
+  function copyCurrentAnswers() {
+    var sub = null;
+    for (var i = 0; i < state.submissions.length; i++) {
+      if (state.submissions[i].id === state.currentId) { sub = state.submissions[i]; break; }
+    }
+    if (!sub) { toast('پاسخی پیدا نشد', 'error'); return; }
+
+    var profile = sub.profiles || {};
+    var lines = [];
+
+    lines.push('پاسخ‌های: ' + (profile.full_name || 'دانش‌آموز'));
+    lines.push('کد: ' + (profile.code || '—'));
+    lines.push('تاریخ و ساعت: ' + formatDateTimeFull(sub.submitted_at));
+    lines.push('مدت: ' + formatDuration(sub.duration_seconds));
+    lines.push('━'.repeat(40));
+    lines.push('');
+
+    var inputs = (sub.answers && sub.answers.inputs) || [];
+    inputs.forEach(function (item) {
+      var label = item.label || item.name || ('سؤال ' + item.index);
+      var val = (item.value !== null && item.value !== undefined && String(item.value).trim() !== '')
+        ? String(item.value)
+        : '(بدون پاسخ)';
+      lines.push(item.index + '. ' + label);
+      lines.push('   ← ' + val);
+      lines.push('');
+    });
+
+    var text = lines.join('\n');
+
+    /* کپی در clipboard */
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        toast('📋 پاسخ‌ها کپی شد', 'success');
+      }).catch(function () {
+        fallbackCopy(text);
+      });
+    } else {
+      fallbackCopy(text);
+    }
+  }
+
+  function fallbackCopy(text) {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      toast('📋 پاسخ‌ها کپی شد', 'success');
+    } catch (e) {
+      toast('خطا در کپی', 'error');
+    }
+  }
+
+  /* ============================================================
+   * EXPORT CSV
    * ============================================================ */
   function exportCSV() {
-    if (!state.submissions.length) {
+    if (!state.filtered.length) {
       toast('داده‌ای برای خروجی نیست', 'warn');
       return;
     }
 
-    var rows = [
-      ['ردیف', 'نام دانش‌آموز', 'کد', 'تاریخ ثبت', 'ساعت ثبت', 'مدت (ثانیه)', 'تعداد پاسخ', 'جزئیات پاسخ‌ها']
-    ];
+    /* ستون‌ها از اولین پاسخ */
+    var sample = state.filtered[0];
+    var sampleInputs = (sample.answers && sample.answers.inputs) || [];
 
-    state.submissions.forEach(function (s, i) {
+    /* هدر */
+    var headers = ['ردیف', 'نام دانش‌آموز', 'کد', 'تاریخ', 'ساعت', 'مدت (ثانیه)', 'تعداد پاسخ', 'وضعیت'];
+
+    /* ستون‌های سوالات */
+    sampleInputs.forEach(function (q, i) {
+      var label = q.label || q.name || ('سؤال ' + (i + 1));
+      headers.push(label.slice(0, 100));
+    });
+
+    var rows = [headers];
+
+    state.filtered.forEach(function (s, i) {
       var profile = s.profiles || {};
-      var answers = (s.answers && s.answers.inputs) ? s.answers.inputs : [];
+      var answers = (s.answers && s.answers.inputs) || [];
 
-      var detail = answers.map(function (a) {
-        var label = a.label || a.name || 'سؤال ' + a.index;
-        var value = a.value !== null && a.value !== undefined ? a.value : '—';
-        return '[' + a.index + '] ' + label + ': ' + value;
-      }).join(' | ');
-
-      /* 🆕 تفکیک تاریخ و ساعت */
       var dateStr = '—';
       var timeStr = '—';
       if (s.submitted_at) {
@@ -962,16 +1203,34 @@
         } catch (e) {}
       }
 
-      rows.push([
+      /* وضعیت */
+      var statusText = 'ناقص';
+      if (s._answersCount === 0) statusText = 'بدون پاسخ';
+      else if (s._answersCount === s._totalQuestions) statusText = 'کامل';
+
+      var row = [
         i + 1,
         profile.full_name || '—',
         profile.code || '—',
         dateStr,
         timeStr,
         s.duration_seconds || 0,
-        answers.length,
-        detail
-      ]);
+        s._answersCount,
+        statusText
+      ];
+
+      /* پاسخ هر سوال */
+      sampleInputs.forEach(function (q, qi) {
+        /* پیدا کردن پاسخ متناظر */
+        var matching = null;
+        for (var j = 0; j < answers.length; j++) {
+          if (answers[j].index === q.index) { matching = answers[j]; break; }
+        }
+        var val = matching && matching.value ? String(matching.value) : '—';
+        row.push(val);
+      });
+
+      rows.push(row);
     });
 
     var csv = rows.map(function (r) {
@@ -987,7 +1246,53 @@
       '_' + Date.now() + '.csv';
 
     downloadBlob(blob, filename);
-    toast('✅ فایل CSV دانلود شد', 'success');
+    toast('✅ CSV دانلود شد', 'success');
+  }
+
+  /* ============================================================
+   * EXPORT JSON
+   * ============================================================ */
+  function exportJSON() {
+    if (!state.filtered.length) {
+      toast('داده‌ای برای خروجی نیست', 'warn');
+      return;
+    }
+
+    var data = {
+      exam: {
+        id: state.exam.id,
+        title: state.exam.title,
+        description: state.exam.description,
+        created_at: state.exam.created_at
+      },
+      exported_at: new Date().toISOString(),
+      total: state.filtered.length,
+      submissions: state.filtered.map(function (s) {
+        return {
+          id: s.id,
+          student: {
+            id: s.student_id,
+            code: s.profiles && s.profiles.code,
+            full_name: s.profiles && s.profiles.full_name
+          },
+          submitted_at: s.submitted_at,
+          duration_seconds: s.duration_seconds,
+          answers_count: s._answersCount,
+          total_questions: s._totalQuestions,
+          answers: s.answers
+        };
+      })
+    };
+
+    var json = JSON.stringify(data, null, 2);
+    var blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+
+    var filename = 'پاسخ‌های_' +
+      (state.exam && state.exam.title ? state.exam.title.replace(/[^\u0600-\u06FF\w]/g, '_') : 'آزمون') +
+      '_' + Date.now() + '.json';
+
+    downloadBlob(blob, filename);
+    toast('✅ JSON دانلود شد', 'success');
   }
 
   function escapeCSV(field) {
@@ -1015,6 +1320,13 @@
   }
 
   /* ============================================================
+   * PRINT
+   * ============================================================ */
+  function printCurrent() {
+    window.print();
+  }
+
+  /* ============================================================
    * REALTIME
    * ============================================================ */
   function subscribeRealtime() {
@@ -1037,18 +1349,22 @@
               .maybeSingle();
 
             var full = Object.assign({}, payload.new, {
-              profiles: pr.data || null
+              profiles: pr.data || null,
+              _answersCount: getAnswersCount(payload.new),
+              _totalQuestions: getTotalQuestions(payload.new)
             });
 
             state.submissions.unshift(full);
             applySortAndFilter();
+            renderStats();
+            renderChart();
             if (state.view === 'list') renderList();
 
             var now = formatTimeWithSeconds(new Date().toISOString());
             toast('📬 پاسخ جدید در ساعت ' + now + ' از ' +
                   (pr.data && pr.data.full_name || 'دانش‌آموز'), 'success', 5000);
           } catch (e) {
-            console.warn('[view] realtime insert:', e);
+            console.warn('[view] realtime:', e);
           }
         })
         .subscribe();
@@ -1079,7 +1395,7 @@
           state.query = (val || '').trim();
           applySortAndFilter();
           renderList();
-        }, 200);
+        }, 250);
       });
     }
 
@@ -1091,10 +1407,64 @@
       });
     }
 
-    if (el.exportBtn) el.exportBtn.addEventListener('click', exportCSV);
+    if (el.filterSelect) {
+      el.filterSelect.addEventListener('change', function (e) {
+        state.filter = e.target.value || 'all';
+        applySortAndFilter();
+        renderList();
+      });
+    }
+
+    if (el.exportCsvBtn) el.exportCsvBtn.addEventListener('click', exportCSV);
+    if (el.exportJsonBtn) el.exportJsonBtn.addEventListener('click', exportJSON);
     if (el.backToList) el.backToList.addEventListener('click', backToList);
     if (el.prevBtn) el.prevBtn.addEventListener('click', goPrev);
     if (el.nextBtn) el.nextBtn.addEventListener('click', goNext);
+    if (el.copyBtn) el.copyBtn.addEventListener('click', copyCurrentAnswers);
+    if (el.printBtn) el.printBtn.addEventListener('click', printCurrent);
+
+    if (el.detailExportCsv) {
+      el.detailExportCsv.addEventListener('click', function () {
+        /* خروجی CSV فقط برای این دانش‌آموز */
+        var sub = null;
+        for (var i = 0; i < state.submissions.length; i++) {
+          if (state.submissions[i].id === state.currentId) { sub = state.submissions[i]; break; }
+        }
+        if (!sub) return;
+
+        var profile = sub.profiles || {};
+        var answers = (sub.answers && sub.answers.inputs) || [];
+
+        var headers = ['شماره', 'سؤال', 'نوع', 'پاسخ'];
+        var rows = [headers];
+
+        answers.forEach(function (a) {
+          rows.push([
+            a.index,
+            a.label || a.name || '—',
+            a.type || '—',
+            (a.value !== null && a.value !== undefined && String(a.value).trim() !== '') ? String(a.value) : '—'
+          ]);
+        });
+
+        var csv = rows.map(function (r) {
+          return r.map(escapeCSV).join(',');
+        }).join('\n');
+
+        var blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+        var filename = 'پاسخ_' + (profile.full_name || 'دانش‌آموز').replace(/\s+/g, '_') + '.csv';
+        downloadBlob(blob, filename);
+        toast('✅ CSV دانلود شد', 'success');
+      });
+    }
+
+    if (el.refreshBtn) {
+      el.refreshBtn.addEventListener('click', async function () {
+        toast('🔄 در حال رفرش...', 'info', 1500);
+        await loadSubmissions();
+        toast('✅ رفرش شد', 'success', 1500);
+      });
+    }
 
     document.addEventListener('keydown', function (e) {
       if (state.view === 'detail') {
@@ -1130,7 +1500,6 @@
 
     state.user = auth.user;
     state.profile = auth.profile;
-
     fillHeader();
 
     var params = getQuery();
@@ -1163,7 +1532,7 @@
 
     try {
       console.log(
-        '%c👁 مشاهده‌ی پاسخ‌ها آماده\n%c' + (state.exam.title || 'آزمون'),
+        '%c📊 پنل مشاهده پاسخ‌ها آماده\n%c' + (state.exam.title || 'آزمون'),
         'color: #6C5CE7; font-size: 14px; font-weight: bold;',
         'color: #00CEC9; font-size: 12px;'
       );
@@ -1183,9 +1552,9 @@
     showDetail: showDetail,
     backToList: backToList,
     exportCSV: exportCSV,
-    formatDateTime: formatDateTime,
-    formatDateTimeFull: formatDateTimeFull,
-    formatRelativeTime: formatRelativeTime
+    exportJSON: exportJSON,
+    copyCurrentAnswers: copyCurrentAnswers,
+    printCurrent: printCurrent
   };
 
   if (document.readyState === 'loading') {
